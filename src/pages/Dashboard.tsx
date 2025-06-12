@@ -6,30 +6,30 @@ export default function Dashboard() {
   const stats = [
     {
       title: "Produtos em Estoque",
-      value: "1,234",
+      value: "28",
       icon: Package,
-      change: "+12%",
+      change: "+2",
       changeType: "positive" as const,
     },
     {
       title: "Pedidos Pendentes",
-      value: "56",
+      value: "12",
       icon: ShoppingCart,
-      change: "+5%",
+      change: "+3",
       changeType: "positive" as const,
     },
     {
       title: "Entregas Hoje",
-      value: "23",
+      value: "5",
       icon: Truck,
-      change: "-2%",
-      changeType: "negative" as const,
+      change: "+1",
+      changeType: "positive" as const,
     },
     {
       title: "Alertas",
-      value: "8",
+      value: "3",
       icon: AlertTriangle,
-      change: "+3",
+      change: "estoque baixo",
       changeType: "warning" as const,
     },
   ];
@@ -63,7 +63,7 @@ export default function Dashboard() {
                     : "text-yellow-600"
                 }`}
               >
-                {stat.change} desde o último mês
+                {stat.change} {stat.changeType !== "warning" && "desde ontem"}
               </p>
             </CardContent>
           </Card>
@@ -80,22 +80,29 @@ export default function Dashboard() {
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
                 <div className="flex-1">
-                  <p className="text-sm">Novo pedido recebido #1234</p>
-                  <p className="text-xs text-muted-foreground">Há 5 minutos</p>
+                  <p className="text-sm">Pedido D22 rua: Alface hidroponica - 10 unidades</p>
+                  <p className="text-xs text-muted-foreground">Há 15 minutos</p>
                 </div>
               </div>
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
                 <div className="flex-1">
-                  <p className="text-sm">Entrega concluída #5678</p>
-                  <p className="text-xs text-muted-foreground">Há 15 minutos</p>
+                  <p className="text-sm">Entrega E10: Moranguinho - 4 unidades recebidas</p>
+                  <p className="text-xs text-muted-foreground">Há 25 minutos</p>
                 </div>
               </div>
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></div>
                 <div className="flex-1">
-                  <p className="text-sm">Estoque baixo: Tomates</p>
-                  <p className="text-xs text-muted-foreground">Há 30 minutos</p>
+                  <p className="text-sm">Alerta: Tomate grape baixo estoque</p>
+                  <p className="text-xs text-muted-foreground">Há 45 minutos</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                <div className="flex-1">
+                  <p className="text-sm">Pedido F59: Alho desc 500g - aguardando preço</p>
+                  <p className="text-xs text-muted-foreground">Há 1 hora</p>
                 </div>
               </div>
             </div>
@@ -119,6 +126,10 @@ export default function Dashboard() {
               <div className="flex justify-between items-center">
                 <span className="text-sm">Conectividade</span>
                 <span className="text-sm text-green-600">Excelente</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Produtos Ativos</span>
+                <span className="text-sm text-muted-foreground">28 tipos</span>
               </div>
             </div>
           </CardContent>

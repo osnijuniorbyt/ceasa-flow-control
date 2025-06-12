@@ -7,34 +7,44 @@ import { Truck, Package, Clock, CheckCircle } from "lucide-react";
 export default function Deliveries() {
   const deliveries = [
     {
-      id: "D001",
-      driver: "José Silva",
-      vehicle: "Caminhão - ABC-1234",
-      destination: "Mercado Central",
-      products: "Tomates, Alface (50kg)",
-      status: "Em Trânsito",
-      estimatedTime: "14:30",
-      distance: "15km",
-    },
-    {
-      id: "D002",
-      driver: "Maria Santos",
-      vehicle: "Van - XYZ-5678",
-      destination: "Supermercado Bom Preço",
-      products: "Bananas, Maçãs (30kg)",
+      id: "E10",
+      driver: "João Silva",
+      vehicle: "Fiorino - ABC-1234",
+      destination: "Feira do Produtor",
+      products: "Moranguinho - 4 unidades",
       status: "Entregue",
-      estimatedTime: "13:45",
-      distance: "8km",
+      estimatedTime: "09:30",
+      distance: "3km",
     },
     {
-      id: "D003",
+      id: "F59",
+      driver: "Maria Santos",
+      vehicle: "Kombi - XYZ-5678",
+      destination: "Mercadinho Central",
+      products: "Alho desc 500g - 5 pacotes",
+      status: "Em Trânsito",
+      estimatedTime: "11:15",
+      distance: "2km",
+    },
+    {
+      id: "D22",
       driver: "Carlos Oliveira",
-      vehicle: "Caminhão - DEF-9012",
+      vehicle: "Pick-up - DEF-9012",
       destination: "Quitanda do Bairro",
-      products: "Cenouras, Brócolis (25kg)",
+      products: "Alface hidroponica - 8 unidades",
       status: "Programada",
-      estimatedTime: "16:00",
-      distance: "12km",
+      estimatedTime: "14:00",
+      distance: "1.5km",
+    },
+    {
+      id: "E104",
+      driver: "Ana Costa",
+      vehicle: "Van - GHI-3456",
+      destination: "Restaurante Sabor",
+      products: "Baroa granel - 3kg",
+      status: "Programada",
+      estimatedTime: "15:30",
+      distance: "4km",
     },
   ];
 
@@ -69,9 +79,9 @@ export default function Deliveries() {
             <Truck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">23</div>
+            <div className="text-2xl font-bold">5</div>
             <p className="text-xs text-muted-foreground">
-              15 concluídas
+              2 concluídas
             </p>
           </CardContent>
         </Card>
@@ -84,9 +94,9 @@ export default function Deliveries() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
+            <div className="text-2xl font-bold">1</div>
             <p className="text-xs text-muted-foreground">
-              Saídas ativas
+              Saída ativa
             </p>
           </CardContent>
         </Card>
@@ -99,7 +109,7 @@ export default function Deliveries() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
+            <div className="text-2xl font-bold">2</div>
             <p className="text-xs text-muted-foreground">
               Para hoje
             </p>
@@ -114,7 +124,7 @@ export default function Deliveries() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">45min</div>
+            <div className="text-2xl font-bold">25min</div>
             <p className="text-xs text-muted-foreground">
               Por entrega
             </p>

@@ -8,24 +8,24 @@ export default function Warehouse() {
   const sections = [
     {
       id: "A1",
-      name: "Seção A1 - Frutas",
-      capacity: "80%",
-      products: 45,
+      name: "Seção A1 - Verduras e Legumes",
+      capacity: "75%",
+      products: 12,
       status: "Normal",
     },
     {
       id: "B1", 
-      name: "Seção B1 - Verduras",
-      capacity: "95%",
-      products: 62,
-      status: "Quase Cheio",
+      name: "Seção B1 - Frutas",
+      capacity: "60%",
+      products: 8,
+      status: "Normal",
     },
     {
       id: "C1",
-      name: "Seção C1 - Legumes",
-      capacity: "60%",
-      products: 38,
-      status: "Normal",
+      name: "Seção C1 - Tubérculos",
+      capacity: "85%",
+      products: 8,
+      status: "Quase Cheio",
     },
   ];
 
@@ -47,7 +47,7 @@ export default function Warehouse() {
             <WarehouseIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">78%</div>
+            <div className="text-2xl font-bold">73%</div>
             <p className="text-xs text-muted-foreground">
               Do espaço total utilizado
             </p>
@@ -62,7 +62,7 @@ export default function Warehouse() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">145</div>
+            <div className="text-2xl font-bold">28</div>
             <p className="text-xs text-muted-foreground">
               Tipos diferentes
             </p>
@@ -77,7 +77,7 @@ export default function Warehouse() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2.3x</div>
+            <div className="text-2xl font-bold">1.8x</div>
             <p className="text-xs text-muted-foreground">
               Por semana
             </p>
@@ -92,9 +92,9 @@ export default function Warehouse() {
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
+            <div className="text-2xl font-bold">1</div>
             <p className="text-xs text-muted-foreground">
-              Seções próximas do limite
+              Seção próxima do limite
             </p>
           </CardContent>
         </Card>

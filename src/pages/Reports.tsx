@@ -35,26 +35,26 @@ export default function Reports() {
   const quickStats = [
     {
       title: "Vendas Hoje",
-      value: "R$ 12.450",
-      change: "+8.2%",
+      value: "R$ 540",
+      change: "+12%",
       positive: true,
     },
     {
       title: "Produtos Vendidos",
-      value: "342",
-      change: "+12.5%",
+      value: "18",
+      change: "+3",
       positive: true,
     },
     {
       title: "Margem de Lucro",
-      value: "23.4%",
-      change: "-1.2%",
-      positive: false,
+      value: "28%",
+      change: "+2%",
+      positive: true,
     },
     {
-      title: "Satisfação Clientes",
-      value: "4.8/5",
-      change: "+0.3",
+      title: "Fornecedores Ativos",
+      value: "8",
+      change: "estáveis",
       positive: true,
     },
   ];
