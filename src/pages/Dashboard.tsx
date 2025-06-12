@@ -58,9 +58,9 @@ export default function Dashboard() {
                 className={`text-xs ${
                   stat.changeType === "positive"
                     ? "text-green-600"
-                    : stat.changeType === "negative"
-                    ? "text-red-600"
-                    : "text-yellow-600"
+                    : stat.changeType === "warning"
+                    ? "text-yellow-600"
+                    : "text-red-600"
                 }`}
               >
                 {stat.change} {stat.changeType !== "warning" && "desde ontem"}
