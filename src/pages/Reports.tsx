@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Download, FileText, TrendingUp } from "lucide-react";
+import { BarChart3, Download, FileText, TrendingUp, Package } from "lucide-react";
 
 export default function Reports() {
   const reports = [
