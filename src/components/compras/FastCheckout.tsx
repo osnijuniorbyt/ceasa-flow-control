@@ -1,18 +1,30 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { ShoppingCart, Zap, Check, X } from "lucide-react";
-import { PurchaseProduct } from "@/types/compras";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { FastCheckoutHeader } from "./FastCheckoutHeader";
+import { FastCheckoutBulkControls } from "./FastCheckoutBulkControls";
+import { FastCheckoutProductItem } from "./FastCheckoutProductItem";
+import { FastCheckoutActionButtons } from "./FastCheckoutActionButtons";
+import { FastCheckoutQuickInfo } from "./FastCheckoutQuickInfo";
 
-interface FastCheckoutProduct extends PurchaseProduct {
+interface FastCheckoutProduct {
+  id: string;
+  name: string;
+  category: string;
+  currentStock: number;
   originalStock: number;
+  unit: string;
+  stockLevel: "critical" | "low" | "medium" | "good";
+  suggestedQuantity: number;
   targetQuantity: number;
+  lastSupplier: string;
+  lastPrice: number;
   unitPrice: number;
+  supplierRating: "excellent" | "good" | "warning" | "poor";
+  supplierNote: string;
+  dailySales: number;
+  isSelected: boolean;
   paymentMethod: "BOLETO" | "NOTA FISCAL";
   daysToPayment: number;
 }
@@ -187,185 +199,45 @@ export function FastCheckout() {
     setProducts(products.map(product => ({ ...product, isSelected: false })));
   };
 
-  const getStockIndicator = (level: string) => {
-    switch (level) {
-      case "critical": return "🔴";
-      case "low": return "🟡";
-      default: return "🟢";
-    }
+  const handleClearSelections = () => {
+    setProducts(products.map(p => ({ ...p, isSelected: false })));
   };
 
   return (
     <Card className="w-full max-w-5xl mx-auto">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Zap className="h-6 w-6 text-orange-500" />
-              Checkout Rápido - Compras Diárias
-            </CardTitle>
-            <p className="text-muted-foreground">
-              Interface otimizada para pedidos rápidos com controle de pagamentos integrado
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-muted-foreground">Total Selecionado</p>
-            <p className="text-2xl font-bold text-primary">
-              R$ {totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </p>
-            <p className="text-sm text-muted-foreground">{totalItems} itens</p>
-          </div>
-        </div>
-      </CardHeader>
+      <FastCheckoutHeader 
+        totalValue={totalValue}
+        totalItems={totalItems}
+      />
+      
       <CardContent className="space-y-4">
-        {/* Bulk Controls */}
-        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              checked={allSelected}
-              onCheckedChange={handleSelectAll}
-            />
-            <label className="text-sm font-medium">
-              Selecionar Todos ({products.length} produtos)
-            </label>
-          </div>
-          <Badge variant="outline">
-            {selectedProducts.length} de {products.length} selecionados
-          </Badge>
-        </div>
+        <FastCheckoutBulkControls
+          allSelected={allSelected}
+          selectedCount={selectedProducts.length}
+          totalCount={products.length}
+          onSelectAll={handleSelectAll}
+        />
 
-        {/* Product List */}
         <div className="space-y-3">
           {products.map((product) => (
-            <div
+            <FastCheckoutProductItem
               key={product.id}
-              className={`p-4 border-2 rounded-lg transition-all cursor-pointer ${
-                product.isSelected 
-                  ? 'border-primary bg-primary/5 shadow-sm' 
-                  : 'border-border hover:border-primary/50'
-              }`}
-              onClick={() => handleProductToggle(product.id)}
-              onKeyDown={(e) => handleKeyPress(e, product.id)}
-              tabIndex={0}
-            >
-              <div className="flex items-center gap-4">
-                <Checkbox
-                  checked={product.isSelected}
-                  onCheckedChange={() => handleProductToggle(product.id)}
-                  className="h-6 w-6"
-                />
-                
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
-                  {/* Product Info */}
-                  <div className="md:col-span-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{getStockIndicator(product.stockLevel)}</span>
-                      <h4 className="font-semibold">{product.name}</h4>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Estoque: {product.currentStock}{product.unit} | Vende: {product.dailySales}{product.unit}/dia
-                    </p>
-                  </div>
-                  
-                  {/* Quantity */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">
-                      {product.originalStock}{product.unit} →
-                    </span>
-                    <Input
-                      type="number"
-                      value={product.targetQuantity}
-                      onChange={(e) => handleQuantityChange(product.id, parseInt(e.target.value) || 0)}
-                      className="w-20 h-10 text-center font-semibold"
-                      min="0"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <span className="text-sm">{product.unit}</span>
-                  </div>
-                  
-                  {/* Supplier */}
-                  <div>
-                    <Badge variant="secondary" className="font-medium">
-                      {product.lastSupplier}
-                    </Badge>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {product.supplierNote}
-                    </p>
-                  </div>
-                  
-                  {/* Price */}
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm">R$</span>
-                    <Input
-                      type="number"
-                      value={product.unitPrice.toFixed(2)}
-                      onChange={(e) => handlePriceChange(product.id, parseFloat(e.target.value) || 0)}
-                      className="w-24 h-10 text-center font-semibold"
-                      step="0.01"
-                      min="0"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <span className="text-sm">/{product.unit}</span>
-                  </div>
-                  
-                  {/* Payment Method & Total */}
-                  <div className="text-right">
-                    <Badge className={`${
-                      product.paymentMethod === "BOLETO" 
-                        ? "bg-blue-100 text-blue-800" 
-                        : "bg-green-100 text-green-800"
-                    }`}>
-                      {product.paymentMethod}
-                    </Badge>
-                    <p className="font-bold text-lg mt-1">
-                      R$ {(product.targetQuantity * product.unitPrice).toLocaleString('pt-BR', { 
-                        minimumFractionDigits: 2 
-                      })}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Venc: {product.daysToPayment} dias
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+              product={product}
+              onToggle={handleProductToggle}
+              onQuantityChange={handleQuantityChange}
+              onPriceChange={handlePriceChange}
+              onKeyPress={handleKeyPress}
+            />
           ))}
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-4 pt-4 border-t">
-          <Button
-            onClick={handleConfirmOrders}
-            disabled={selectedProducts.length === 0}
-            className="flex-1 h-14 text-lg font-semibold"
-            size="lg"
-          >
-            <ShoppingCart className="h-5 w-5 mr-2" />
-            Confirmar Pedidos Selecionados ({selectedProducts.length})
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={() => setProducts(products.map(p => ({ ...p, isSelected: false })))}
-            className="h-14 px-8"
-          >
-            <X className="h-4 w-4 mr-2" />
-            Limpar
-          </Button>
-        </div>
+        <FastCheckoutActionButtons
+          selectedCount={selectedProducts.length}
+          onConfirm={handleConfirmOrders}
+          onClear={handleClearSelections}
+        />
 
-        {/* Quick Info */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
-          <div>
-            <span className="font-medium">Atalhos:</span> Space = Selecionar, Enter = Confirmar
-          </div>
-          <div>
-            <span className="font-medium">Fornecedores:</span> {new Set(selectedProducts.map(p => p.lastSupplier)).size} únicos
-          </div>
-          <div>
-            <span className="font-medium">Integração:</span> Controle de pagamentos automático
-          </div>
-        </div>
+        <FastCheckoutQuickInfo selectedProducts={selectedProducts} />
       </CardContent>
     </Card>
   );
