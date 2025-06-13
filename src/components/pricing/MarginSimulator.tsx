@@ -1,19 +1,14 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
 import { 
   Calculator, 
-  TrendingUp, 
-  DollarSign, 
-  Target,
-  BarChart3,
-  RefreshCw
+  BarChart3
 } from "lucide-react";
+import { ProductSelector } from "./ProductSelector";
+import { SimulationControls } from "./SimulationControls";
+import { SimulationResults } from "./SimulationResults";
+import { SimulationSummary } from "./SimulationSummary";
 
 interface SimulationResult {
   newPrice: number;
@@ -107,91 +102,25 @@ export function MarginSimulator() {
             {/* Controls */}
             <div className="space-y-6">
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="product">Produto</Label>
-                  <select 
-                    id="product"
-                    value={selectedProduct}
-                    onChange={(e) => handleProductChange(e.target.value)}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    {products.map(product => (
-                      <option key={product.id} value={product.id}>
-                        {product.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <ProductSelector
+                  products={products}
+                  selectedProduct={selectedProduct}
+                  onProductChange={handleProductChange}
+                />
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="currentPrice">Preço Atual (R$)</Label>
-                    <Input
-                      id="currentPrice"
-                      type="number"
-                      value={currentPrice}
-                      onChange={(e) => setCurrentPrice(parseFloat(e.target.value) || 0)}
-                      step="0.01"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="cost">Custo (R$)</Label>
-                    <Input
-                      id="cost"
-                      type="number"
-                      value={cost}
-                      onChange={(e) => setCost(parseFloat(e.target.value) || 0)}
-                      step="0.01"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="units">Unidades Vendidas (mês)</Label>
-                  <Input
-                    id="units"
-                    type="number"
-                    value={currentUnits}
-                    onChange={(e) => setCurrentUnits(parseInt(e.target.value) || 0)}
-                  />
-                </div>
-
-                <div>
-                  <Label>Novo Preço: R$ {targetPrice[0].toFixed(2)}</Label>
-                  <Slider
-                    value={targetPrice}
-                    onValueChange={setTargetPrice}
-                    max={currentPrice * 2}
-                    min={cost * 1.1}
-                    step={0.05}
-                    className="mt-2"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                    <span>R$ {(cost * 1.1).toFixed(2)}</span>
-                    <span>R$ {(currentPrice * 2).toFixed(2)}</span>
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Elasticidade de Preço: {priceElasticity[0].toFixed(1)}</Label>
-                  <Slider
-                    value={priceElasticity}
-                    onValueChange={setPriceElasticity}
-                    max={2}
-                    min={0.1}
-                    step={0.1}
-                    className="mt-2"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                    <span>Inelástico (0.1)</span>
-                    <span>Muito Elástico (2.0)</span>
-                  </div>
-                </div>
-
-                <Button onClick={resetSimulation} variant="outline" className="w-full">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Resetar Simulação
-                </Button>
+                <SimulationControls
+                  currentPrice={currentPrice}
+                  setCurrentPrice={setCurrentPrice}
+                  cost={cost}
+                  setCost={setCost}
+                  currentUnits={currentUnits}
+                  setCurrentUnits={setCurrentUnits}
+                  targetPrice={targetPrice}
+                  setTargetPrice={setTargetPrice}
+                  priceElasticity={priceElasticity}
+                  setPriceElasticity={setPriceElasticity}
+                  onReset={resetSimulation}
+                />
               </div>
             </div>
 
@@ -202,90 +131,19 @@ export function MarginSimulator() {
                 Resultados da Simulação
               </h3>
 
-              <div className="grid grid-cols-2 gap-4">
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Target className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm font-medium">Margem</span>
-                    </div>
-                    <div className="text-2xl font-bold">
-                      {simulation.margin.toFixed(1)}%
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Atual: {(((currentPrice - cost) / currentPrice) * 100).toFixed(1)}%
-                    </div>
-                  </CardContent>
-                </Card>
+              <SimulationResults 
+                simulation={simulation}
+                currentPrice={currentPrice}
+                cost={cost}
+              />
 
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <DollarSign className="h-4 w-4 text-green-600" />
-                      <span className="text-sm font-medium">Receita</span>
-                    </div>
-                    <div className="text-2xl font-bold">
-                      {simulation.revenueChange >= 0 ? '+' : ''}
-                      {simulation.revenueChange.toFixed(1)}%
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Mudança esperada
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="h-4 w-4 text-purple-600" />
-                      <span className="text-sm font-medium">Volume</span>
-                    </div>
-                    <div className="text-2xl font-bold">
-                      {simulation.unitsSoldChange >= 0 ? '+' : ''}
-                      {simulation.unitsSoldChange.toFixed(1)}%
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Unidades vendidas
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Calculator className="h-4 w-4 text-orange-600" />
-                      <span className="text-sm font-medium">Lucro</span>
-                    </div>
-                    <div className="text-2xl font-bold">
-                      {simulation.totalProfit >= 0 ? '+' : ''}
-                      R$ {simulation.totalProfit.toFixed(0)}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Diferença mensal
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="space-y-3">
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="font-medium text-blue-800 mb-2">Resumo do Cenário</h4>
-                  <div className="space-y-1 text-sm text-blue-700">
-                    <div>• Preço: R$ {currentPrice.toFixed(2)} → R$ {simulation.newPrice.toFixed(2)}</div>
-                    <div>• Margem: {(((currentPrice - cost) / currentPrice) * 100).toFixed(1)}% → {simulation.margin.toFixed(1)}%</div>
-                    <div>• Break-even: {simulation.breakEvenUnits} unidades</div>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button className="flex-1">
-                    Aplicar Novo Preço
-                  </Button>
-                  <Button variant="outline">
-                    Salvar Cenário
-                  </Button>
-                </div>
-              </div>
+              <SimulationSummary
+                currentPrice={currentPrice}
+                newPrice={simulation.newPrice}
+                currentMargin={((currentPrice - cost) / currentPrice) * 100}
+                newMargin={simulation.margin}
+                breakEvenUnits={simulation.breakEvenUnits}
+              />
             </div>
           </div>
         </CardContent>
