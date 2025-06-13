@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MobileLayout } from "@/components/mobile/MobileLayout";
+import { CartProvider } from "@/contexts/CartContext";
 import { useEffect } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -80,29 +81,31 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<MobileLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="compras" element={<Compras />} />
-              <Route path="purchase-orders" element={<PurchaseOrders />} />
-              <Route path="buyer-portal" element={<BuyerPortal />} />
-              <Route path="warehouse" element={<Warehouse />} />
-              <Route path="warehouse/receiving" element={<WarehouseReceiving />} />
-              <Route path="inventory" element={<Inventory />} />
-              <Route path="product-management" element={<ProductManagement />} />
-              <Route path="commercial" element={<Commercial />} />
-              <Route path="pricing" element={<Pricing />} />
-              <Route path="automation-rules" element={<AutomationRules />} />
-              <Route path="deliveries" element={<Deliveries />} />
-              <Route path="reports" element={<Reports />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <CartProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<MobileLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="compras" element={<Compras />} />
+                <Route path="purchase-orders" element={<PurchaseOrders />} />
+                <Route path="buyer-portal" element={<BuyerPortal />} />
+                <Route path="warehouse" element={<Warehouse />} />
+                <Route path="warehouse/receiving" element={<WarehouseReceiving />} />
+                <Route path="inventory" element={<Inventory />} />
+                <Route path="product-management" element={<ProductManagement />} />
+                <Route path="commercial" element={<Commercial />} />
+                <Route path="pricing" element={<Pricing />} />
+                <Route path="automation-rules" element={<AutomationRules />} />
+                <Route path="deliveries" element={<Deliveries />} />
+                <Route path="reports" element={<Reports />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </CartProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

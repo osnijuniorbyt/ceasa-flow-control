@@ -1,7 +1,11 @@
 
+import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { NumberInput } from "@/components/mobile/NumberInput";
+import { Plus, Minus } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 interface FastCheckoutProduct {
   id: string;
@@ -39,12 +43,28 @@ export function FastCheckoutProductItem({
   onPriceChange,
   onKeyPress
 }: FastCheckoutProductItemProps) {
+  const { addItem } = useCart();
+  const [orderQuantity, setOrderQuantity] = useState(1);
+
   const getStockIndicator = (level: string) => {
     switch (level) {
       case "critical": return "🔴";
       case "low": return "🟡";
       default: return "🟢";
     }
+  };
+
+  const handleAddToCart = () => {
+    addItem(product, orderQuantity);
+    setOrderQuantity(1);
+  };
+
+  const handleQuantityIncrement = () => {
+    setOrderQuantity(prev => Math.min(prev + 1, 999));
+  };
+
+  const handleQuantityDecrement = () => {
+    setOrderQuantity(prev => Math.max(prev - 1, 1));
   };
 
   return (
@@ -77,18 +97,18 @@ export function FastCheckoutProductItem({
             </p>
           </div>
           
-          {/* Quantity */}
-          <div className="flex items-center gap-2">
+          {/* Quantity Controls - Desktop */}
+          <div className="hidden md:flex items-center gap-2">
             <span className="text-sm text-muted-foreground">
               {product.originalStock}{product.unit} →
             </span>
-            <Input
-              type="number"
+            <NumberInput
               value={product.targetQuantity}
-              onChange={(e) => onQuantityChange(product.id, parseInt(e.target.value) || 0)}
-              className="w-20 h-10 text-center font-semibold"
-              min="0"
-              onClick={(e) => e.stopPropagation()}
+              onChange={(value) => onQuantityChange(product.id, value)}
+              className="w-20 h-10"
+              min={0}
+              max={999}
+              allowDecimal={false}
             />
             <span className="text-sm">{product.unit}</span>
           </div>
@@ -106,14 +126,13 @@ export function FastCheckoutProductItem({
           {/* Price */}
           <div className="flex items-center gap-1">
             <span className="text-sm">R$</span>
-            <Input
-              type="number"
-              value={product.unitPrice.toFixed(2)}
-              onChange={(e) => onPriceChange(product.id, parseFloat(e.target.value) || 0)}
-              className="w-24 h-10 text-center font-semibold"
-              step="0.01"
-              min="0"
-              onClick={(e) => e.stopPropagation()}
+            <NumberInput
+              value={product.unitPrice}
+              onChange={(value) => onPriceChange(product.id, value)}
+              className="w-24 h-10"
+              min={0}
+              max={9999}
+              allowDecimal={true}
             />
             <span className="text-sm">/{product.unit}</span>
           </div>
@@ -136,6 +155,52 @@ export function FastCheckoutProductItem({
               Venc: {product.daysToPayment} dias
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Add to Cart Section */}
+      <div className="md:hidden mt-4 pt-4 border-t border-border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleQuantityDecrement();
+              }}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <span className="text-lg font-semibold w-12 text-center">
+              {orderQuantity}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleQuantityIncrement();
+              }}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground ml-2">
+              {product.unit}
+            </span>
+          </div>
+
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAddToCart();
+            }}
+            className="flex-shrink-0"
+          >
+            Adicionar R$ {(orderQuantity * product.unitPrice).toLocaleString('pt-BR', { 
+              minimumFractionDigits: 2 
+            })}
+          </Button>
         </div>
       </div>
     </div>
