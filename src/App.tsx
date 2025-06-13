@@ -4,7 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Layout } from "@/components/Layout";
+import { MobileLayout } from "@/components/mobile/MobileLayout";
+import { useEffect } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Compras from "./pages/Compras";
@@ -31,34 +32,80 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="compras" element={<Compras />} />
-            <Route path="purchase-orders" element={<PurchaseOrders />} />
-            <Route path="buyer-portal" element={<BuyerPortal />} />
-            <Route path="warehouse" element={<Warehouse />} />
-            <Route path="warehouse/receiving" element={<WarehouseReceiving />} />
-            <Route path="inventory" element={<Inventory />} />
-            <Route path="product-management" element={<ProductManagement />} />
-            <Route path="commercial" element={<Commercial />} />
-            <Route path="pricing" element={<Pricing />} />
-            <Route path="automation-rules" element={<AutomationRules />} />
-            <Route path="deliveries" element={<Deliveries />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  useEffect(() => {
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+
+    // Add mobile viewport meta tag if not present
+    if (!document.querySelector('meta[name="viewport"]')) {
+      const meta = document.createElement('meta');
+      meta.name = 'viewport';
+      meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+      document.getElementsByTagName('head')[0].appendChild(meta);
+    }
+
+    // Add mobile-specific meta tags
+    const appleMeta = document.createElement('meta');
+    appleMeta.name = 'apple-mobile-web-app-capable';
+    appleMeta.content = 'yes';
+    document.getElementsByTagName('head')[0].appendChild(appleMeta);
+
+    const appleStatusBar = document.createElement('meta');
+    appleStatusBar.name = 'apple-mobile-web-app-status-bar-style';
+    appleStatusBar.content = 'black-translucent';
+    document.getElementsByTagName('head')[0].appendChild(appleStatusBar);
+
+    // Prevent zoom on double tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (event) => {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<MobileLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="compras" element={<Compras />} />
+              <Route path="purchase-orders" element={<PurchaseOrders />} />
+              <Route path="buyer-portal" element={<BuyerPortal />} />
+              <Route path="warehouse" element={<Warehouse />} />
+              <Route path="warehouse/receiving" element={<WarehouseReceiving />} />
+              <Route path="inventory" element={<Inventory />} />
+              <Route path="product-management" element={<ProductManagement />} />
+              <Route path="commercial" element={<Commercial />} />
+              <Route path="pricing" element={<Pricing />} />
+              <Route path="automation-rules" element={<AutomationRules />} />
+              <Route path="deliveries" element={<Deliveries />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
