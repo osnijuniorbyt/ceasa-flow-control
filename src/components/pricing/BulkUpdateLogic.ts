@@ -120,7 +120,6 @@ export function useBulkUpdateLogic() {
             change = (fixedValue / item.currentPrice) * 100;
             break;
           case "csv":
-            // Parse CSV data securely
             const lines = csvData.split('\n').filter(line => line.trim());
             const itemLine = lines.find(line => line.startsWith(item.id));
             if (itemLine) {
@@ -136,7 +135,6 @@ export function useBulkUpdateLogic() {
             break;
         }
         
-        // Validate final price
         if (!validateNumber(newPrice, 0.01, 9999)) {
           return {
             ...item,
@@ -145,8 +143,7 @@ export function useBulkUpdateLogic() {
           };
         }
         
-        // Business rule validation (estimate cost from current margin)
-        const estimatedCost = item.currentPrice * 0.7; // Assume 30% margin
+        const estimatedCost = item.currentPrice * 0.7;
         const validation = validatePricingRule(newPrice, estimatedCost);
         
         let itemValidation: "valid" | "warning" | "error" = "valid";
@@ -157,7 +154,6 @@ export function useBulkUpdateLogic() {
           message = validation.message;
         }
         
-        // Additional validation rules
         if (Math.abs(change) > 20) {
           itemValidation = change > 20 ? "warning" : "error";
           message = `Mudança de ${change.toFixed(1)}% muito ${change > 0 ? 'alta' : 'baixa'}`;
@@ -200,12 +196,10 @@ export function useBulkUpdateLogic() {
     try {
       const selectedItems = filteredItems.filter(item => item.selected);
       
-      // Log all price changes
       selectedItems.forEach(item => {
         logPriceChange(item.id, item.currentPrice, item.newPrice);
       });
 
-      // In production, this would make secure API calls
       toast.success(`${selectedItems.length} preços atualizados com segurança`);
     } catch (error) {
       handleSecureError(error, 'Erro ao confirmar atualizações');

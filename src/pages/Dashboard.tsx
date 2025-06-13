@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, ShoppingCart, Truck, AlertTriangle } from "lucide-react";
 
-export default function Dashboard() {
+const Dashboard = () => {
   const stats = [
     {
       title: "Produtos em Estoque",
@@ -137,4 +137,6 @@ export default function Dashboard() {
       </div>
     </div>
   );
-}
+};
+
+export default Dashboard;
