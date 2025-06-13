@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -10,10 +9,11 @@ import {
   FileSpreadsheet,
   Download
 } from "lucide-react";
+import { UpdateMethod } from "./BulkUpdateTypes";
 
 interface UpdateMethodSelectorProps {
-  updateMethod: "percentage" | "fixed" | "csv";
-  setUpdateMethod: (method: "percentage" | "fixed" | "csv") => void;
+  updateMethod: UpdateMethod;
+  setUpdateMethod: (method: UpdateMethod) => void;
   percentageValue: number;
   setPercentageValue: (value: number) => void;
   fixedValue: number;
