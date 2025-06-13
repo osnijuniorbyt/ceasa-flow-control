@@ -1,23 +1,10 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Calculator, 
-  BarChart3
-} from "lucide-react";
-import { ProductSelector } from "./ProductSelector";
-import { SimulationControls } from "./SimulationControls";
-import { SimulationResults } from "./SimulationResults";
-import { SimulationSummary } from "./SimulationSummary";
-
-interface SimulationResult {
-  newPrice: number;
-  margin: number;
-  revenueChange: number;
-  unitsSoldChange: number;
-  totalProfit: number;
-  breakEvenUnits: number;
-}
+import { Calculator } from "lucide-react";
+import { PricingInputs } from "./PricingInputs";
+import { PricingResults } from "./PricingResults";
+import { calculatePricingSimulation } from "./PricingCalculator";
 
 export function MarginSimulator() {
   const [selectedProduct, setSelectedProduct] = useState("P001");
@@ -34,34 +21,13 @@ export function MarginSimulator() {
     { id: "P004", name: "Batata doce", price: 4.20, cost: 2.80, units: 120 }
   ];
 
-  const calculateSimulation = (): SimulationResult => {
-    const newPrice = targetPrice[0];
-    const priceChangePercent = (newPrice - currentPrice) / currentPrice;
-    const demandChangePercent = -priceElasticity[0] * priceChangePercent;
-    const newUnits = Math.max(0, currentUnits * (1 + demandChangePercent));
-    
-    const margin = ((newPrice - cost) / newPrice) * 100;
-    const currentRevenue = currentPrice * currentUnits;
-    const newRevenue = newPrice * newUnits;
-    const revenueChange = ((newRevenue - currentRevenue) / currentRevenue) * 100;
-    
-    const currentProfit = (currentPrice - cost) * currentUnits;
-    const newProfit = (newPrice - cost) * newUnits;
-    const totalProfit = newProfit - currentProfit;
-    
-    const breakEvenUnits = cost > 0 ? Math.ceil(currentUnits * currentPrice / newPrice) : 0;
-
-    return {
-      newPrice,
-      margin,
-      revenueChange,
-      unitsSoldChange: ((newUnits - currentUnits) / currentUnits) * 100,
-      totalProfit,
-      breakEvenUnits
-    };
-  };
-
-  const simulation = calculateSimulation();
+  const simulation = calculatePricingSimulation({
+    currentPrice,
+    cost,
+    currentUnits,
+    targetPrice: targetPrice[0],
+    priceElasticity: priceElasticity[0]
+  });
 
   const handleProductChange = (productId: string) => {
     const product = products.find(p => p.id === productId);
@@ -99,52 +65,28 @@ export function MarginSimulator() {
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Controls */}
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <ProductSelector
-                  products={products}
-                  selectedProduct={selectedProduct}
-                  onProductChange={handleProductChange}
-                />
+            <PricingInputs
+              products={products}
+              selectedProduct={selectedProduct}
+              currentPrice={currentPrice}
+              cost={cost}
+              currentUnits={currentUnits}
+              targetPrice={targetPrice}
+              priceElasticity={priceElasticity}
+              onProductChange={handleProductChange}
+              setCurrentPrice={setCurrentPrice}
+              setCost={setCost}
+              setCurrentUnits={setCurrentUnits}
+              setTargetPrice={setTargetPrice}
+              setPriceElasticity={setPriceElasticity}
+              onReset={resetSimulation}
+            />
 
-                <SimulationControls
-                  currentPrice={currentPrice}
-                  setCurrentPrice={setCurrentPrice}
-                  cost={cost}
-                  setCost={setCost}
-                  currentUnits={currentUnits}
-                  setCurrentUnits={setCurrentUnits}
-                  targetPrice={targetPrice}
-                  setTargetPrice={setTargetPrice}
-                  priceElasticity={priceElasticity}
-                  setPriceElasticity={setPriceElasticity}
-                  onReset={resetSimulation}
-                />
-              </div>
-            </div>
-
-            {/* Results */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Resultados da Simulação
-              </h3>
-
-              <SimulationResults 
-                simulation={simulation}
-                currentPrice={currentPrice}
-                cost={cost}
-              />
-
-              <SimulationSummary
-                currentPrice={currentPrice}
-                newPrice={simulation.newPrice}
-                currentMargin={((currentPrice - cost) / currentPrice) * 100}
-                newMargin={simulation.margin}
-                breakEvenUnits={simulation.breakEvenUnits}
-              />
-            </div>
+            <PricingResults 
+              simulation={simulation}
+              currentPrice={currentPrice}
+              cost={cost}
+            />
           </div>
         </CardContent>
       </Card>
