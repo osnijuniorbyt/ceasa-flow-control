@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import Compras from "./pages/Compras";
 import PurchaseOrders from "./pages/PurchaseOrders";
 import BuyerPortal from "./pages/BuyerPortal";
 import Warehouse from "./pages/Warehouse";
@@ -39,6 +40,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
+            <Route path="compras" element={<Compras />} />
             <Route path="purchase-orders" element={<PurchaseOrders />} />
             <Route path="buyer-portal" element={<BuyerPortal />} />
             <Route path="warehouse" element={<Warehouse />} />
