@@ -21,6 +21,7 @@ import {
   Settings,
   Truck,
   Brain,
+  DollarSign,
 } from "lucide-react";
 
 const menuItems = [
@@ -53,6 +54,11 @@ const menuItems = [
     title: "Central Comercial IA",
     url: "/commercial",
     icon: Brain,
+  },
+  {
+    title: "Gestão de Preços",
+    url: "/pricing",
+    icon: DollarSign,
   },
   {
     title: "Entregas",
