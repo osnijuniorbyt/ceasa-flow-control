@@ -1,10 +1,18 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Download, FileText, TrendingUp, Package } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BarChart3, Download, FileText, TrendingUp, Package, Users, Brain } from "lucide-react";
+import { ProductPerformance } from "@/components/reports/ProductPerformance";
+import { CategoryBreakdown } from "@/components/reports/CategoryBreakdown";
+import { SupplierScorecard } from "@/components/reports/SupplierScorecard";
+import { ExecutiveSummary } from "@/components/reports/ExecutiveSummary";
 
 export default function Reports() {
+  const [activeTab, setActiveTab] = useState("executive");
+
   const reports = [
     {
       id: "R001",
@@ -35,19 +43,19 @@ export default function Reports() {
   const quickStats = [
     {
       title: "Vendas Hoje",
-      value: "R$ 540",
+      value: "R$ 1.840",
       change: "+12%",
       positive: true,
     },
     {
       title: "Produtos Vendidos",
-      value: "18",
-      change: "+3",
+      value: "156",
+      change: "+8",
       positive: true,
     },
     {
       title: "Margem de Lucro",
-      value: "28%",
+      value: "40%",
       change: "+2%",
       positive: true,
     },
@@ -61,11 +69,23 @@ export default function Reports() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Relatórios</h2>
-        <p className="text-muted-foreground">
-          Análises e relatórios do sistema
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Relatórios</h2>
+          <p className="text-muted-foreground">
+            Análises completas e insights de IA do sistema CEASA
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Exportar Relatório
+          </Button>
+          <Button>
+            <Brain className="h-4 w-4 mr-2" />
+            Gerar Insights IA
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
@@ -86,6 +106,31 @@ export default function Reports() {
           </Card>
         ))}
       </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="executive">Resumo Executivo</TabsTrigger>
+          <TabsTrigger value="products">Performance Produtos</TabsTrigger>
+          <TabsTrigger value="categories">Análise Categorias</TabsTrigger>
+          <TabsTrigger value="suppliers">Scorecard Fornecedores</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="executive" className="space-y-4">
+          <ExecutiveSummary />
+        </TabsContent>
+
+        <TabsContent value="products" className="space-y-4">
+          <ProductPerformance />
+        </TabsContent>
+
+        <TabsContent value="categories" className="space-y-4">
+          <CategoryBreakdown />
+        </TabsContent>
+
+        <TabsContent value="suppliers" className="space-y-4">
+          <SupplierScorecard />
+        </TabsContent>
+      </Tabs>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
@@ -151,17 +196,17 @@ export default function Reports() {
                   Relatório de Estoque
                 </Button>
                 <Button variant="outline" className="justify-start">
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  Análise de Performance
+                  <Users className="h-4 w-4 mr-2" />
+                  Análise de Fornecedores
                 </Button>
                 <Button variant="outline" className="justify-start">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Relatório Financeiro
+                  <Brain className="h-4 w-4 mr-2" />
+                  Insights de IA
                 </Button>
               </div>
               
               <div className="pt-4 border-t">
-                <h4 className="font-medium mb-2">Relatórios Personalizados</h4>
+                <h4 className="font-medium mb-2">Relatórios Avançados</h4>
                 <Button variant="outline" className="w-full">
                   Criar Relatório Personalizado
                 </Button>
