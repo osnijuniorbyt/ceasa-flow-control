@@ -149,7 +149,7 @@ export function QuickPricingTable() {
             <CardTitle className="flex items-center gap-2">
               <RefreshCw className="h-5 w-5" />
               Atualização Rápida de Preços
-              <Shield className="h-4 w-4 text-green-600" title="Sistema Seguro" />
+              <Shield className="h-4 w-4 text-green-600" />
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
               Ajuste preços rapidamente com validação e segurança integradas

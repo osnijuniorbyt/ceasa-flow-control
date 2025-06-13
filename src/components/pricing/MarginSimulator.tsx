@@ -159,7 +159,7 @@ export function MarginSimulator() {
           <CardTitle className="flex items-center gap-2">
             <Calculator className="h-5 w-5" />
             Simulador de Margem e Impacto
-            <Shield className="h-4 w-4 text-green-600" title="Sistema Seguro" />
+            <Shield className="h-4 w-4 text-green-600" />
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Simule mudanças de preço com validação de segurança integrada

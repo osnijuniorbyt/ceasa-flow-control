@@ -246,7 +246,7 @@ export function BulkPriceUpdater() {
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
             Atualização em Lote de Preços
-            <Shield className="h-4 w-4 text-green-600" title="Sistema Seguro" />
+            <Shield className="h-4 w-4 text-green-600" />
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Atualize múltiplos preços com validação de segurança e auditoria integradas
