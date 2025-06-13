@@ -2,42 +2,12 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { 
-  Package, 
-  Search, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  AlertTriangle,
-  TrendingUp,
-  TrendingDown 
-} from "lucide-react";
-
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  currentStock: number;
-  unit: string;
-  minStock: number;
-  maxStock: number;
-  pricePerUnit: number;
-  supplier: string;
-  location: string;
-  lastRestocked: string;
-  status: "normal" | "low" | "critical" | "overstock";
-}
+import { Plus } from "lucide-react";
+import { Product, ProductCategory } from "@/types/product";
+import { filterProducts } from "@/utils/productUtils";
+import ProductStatsCards from "@/components/product-management/ProductStatsCards";
+import ProductFilters from "@/components/product-management/ProductFilters";
+import ProductTable from "@/components/product-management/ProductTable";
 
 export default function ProductManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -158,36 +128,9 @@ export default function ProductManagement() {
     }
   ];
 
-  const categories = ["all", "Verduras", "Frutas", "Legumes", "Tubérculos", "Temperos"];
+  const categories: ProductCategory[] = ["all", "Verduras", "Frutas", "Legumes", "Tubérculos", "Temperos"];
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "critical":
-        return <Badge className="bg-red-100 text-red-800">Crítico</Badge>;
-      case "low":
-        return <Badge className="bg-yellow-100 text-yellow-800">Baixo</Badge>;
-      case "overstock":
-        return <Badge className="bg-blue-100 text-blue-800">Excesso</Badge>;
-      default:
-        return <Badge className="bg-green-100 text-green-800">Normal</Badge>;
-    }
-  };
-
-  const getStockIcon = (current: number, min: number, max: number) => {
-    if (current <= min * 0.5) return <TrendingDown className="h-4 w-4 text-red-500" />;
-    if (current >= max * 0.9) return <TrendingUp className="h-4 w-4 text-blue-500" />;
-    return null;
-  };
-
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  const totalValue = products.reduce((sum, product) => sum + (product.currentStock * product.pricePerUnit), 0);
-  const criticalProducts = products.filter(p => p.status === "critical").length;
-  const lowStockProducts = products.filter(p => p.status === "low").length;
+  const filteredProducts = filterProducts(products, searchTerm, selectedCategory);
 
   return (
     <div className="space-y-6">
@@ -204,132 +147,23 @@ export default function ProductManagement() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Produtos</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{products.length}</div>
-            <p className="text-xs text-muted-foreground">Produtos cadastrados</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ {totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-            <p className="text-xs text-muted-foreground">Em estoque</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Estoque Crítico</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{criticalProducts}</div>
-            <p className="text-xs text-muted-foreground">Produtos em falta</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Estoque Baixo</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{lowStockProducts}</div>
-            <p className="text-xs text-muted-foreground">Necessita reposição</p>
-          </CardContent>
-        </Card>
-      </div>
+      <ProductStatsCards products={products} />
 
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Lista de Produtos</CardTitle>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Search className="h-4 w-4" />
-                <Input
-                  placeholder="Buscar produtos..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-64"
-                />
-              </div>
-              <select 
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                {categories.map(category => (
-                  <option key={category} value={category}>
-                    {category === "all" ? "Todas as categorias" : category}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <ProductFilters
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              categories={categories}
+            />
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Produto</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Estoque</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Preço/Unidade</TableHead>
-                <TableHead>Fornecedor</TableHead>
-                <TableHead>Localização</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredProducts.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      {getStockIcon(product.currentStock, product.minStock, product.maxStock)}
-                      {product.name}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{product.category}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{product.currentStock} {product.unit}</div>
-                      <div className="text-xs text-muted-foreground">
-                        Min: {product.minStock} | Max: {product.maxStock}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(product.status)}</TableCell>
-                  <TableCell>R$ {product.pricePerUnit.toFixed(2)}</TableCell>
-                  <TableCell className="text-sm">{product.supplier}</TableCell>
-                  <TableCell>{product.location}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <ProductTable products={filteredProducts} />
         </CardContent>
       </Card>
     </div>
