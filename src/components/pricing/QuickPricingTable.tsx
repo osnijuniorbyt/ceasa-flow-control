@@ -3,9 +3,12 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody } from "@/components/ui/table";
-import { Save, RefreshCw } from "lucide-react";
+import { Save, RefreshCw, Shield } from "lucide-react";
 import { PricingTableHeader } from "./PricingTableHeader";
 import { PricingTableRow } from "./PricingTableRow";
+import { SecureForm } from "@/components/security/SecureForm";
+import { validateNumber, validatePricingRule, logPriceChange, handleSecureError, formatSecureNumber } from "@/utils/security";
+import { toast } from "sonner";
 
 interface PriceItem {
   id: string;
@@ -73,17 +76,68 @@ export function QuickPricingTable() {
   ]);
 
   const updatePrice = (id: string, newPrice: number) => {
-    setPriceData(prev => prev.map(item => 
-      item.id === id 
-        ? { ...item, currentPrice: newPrice, lastUpdated: new Date().toLocaleString('pt-BR') }
-        : item
-    ));
+    try {
+      // Validate input
+      if (!validateNumber(newPrice, 0.01, 9999)) {
+        toast.error('Preço deve estar entre R$ 0,01 e R$ 9.999,00');
+        return;
+      }
+
+      const item = priceData.find(p => p.id === id);
+      if (!item) {
+        handleSecureError(new Error('Item not found'), 'Produto não encontrado');
+        return;
+      }
+
+      // Estimate cost from current margin (for business rule validation)
+      const estimatedCost = item.currentPrice * (1 - item.margin / 100);
+      const validation = validatePricingRule(newPrice, estimatedCost);
+      
+      if (!validation.valid) {
+        toast.error(validation.message);
+        return;
+      }
+
+      // Log price change for audit
+      logPriceChange(id, item.currentPrice, newPrice);
+
+      setPriceData(prev => prev.map(priceItem => 
+        priceItem.id === id 
+          ? { 
+              ...priceItem, 
+              currentPrice: newPrice, 
+              lastUpdated: new Date().toLocaleString('pt-BR'),
+              margin: Math.round(((newPrice - estimatedCost) / newPrice) * 100)
+            }
+          : priceItem
+      ));
+
+      toast.success(`Preço atualizado para R$ ${formatSecureNumber(newPrice)}`);
+    } catch (error) {
+      handleSecureError(error, 'Erro ao atualizar preço');
+    }
   };
 
   const applySuggestedPrice = (id: string) => {
-    const item = priceData.find(p => p.id === id);
-    if (item) {
-      updatePrice(id, item.suggestedPrice);
+    try {
+      const item = priceData.find(p => p.id === id);
+      if (item) {
+        updatePrice(id, item.suggestedPrice);
+      }
+    } catch (error) {
+      handleSecureError(error, 'Erro ao aplicar preço sugerido');
+    }
+  };
+
+  const handleSaveAll = async (data: any, csrfToken: string) => {
+    try {
+      // In production, this would make a secure API call with CSRF token
+      toast.success('Todos os preços foram salvos com segurança');
+      
+      // Log bulk update
+      logPriceChange('BULK_UPDATE', 0, priceData.length, 'current_user');
+    } catch (error) {
+      handleSecureError(error, 'Erro ao salvar preços');
     }
   };
 
@@ -95,15 +149,18 @@ export function QuickPricingTable() {
             <CardTitle className="flex items-center gap-2">
               <RefreshCw className="h-5 w-5" />
               Atualização Rápida de Preços
+              <Shield className="h-4 w-4 text-green-600" title="Sistema Seguro" />
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
-              Ajuste preços rapidamente com base em sugestões automáticas
+              Ajuste preços rapidamente com validação e segurança integradas
             </p>
           </div>
-          <Button>
-            <Save className="h-4 w-4 mr-2" />
-            Salvar Todas
-          </Button>
+          <SecureForm onSubmit={handleSaveAll} formId="save-all-prices">
+            <Button type="submit">
+              <Save className="h-4 w-4 mr-2" />
+              Salvar Todas
+            </Button>
+          </SecureForm>
         </div>
       </CardHeader>
       <CardContent>

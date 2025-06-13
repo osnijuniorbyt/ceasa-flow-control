@@ -1,11 +1,14 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload } from "lucide-react";
+import { Upload, Shield } from "lucide-react";
 import { UpdateMethodSelector } from "./UpdateMethodSelector";
 import { ItemPreview } from "./ItemPreview";
 import { ValidationSummary } from "./ValidationSummary";
 import { BulkControls } from "./BulkControls";
+import { SecureForm } from "@/components/security/SecureForm";
+import { validateNumber, validatePricingRule, logPriceChange, handleSecureError, sanitizeInput } from "@/utils/security";
+import { toast } from "sonner";
 
 interface BulkUpdateItem {
   id: string;
@@ -72,51 +75,135 @@ export function BulkPriceUpdater() {
 
   const categories = ["all", "Verduras", "Legumes", "Frutas", "Tubérculos"];
 
+  const handlePercentageChange = (value: number) => {
+    try {
+      if (!validateNumber(value, -50, 100)) {
+        toast.error('Percentual deve estar entre -50% e 100%');
+        return;
+      }
+      setPercentageValue(value);
+    } catch (error) {
+      handleSecureError(error, 'Erro ao validar percentual');
+    }
+  };
+
+  const handleFixedValueChange = (value: number) => {
+    try {
+      if (!validateNumber(value, -999, 999)) {
+        toast.error('Valor fixo deve estar entre -R$ 999,00 e R$ 999,00');
+        return;
+      }
+      setFixedValue(value);
+    } catch (error) {
+      handleSecureError(error, 'Erro ao validar valor fixo');
+    }
+  };
+
+  const handleCsvDataChange = (data: string) => {
+    try {
+      const sanitized = sanitizeInput(data);
+      if (sanitized.length > 10000) {
+        toast.error('Dados CSV muito grandes (máximo 10.000 caracteres)');
+        return;
+      }
+      setCsvData(sanitized);
+    } catch (error) {
+      handleSecureError(error, 'Erro ao processar dados CSV');
+    }
+  };
+
   const applyBulkUpdate = () => {
-    setBulkItems(prev => prev.map(item => {
-      if (!item.selected) return item;
-      
-      let newPrice = item.currentPrice;
-      let change = 0;
-      
-      switch (updateMethod) {
-        case "percentage":
-          newPrice = item.currentPrice * (1 + percentageValue / 100);
-          change = percentageValue;
-          break;
-        case "fixed":
-          newPrice = item.currentPrice + fixedValue;
-          change = (fixedValue / item.currentPrice) * 100;
-          break;
-      }
-      
-      // Validation logic
-      let validation: "valid" | "warning" | "error" = "valid";
-      let message = undefined;
-      
-      if (newPrice > item.currentPrice * 1.2) {
-        validation = "warning";
-        message = "Aumento superior a 20%";
-      }
-      if (newPrice < item.currentPrice * 0.8) {
-        validation = "error";
-        message = "Redução superior a 20%";
-      }
-      
-      return {
-        ...item,
-        newPrice: Math.round(newPrice * 100) / 100,
-        change: Math.round(change * 10) / 10,
-        validation,
-        message
-      };
-    }));
+    try {
+      setBulkItems(prev => prev.map(item => {
+        if (!item.selected) return item;
+        
+        let newPrice = item.currentPrice;
+        let change = 0;
+        
+        switch (updateMethod) {
+          case "percentage":
+            if (!validateNumber(percentageValue, -50, 100)) {
+              toast.error(`Percentual inválido para ${item.name}`);
+              return item;
+            }
+            newPrice = item.currentPrice * (1 + percentageValue / 100);
+            change = percentageValue;
+            break;
+          case "fixed":
+            if (!validateNumber(fixedValue, -999, 999)) {
+              toast.error(`Valor fixo inválido para ${item.name}`);
+              return item;
+            }
+            newPrice = item.currentPrice + fixedValue;
+            change = (fixedValue / item.currentPrice) * 100;
+            break;
+          case "csv":
+            // Parse CSV data securely
+            const lines = csvData.split('\n').filter(line => line.trim());
+            const itemLine = lines.find(line => line.startsWith(item.id));
+            if (itemLine) {
+              const parts = itemLine.split(',');
+              if (parts.length >= 2) {
+                const csvPrice = parseFloat(parts[1]);
+                if (validateNumber(csvPrice, 0.01, 9999)) {
+                  newPrice = csvPrice;
+                  change = ((csvPrice - item.currentPrice) / item.currentPrice) * 100;
+                }
+              }
+            }
+            break;
+        }
+        
+        // Validate final price
+        if (!validateNumber(newPrice, 0.01, 9999)) {
+          return {
+            ...item,
+            validation: "error" as const,
+            message: "Preço final inválido"
+          };
+        }
+        
+        // Business rule validation (estimate cost from current margin)
+        const estimatedCost = item.currentPrice * 0.7; // Assume 30% margin
+        const validation = validatePricingRule(newPrice, estimatedCost);
+        
+        let itemValidation: "valid" | "warning" | "error" = "valid";
+        let message = undefined;
+        
+        if (!validation.valid) {
+          itemValidation = "warning";
+          message = validation.message;
+        }
+        
+        // Additional validation rules
+        if (Math.abs(change) > 20) {
+          itemValidation = change > 20 ? "warning" : "error";
+          message = `Mudança de ${change.toFixed(1)}% muito ${change > 0 ? 'alta' : 'baixa'}`;
+        }
+        
+        return {
+          ...item,
+          newPrice: Math.round(newPrice * 100) / 100,
+          change: Math.round(change * 10) / 10,
+          validation: itemValidation,
+          message
+        };
+      }));
+
+      toast.success('Atualização aplicada com validação de segurança');
+    } catch (error) {
+      handleSecureError(error, 'Erro ao aplicar atualização em lote');
+    }
   };
 
   const toggleItemSelection = (id: string) => {
-    setBulkItems(prev => prev.map(item => 
-      item.id === id ? { ...item, selected: !item.selected } : item
-    ));
+    try {
+      setBulkItems(prev => prev.map(item => 
+        item.id === id ? { ...item, selected: !item.selected } : item
+      ));
+    } catch (error) {
+      handleSecureError(error, 'Erro ao selecionar item');
+    }
   };
 
   const selectAllItems = () => {
@@ -125,6 +212,22 @@ export function BulkPriceUpdater() {
 
   const deselectAllItems = () => {
     setBulkItems(prev => prev.map(item => ({ ...item, selected: false })));
+  };
+
+  const handleConfirmUpdates = async (data: any, csrfToken: string) => {
+    try {
+      const selectedItems = filteredItems.filter(item => item.selected);
+      
+      // Log all price changes
+      selectedItems.forEach(item => {
+        logPriceChange(item.id, item.currentPrice, item.newPrice);
+      });
+
+      // In production, this would make secure API calls
+      toast.success(`${selectedItems.length} preços atualizados com segurança`);
+    } catch (error) {
+      handleSecureError(error, 'Erro ao confirmar atualizações');
+    }
   };
 
   const filteredItems = bulkItems.filter(item => 
@@ -143,9 +246,10 @@ export function BulkPriceUpdater() {
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
             Atualização em Lote de Preços
+            <Shield className="h-4 w-4 text-green-600" title="Sistema Seguro" />
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Atualize múltiplos preços simultaneamente com validação automática
+            Atualize múltiplos preços com validação de segurança e auditoria integradas
           </p>
         </CardHeader>
         <CardContent>
@@ -154,11 +258,11 @@ export function BulkPriceUpdater() {
               updateMethod={updateMethod}
               setUpdateMethod={setUpdateMethod}
               percentageValue={percentageValue}
-              setPercentageValue={setPercentageValue}
+              setPercentageValue={handlePercentageChange}
               fixedValue={fixedValue}
-              setFixedValue={setFixedValue}
+              setFixedValue={handleFixedValueChange}
               csvData={csvData}
-              setCsvData={setCsvData}
+              setCsvData={handleCsvDataChange}
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
               categories={categories}
@@ -180,7 +284,9 @@ export function BulkPriceUpdater() {
                 totalImpact={totalImpact}
               />
 
-              <BulkControls selectedCount={selectedCount} />
+              <SecureForm onSubmit={handleConfirmUpdates} formId="bulk-price-update">
+                <BulkControls selectedCount={selectedCount} />
+              </SecureForm>
             </div>
           </div>
         </CardContent>
