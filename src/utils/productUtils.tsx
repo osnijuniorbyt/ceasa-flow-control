@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Product } from "@/types/product";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown } from "lucide-react";
