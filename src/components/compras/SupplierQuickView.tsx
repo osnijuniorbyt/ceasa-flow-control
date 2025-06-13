@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,12 @@ export function SupplierQuickView() {
       contact: "(11) 99999-1234",
       notes: "Sempre pontual, produtos frescos",
       totalOrders: 45,
-      onTimeDelivery: 98
+      onTimeDelivery: 98,
+      paymentMethod: "NOTA FISCAL",
+      paymentStatus: "PAGO",
+      outstandingAmount: 0,
+      lastPaymentDate: "2024-01-14",
+      nextDueDate: "2024-01-28"
     },
     {
       id: "S002",
@@ -33,7 +37,12 @@ export function SupplierQuickView() {
       contact: "(11) 98888-5678",
       notes: "Melhor qualidade de morangos",
       totalOrders: 38,
-      onTimeDelivery: 95
+      onTimeDelivery: 95,
+      paymentMethod: "BOLETO",
+      paymentStatus: "PENDENTE",
+      outstandingAmount: 850.00,
+      lastPaymentDate: "2024-01-10",
+      nextDueDate: "2024-01-18"
     },
     {
       id: "S003",
@@ -47,7 +56,12 @@ export function SupplierQuickView() {
       contact: "(11) 97777-9012",
       notes: "Preços competitivos, qualidade variável",
       totalOrders: 22,
-      onTimeDelivery: 75
+      onTimeDelivery: 75,
+      paymentMethod: "BOLETO",
+      paymentStatus: "VENCIDO",
+      outstandingAmount: 1250.00,
+      lastPaymentDate: "2024-01-05",
+      nextDueDate: "2024-01-12"
     },
     {
       id: "S004",
@@ -61,7 +75,12 @@ export function SupplierQuickView() {
       contact: "(11) 96666-3456",
       notes: "Especialista em batatas e mandioca",
       totalOrders: 31,
-      onTimeDelivery: 90
+      onTimeDelivery: 90,
+      paymentMethod: "NOTA FISCAL",
+      paymentStatus: "PENDENTE",
+      outstandingAmount: 620.00,
+      lastPaymentDate: "2024-01-08",
+      nextDueDate: "2024-01-19"
     }
   ];
 
