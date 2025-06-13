@@ -22,7 +22,7 @@ import {
   Truck,
   Brain,
   DollarSign,
-  ShoppingBag,
+  CreditCard,
 } from "lucide-react";
 
 const menuItems = [
@@ -32,9 +32,9 @@ const menuItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Compras",
+    title: "Controle de Pagamentos",
     url: "/compras",
-    icon: ShoppingBag,
+    icon: CreditCard,
   },
   {
     title: "Pedidos de Compra",
