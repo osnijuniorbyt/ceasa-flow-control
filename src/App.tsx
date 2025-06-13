@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import PurchaseOrders from "./pages/PurchaseOrders";
 import BuyerPortal from "./pages/BuyerPortal";
 import Warehouse from "./pages/Warehouse";
+import WarehouseReceiving from "./pages/WarehouseReceiving";
 import Inventory from "./pages/Inventory";
 import ProductManagement from "./pages/ProductManagement";
 import Commercial from "./pages/Commercial";
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="purchase-orders" element={<PurchaseOrders />} />
             <Route path="buyer-portal" element={<BuyerPortal />} />
             <Route path="warehouse" element={<Warehouse />} />
+            <Route path="warehouse/receiving" element={<WarehouseReceiving />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="product-management" element={<ProductManagement />} />
             <Route path="commercial" element={<Commercial />} />

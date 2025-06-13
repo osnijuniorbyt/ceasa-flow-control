@@ -2,7 +2,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Warehouse as WarehouseIcon, Package, TrendingUp, AlertTriangle } from "lucide-react";
+import { Warehouse as WarehouseIcon, Package, TrendingUp, AlertTriangle, Scale } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Warehouse() {
   const sections = [
@@ -31,11 +32,19 @@ export default function Warehouse() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Depósito</h2>
-        <p className="text-muted-foreground">
-          Controle do espaço físico e organização do depósito
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Depósito</h2>
+          <p className="text-muted-foreground">
+            Controle do espaço físico e organização do depósito
+          </p>
+        </div>
+        <Link to="/warehouse/receiving">
+          <Button className="flex items-center gap-2">
+            <Scale className="h-4 w-4" />
+            Recebimento
+          </Button>
+        </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
