@@ -134,8 +134,8 @@ export function QuickPricingTable() {
       // In production, this would make a secure API call with CSRF token
       toast.success('Todos os preços foram salvos com segurança');
       
-      // Log bulk update
-      logPriceChange('BULK_UPDATE', 0, priceData.length, 'current_user');
+      // Log bulk update - fix the call to use only 3 arguments
+      logPriceChange('BULK_UPDATE', 0, priceData.length);
     } catch (error) {
       handleSecureError(error, 'Erro ao salvar preços');
     }

@@ -45,3 +45,10 @@ export const sanitizeInput = (input: string): string => {
               .replace(/javascript:/gi, '')
               .replace(/on\w+="[^"]*"/gi, '');
 };
+
+export const formatSecureNumber = (value: number): string => {
+  return value.toLocaleString('pt-BR', { 
+    minimumFractionDigits: 2, 
+    maximumFractionDigits: 2 
+  });
+};
