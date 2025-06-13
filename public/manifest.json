@@ -1,8 +1,8 @@
 
 {
-  "name": "CEASA Mobile - Sistema de Controle",
-  "short_name": "CEASA Mobile",
-  "description": "Sistema móvel de controle de fluxo para CEASA",
+  "name": "HORTECH Mobile - Sistema de Controle",
+  "short_name": "HORTECH Mobile",
+  "description": "Sistema móvel de controle de fluxo para HORTECH",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -24,7 +24,7 @@ export function MobileHeader({ onMenuClick, isOnline }: MobileHeaderProps) {
         <div className="flex items-center gap-3">
           <Package className="h-8 w-8 text-primary" />
           <div className="flex flex-col">
-            <span className="font-bold text-lg">CEASA</span>
+            <span className="font-bold text-lg">HORTECH</span>
             <span className="text-xs text-muted-foreground">Mobile</span>
           </div>
         </div>
