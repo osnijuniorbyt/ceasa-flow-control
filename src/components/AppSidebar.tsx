@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -23,6 +22,7 @@ import {
   Brain,
   DollarSign,
   CreditCard,
+  Zap,
 } from "lucide-react";
 
 const menuItems = [
@@ -37,9 +37,9 @@ const menuItems = [
     icon: CreditCard,
   },
   {
-    title: "Pedidos de Compra",
+    title: "Compras Rápidas",
     url: "/purchase-orders",
-    icon: ShoppingCart,
+    icon: Zap,
   },
   {
     title: "Portal do Comprador",
