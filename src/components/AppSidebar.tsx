@@ -20,6 +20,7 @@ import {
   BarChart3,
   Settings,
   Truck,
+  Brain,
 } from "lucide-react";
 
 const menuItems = [
@@ -47,6 +48,11 @@ const menuItems = [
     title: "Inventário",
     url: "/inventory",
     icon: Package,
+  },
+  {
+    title: "Central Comercial IA",
+    url: "/commercial",
+    icon: Brain,
   },
   {
     title: "Entregas",
