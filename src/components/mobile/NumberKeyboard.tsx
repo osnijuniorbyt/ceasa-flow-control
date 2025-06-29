@@ -22,23 +22,30 @@ export function NumberKeyboard({
   max = 9999
 }: NumberKeyboardProps) {
   const handleNumberPress = (num: string) => {
+    // Se o valor atual é "0" e o número não é decimal, substitui
     if (value === "0" && num !== ".") {
       onChange(num);
-    } else if (value.length < 6) {
+    } else if (value.length < 8) { // Aumentei o limite para comportar valores maiores
       onChange(value + num);
     }
   };
 
   const handleDecimalPress = () => {
-    if (allowDecimal && !value.includes(".") && value !== "") {
-      onChange(value + ".");
+    if (allowDecimal && !value.includes(".")) {
+      // Se não há valor, começa com "0."
+      if (value === "" || value === "0") {
+        onChange("0.");
+      } else {
+        onChange(value + ".");
+      }
     }
   };
 
   const handleBackspace = () => {
-    if (value.length > 0) {
-      const newValue = value.slice(0, -1);
-      onChange(newValue || "0");
+    if (value.length > 1) {
+      onChange(value.slice(0, -1));
+    } else {
+      onChange("0");
     }
   };
 

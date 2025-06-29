@@ -26,16 +26,19 @@ export function NumberInput({
   disabled = false
 }: NumberInputProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [tempValue, setTempValue] = useState(value.toString());
+  const [tempValue, setTempValue] = useState("");
 
   const handleOpenKeyboard = () => {
     if (!disabled) {
-      setTempValue(value.toString());
+      // Converte o valor atual para string para o teclado
+      const stringValue = value === 0 ? "0" : value.toString();
+      setTempValue(stringValue);
       setIsOpen(true);
     }
   };
 
   const handleConfirm = () => {
+    // Converte o valor temporário para número
     const numValue = parseFloat(tempValue) || 0;
     const clampedValue = Math.max(min, Math.min(max, numValue));
     onChange(clampedValue);
@@ -43,11 +46,17 @@ export function NumberInput({
   };
 
   const handleCancel = () => {
-    setTempValue(value.toString());
+    // Reset o valor temporário para o valor atual
+    const stringValue = value === 0 ? "0" : value.toString();
+    setTempValue(stringValue);
     setIsOpen(false);
   };
 
-  const displayValue = value === 0 ? "" : value.toString();
+  // Formata o valor para exibição
+  const displayValue = value === 0 ? "" : 
+    allowDecimal ? 
+      value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) :
+      value.toString();
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

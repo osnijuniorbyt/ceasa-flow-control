@@ -44,7 +44,7 @@ export function FastCheckoutProductItem({
   onKeyPress
 }: FastCheckoutProductItemProps) {
   const { addItem } = useCart();
-  const [orderQuantity, setOrderQuantity] = useState(1);
+  const [cartQuantity, setCartQuantity] = useState(1);
 
   const getStockIndicator = (level: string) => {
     switch (level) {
@@ -55,16 +55,24 @@ export function FastCheckoutProductItem({
   };
 
   const handleAddToCart = () => {
-    addItem(product, orderQuantity);
-    setOrderQuantity(1);
+    addItem(product, cartQuantity);
+    setCartQuantity(1);
   };
 
-  const handleQuantityIncrement = () => {
-    setOrderQuantity(prev => Math.min(prev + 1, 999));
+  const handleCartQuantityIncrement = () => {
+    setCartQuantity(prev => Math.min(prev + 1, 999));
   };
 
-  const handleQuantityDecrement = () => {
-    setOrderQuantity(prev => Math.max(prev - 1, 1));
+  const handleCartQuantityDecrement = () => {
+    setCartQuantity(prev => Math.max(prev - 1, 1));
+  };
+
+  const handleTargetQuantityChange = (newQuantity: number) => {
+    onQuantityChange(product.id, newQuantity);
+  };
+
+  const handleUnitPriceChange = (newPrice: number) => {
+    onPriceChange(product.id, newPrice);
   };
 
   return (
@@ -118,7 +126,7 @@ export function FastCheckoutProductItem({
             <label className="text-xs text-muted-foreground mb-1 block">Quantidade</label>
             <NumberInput
               value={product.targetQuantity}
-              onChange={(value) => onQuantityChange(product.id, value)}
+              onChange={handleTargetQuantityChange}
               className="w-full h-12"
               min={0}
               max={999}
@@ -130,7 +138,7 @@ export function FastCheckoutProductItem({
             <label className="text-xs text-muted-foreground mb-1 block">Preço/{product.unit}</label>
             <NumberInput
               value={product.unitPrice}
-              onChange={(value) => onPriceChange(product.id, value)}
+              onChange={handleUnitPriceChange}
               className="w-full h-12"
               min={0}
               max={9999}
@@ -159,21 +167,21 @@ export function FastCheckoutProductItem({
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleQuantityDecrement();
+                  handleCartQuantityDecrement();
                 }}
                 className="h-8 w-8 p-0"
               >
                 <Minus className="h-3 w-3" />
               </Button>
               <span className="text-sm font-semibold w-8 text-center">
-                {orderQuantity}
+                {cartQuantity}
               </span>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleQuantityIncrement();
+                  handleCartQuantityIncrement();
                 }}
                 className="h-8 w-8 p-0"
               >
@@ -190,7 +198,7 @@ export function FastCheckoutProductItem({
               className="h-10"
             >
               <ShoppingCart className="h-4 w-4 mr-1" />
-              R$ {(orderQuantity * product.unitPrice).toLocaleString('pt-BR', { 
+              R$ {(cartQuantity * product.unitPrice).toLocaleString('pt-BR', { 
                 minimumFractionDigits: 2 
               })}
             </Button>
