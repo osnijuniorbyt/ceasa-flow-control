@@ -27,21 +27,17 @@ export function NumberInput({
 }: NumberInputProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tempValue, setTempValue] = useState("");
-  const [isConfirming, setIsConfirming] = useState(false);
 
   const handleOpenKeyboard = () => {
     if (!disabled) {
       // Inicializa o valor temporário com o valor atual formatado corretamente
       const stringValue = value > 0 ? value.toString().replace('.', ',') : "";
       setTempValue(stringValue);
-      setIsConfirming(false);
       setIsOpen(true);
     }
   };
 
   const handleConfirm = () => {
-    setIsConfirming(true);
-    
     // Converte vírgula para ponto para parseFloat
     const normalizedValue = tempValue.replace(',', '.');
     const numValue = parseFloat(normalizedValue) || 0;
@@ -52,26 +48,11 @@ export function NumberInput({
     
     // Fecha o diálogo
     setIsOpen(false);
-    setIsConfirming(false);
   };
 
   const handleCancel = () => {
-    if (!isConfirming) {
-      // Restaura o valor original sem aplicar mudanças
-      const stringValue = value > 0 ? value.toString().replace('.', ',') : "";
-      setTempValue(stringValue);
-    }
+    // Fecha o diálogo sem aplicar mudanças
     setIsOpen(false);
-    setIsConfirming(false);
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    if (!open && !isConfirming) {
-      // Só cancela se não estamos no processo de confirmação
-      handleCancel();
-    } else if (open) {
-      setIsOpen(true);
-    }
   };
 
   // Formata o valor para exibição no input
@@ -81,7 +62,7 @@ export function NumberInput({
       value.toString();
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Input
           value={displayValue}
