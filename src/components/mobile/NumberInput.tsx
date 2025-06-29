@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { NumberKeyboard } from "./NumberKeyboard";
 
 interface NumberInputProps {
@@ -93,7 +93,11 @@ export function NumberInput({
           disabled={disabled}
         />
       </DialogTrigger>
-      <DialogContent className="p-0 max-w-sm">
+      <DialogContent className="p-0 max-w-sm" aria-describedby="number-keyboard-description">
+        <DialogTitle className="sr-only">Teclado Numérico</DialogTitle>
+        <div id="number-keyboard-description" className="sr-only">
+          Use o teclado numérico para inserir valores
+        </div>
         <NumberKeyboard
           value={tempValue}
           onChange={setTempValue}
