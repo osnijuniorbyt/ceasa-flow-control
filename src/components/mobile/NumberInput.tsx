@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { NumberKeyboard } from "./NumberKeyboard";
@@ -28,10 +28,21 @@ export function NumberInput({
   const [isOpen, setIsOpen] = useState(false);
   const [tempValue, setTempValue] = useState("");
 
+  // Debug logging for dialog state changes
+  useEffect(() => {
+    console.log('Dialog state:', { isOpen, tempValue });
+  }, [isOpen, tempValue]);
+
+  // Debug logging to check for unnecessary re-renders
+  useEffect(() => {
+    console.log('NumberInput re-rendered with props:', { value, disabled });
+  });
+
   const handleOpenKeyboard = () => {
     if (!disabled) {
       // Inicializa o valor temporário com o valor atual formatado corretamente
       const stringValue = value > 0 ? value.toString().replace('.', ',') : "";
+      console.log('Opening keyboard with value:', stringValue);
       setTempValue(stringValue);
       setIsOpen(true);
     }
@@ -45,16 +56,19 @@ export function NumberInput({
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Mouse down event triggered');
     handleOpenKeyboard();
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Touch start event triggered');
     handleOpenKeyboard();
   };
 
   const handleConfirm = () => {
+    console.log('Confirming value:', tempValue);
     // Converte vírgula para ponto para parseFloat
     const normalizedValue = tempValue.replace(',', '.');
     const numValue = parseFloat(normalizedValue) || 0;
@@ -68,6 +82,7 @@ export function NumberInput({
   };
 
   const handleCancel = () => {
+    console.log('Cancelling keyboard input');
     // Fecha o diálogo sem aplicar mudanças
     setIsOpen(false);
   };
@@ -81,7 +96,10 @@ export function NumberInput({
   return (
     <Dialog 
       open={isOpen} 
-      onOpenChange={setIsOpen}
+      onOpenChange={(open) => {
+        console.log('Dialog onOpenChange called with:', open);
+        setIsOpen(open);
+      }}
     >
       <DialogTrigger asChild>
         <Input
@@ -100,8 +118,14 @@ export function NumberInput({
       <DialogContent 
         className="p-0 max-w-sm" 
         aria-describedby="number-keyboard-description"
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onInteractOutside={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => {
+          console.log('Pointer down outside detected');
+          e.preventDefault();
+        }}
+        onInteractOutside={(e) => {
+          console.log('Interact outside detected');
+          e.preventDefault();
+        }}
       >
         <DialogTitle className="sr-only">Teclado Numérico</DialogTitle>
         <div id="number-keyboard-description" className="sr-only">
@@ -109,7 +133,10 @@ export function NumberInput({
         </div>
         <NumberKeyboard
           value={tempValue}
-          onChange={setTempValue}
+          onChange={(newValue) => {
+            console.log('Keyboard value changed to:', newValue);
+            setTempValue(newValue);
+          }}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           allowDecimal={allowDecimal}
