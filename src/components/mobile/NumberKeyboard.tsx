@@ -1,222 +1,172 @@
 
-import { Button } from "@/components/ui/button";
-import { Minus, Plus, Delete, Check, X } from "lucide-react";
+import React, { useState, useRef, useCallback } from 'react';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface NumberKeyboardProps {
+  isOpen: boolean;
+  onClose: () => void;
   value: string;
   onChange: (value: string) => void;
   onConfirm: () => void;
-  onCancel: () => void;
-  allowDecimal?: boolean;
-  min?: number;
-  max?: number;
+  label?: string;
+  unit?: string;
+  allowDecimals?: boolean;
 }
 
 export function NumberKeyboard({
+  isOpen,
+  onClose,
   value,
   onChange,
   onConfirm,
-  onCancel,
-  allowDecimal = true,
-  min = 0,
-  max = 9999
+  label = 'Digite o valor',
+  unit = '',
+  allowDecimals = true
 }: NumberKeyboardProps) {
-  const handleNumberPress = (num: string) => {
-    // Se o valor atual é vazio ou "0", substitui pelo número
-    if (value === "" || value === "0") {
-      onChange(num);
-    } else if (value.length < 8) {
-      onChange(value + num);
-    }
-  };
+  const lastActionTime = useRef(0);
+  const DEBOUNCE_DELAY = 150; // milliseconds
 
-  const handleDecimalPress = () => {
-    if (allowDecimal && !value.includes(",")) {
-      // Se não há valor ou é zero, começa com "0,"
-      if (value === "" || value === "0") {
-        onChange("0,");
-      } else {
-        onChange(value + ",");
-      }
-    }
+  // Debounced action handler
+  const handleAction = useCallback((action: () => void) => {
+    const now = Date.now();
+    if (now - lastActionTime.current < DEBOUNCE_DELAY) return;
+    
+    lastActionTime.current = now;
+    action();
+  }, []);
+
+  const handleNumber = (num: string) => {
+    handleAction(() => {
+      onChange(value + num);
+    });
   };
 
   const handleBackspace = () => {
-    if (value.length > 1) {
+    handleAction(() => {
       onChange(value.slice(0, -1));
-    } else {
-      onChange("");
-    }
+    });
   };
 
   const handleClear = () => {
-    onChange("");
+    handleAction(() => {
+      onChange('');
+    });
   };
 
-  const handleIncrement = () => {
-    const normalizedValue = value.replace(',', '.');
-    const numValue = parseFloat(normalizedValue) || 0;
-    const increment = allowDecimal ? 0.5 : 1;
-    const newValue = Math.min(numValue + increment, max);
-    const stringValue = newValue.toString().replace('.', ',');
-    onChange(stringValue);
-  };
-
-  const handleDecrement = () => {
-    const normalizedValue = value.replace(',', '.');
-    const numValue = parseFloat(normalizedValue) || 0;
-    const decrement = allowDecimal ? 0.5 : 1;
-    const newValue = Math.max(numValue - decrement, min);
-    const stringValue = newValue.toString().replace('.', ',');
-    onChange(stringValue);
-  };
-
-  // Wrapper functions for mouse and touch events
-  const wrapEventHandler = (handler: () => void) => {
-    return {
-      onMouseDown: (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        handler();
-      },
-      onTouchStart: (e: React.TouchEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        handler();
+  const handleDecimal = () => {
+    handleAction(() => {
+      if (!value.includes(',')) {
+        onChange(value + ',');
       }
-    };
+    });
   };
 
-  const numberButtons = [
-    ['1', '2', '3'],
-    ['4', '5', '6'],
-    ['7', '8', '9'],
-  ];
+  const handleConfirmClick = () => {
+    handleAction(() => {
+      onConfirm();
+    });
+  };
 
-  // Formata o valor para exibição (mostra 0 se vazio)
-  const displayValue = value === "" ? "0" : value;
+  const handleCancelClick = () => {
+    handleAction(() => {
+      onClose();
+    });
+  };
 
   return (
-    <div className="bg-background border rounded-lg p-3 shadow-lg w-full max-w-sm mx-auto select-none">
-      {/* Display */}
-      <div className="mb-3 p-3 bg-muted rounded-lg">
-        <div className="text-xl font-bold text-center font-mono">
-          {displayValue}
+    <Dialog open={isOpen} onOpenChange={() => {}}>
+      <DialogContent 
+        className="max-w-sm p-0"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
+        <DialogTitle className="sr-only">{label}</DialogTitle>
+        
+        <div className="p-4">
+          {/* Display */}
+          <div className="mb-4 text-center">
+            <p className="text-sm text-muted-foreground">{label}</p>
+            <p className="text-3xl font-bold mt-2">
+              {value || '0'} {unit}
+            </p>
+          </div>
+
+          {/* Number Grid */}
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+              <Button
+                key={num}
+                type="button"
+                variant="outline"
+                className="h-14 text-lg font-semibold"
+                onClick={() => handleNumber(num.toString())}
+              >
+                {num}
+              </Button>
+            ))}
+            
+            {allowDecimals ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="h-14 text-lg"
+                onClick={handleDecimal}
+              >
+                ,
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                className="h-14 text-lg"
+                onClick={handleClear}
+              >
+                C
+              </Button>
+            )}
+            
+            <Button
+              type="button"
+              variant="outline"
+              className="h-14 text-lg font-semibold"
+              onClick={() => handleNumber('0')}
+            >
+              0
+            </Button>
+            
+            <Button
+              type="button"
+              variant="outline"
+              className="h-14 text-lg"
+              onClick={handleBackspace}
+            >
+              ←
+            </Button>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-12"
+              onClick={handleCancelClick}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              className="h-12"
+              onClick={handleConfirmClick}
+            >
+              OK
+            </Button>
+          </div>
         </div>
-      </div>
-
-      {/* Quick adjust buttons */}
-      <div className="flex gap-2 mb-3">
-        <Button
-          variant="outline"
-          size="sm"
-          {...wrapEventHandler(handleDecrement)}
-          className="flex-1 h-10 text-sm"
-          style={{ touchAction: 'manipulation' }}
-        >
-          <Minus className="h-3 w-3 mr-1" />
-          {allowDecimal ? "0,5" : "1"}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          {...wrapEventHandler(handleIncrement)}
-          className="flex-1 h-10 text-sm"
-          style={{ touchAction: 'manipulation' }}
-        >
-          <Plus className="h-3 w-3 mr-1" />
-          {allowDecimal ? "0,5" : "1"}
-        </Button>
-      </div>
-
-      {/* Number grid */}
-      <div className="grid grid-cols-3 gap-2 mb-3">
-        {numberButtons.flat().map((num) => (
-          <Button
-            key={num}
-            variant="outline"
-            className="h-12 text-lg font-semibold touch-manipulation"
-            {...wrapEventHandler(() => handleNumberPress(num))}
-            style={{ touchAction: 'manipulation' }}
-          >
-            {num}
-          </Button>
-        ))}
-      </div>
-
-      {/* Bottom row */}
-      <div className="grid grid-cols-3 gap-2 mb-3">
-        <Button
-          variant="outline"
-          className="h-12 text-base font-semibold"
-          {...wrapEventHandler(handleClear)}
-          style={{ touchAction: 'manipulation' }}
-        >
-          Limpar
-        </Button>
-        <Button
-          variant="outline"
-          className="h-12 text-lg font-semibold"
-          {...wrapEventHandler(() => handleNumberPress("0"))}
-          style={{ touchAction: 'manipulation' }}
-        >
-          0
-        </Button>
-        {allowDecimal ? (
-          <Button
-            variant="outline"
-            className="h-12 text-lg font-semibold"
-            {...wrapEventHandler(handleDecimalPress)}
-            style={{ touchAction: 'manipulation' }}
-          >
-            ,
-          </Button>
-        ) : (
-          <Button
-            variant="outline"
-            className="h-12"
-            {...wrapEventHandler(handleBackspace)}
-            style={{ touchAction: 'manipulation' }}
-          >
-            <Delete className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-
-      {allowDecimal && (
-        <div className="mb-3">
-          <Button
-            variant="outline"
-            className="w-full h-10 text-sm"
-            {...wrapEventHandler(handleBackspace)}
-            style={{ touchAction: 'manipulation' }}
-          >
-            <Delete className="h-3 w-3 mr-1" />
-            Apagar
-          </Button>
-        </div>
-      )}
-
-      {/* Action buttons */}
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          {...wrapEventHandler(onCancel)}
-          className="flex-1 h-12"
-          style={{ touchAction: 'manipulation' }}
-        >
-          <X className="h-4 w-4 mr-1" />
-          Cancelar
-        </Button>
-        <Button
-          {...wrapEventHandler(onConfirm)}
-          className="flex-1 h-12"
-          style={{ touchAction: 'manipulation' }}
-        >
-          <Check className="h-4 w-4 mr-1" />
-          OK
-        </Button>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

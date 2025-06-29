@@ -1,7 +1,6 @@
 
 import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { NumberKeyboard } from "./NumberKeyboard";
 
 interface NumberInputProps {
@@ -13,6 +12,8 @@ interface NumberInputProps {
   max?: number;
   className?: string;
   disabled?: boolean;
+  label?: string;
+  unit?: string;
 }
 
 export function NumberInput({
@@ -23,7 +24,9 @@ export function NumberInput({
   min = 0,
   max = 9999,
   className,
-  disabled = false
+  disabled = false,
+  label = "Digite o valor",
+  unit = ""
 }: NumberInputProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tempValue, setTempValue] = useState("");
@@ -45,61 +48,44 @@ export function NumberInput({
     setIsOpen(false);
   }, [tempValue, min, max, onChange]);
 
-  const handleCancel = useCallback(() => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
-  }, []);
-
-  const handleOpenChange = useCallback((open: boolean) => {
-    setIsOpen(open);
   }, []);
 
   const handleValueChange = useCallback((newValue: string) => {
     setTempValue(newValue);
   }, []);
 
-  // Formata o valor para exibição no input
+  // Format value for display in input
   const displayValue = value === 0 ? "" : 
     allowDecimal ? 
       value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) :
       value.toString();
 
   return (
-    <Dialog 
-      open={isOpen} 
-      onOpenChange={handleOpenChange}
-    >
-      <DialogTrigger asChild>
-        <Input
-          type="text"
-          inputMode="none"
-          readOnly
-          value={displayValue}
-          placeholder={placeholder}
-          onClick={handleOpenKeyboard}
-          className={`text-center font-semibold cursor-pointer select-none ${className}`}
-          disabled={disabled}
-          style={{ fontSize: '16px' }}
-        />
-      </DialogTrigger>
-      <DialogContent 
-        className="p-0 max-w-sm" 
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onInteractOutside={(e) => e.preventDefault()}
-      >
-        <DialogTitle className="sr-only">Teclado Numérico</DialogTitle>
-        <DialogDescription className="sr-only">
-          Use o teclado numérico para inserir valores. Pressione OK para confirmar ou Cancelar para descartar as alterações.
-        </DialogDescription>
-        <NumberKeyboard
-          value={tempValue}
-          onChange={handleValueChange}
-          onConfirm={handleConfirm}
-          onCancel={handleCancel}
-          allowDecimal={allowDecimal}
-          min={min}
-          max={max}
-        />
-      </DialogContent>
-    </Dialog>
+    <>
+      <Input
+        type="text"
+        inputMode="none"
+        readOnly
+        value={displayValue}
+        placeholder={placeholder}
+        onClick={handleOpenKeyboard}
+        className={`text-center font-semibold cursor-pointer select-none ${className}`}
+        disabled={disabled}
+        style={{ fontSize: '16px' }}
+      />
+      
+      <NumberKeyboard
+        isOpen={isOpen}
+        onClose={handleClose}
+        value={tempValue}
+        onChange={handleValueChange}
+        onConfirm={handleConfirm}
+        label={label}
+        unit={unit}
+        allowDecimals={allowDecimal}
+      />
+    </>
   );
 }
