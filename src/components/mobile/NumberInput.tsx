@@ -30,36 +30,48 @@ export function NumberInput({
 
   const handleOpenKeyboard = () => {
     if (!disabled) {
-      // Converte o valor atual para string para o teclado
-      const stringValue = value === 0 ? "0" : value.toString();
+      // Inicializa o valor temporário com o valor atual formatado corretamente
+      const stringValue = value > 0 ? value.toString().replace('.', ',') : "";
       setTempValue(stringValue);
       setIsOpen(true);
     }
   };
 
   const handleConfirm = () => {
-    // Converte o valor temporário para número
-    const numValue = parseFloat(tempValue) || 0;
+    // Converte vírgula para ponto para parseFloat
+    const normalizedValue = tempValue.replace(',', '.');
+    const numValue = parseFloat(normalizedValue) || 0;
     const clampedValue = Math.max(min, Math.min(max, numValue));
+    
+    // Aplica a mudança
     onChange(clampedValue);
+    
+    // Fecha o diálogo de forma controlada
     setIsOpen(false);
   };
 
   const handleCancel = () => {
-    // Reset o valor temporário para o valor atual
-    const stringValue = value === 0 ? "0" : value.toString();
+    // Restaura o valor original sem aplicar mudanças
+    const stringValue = value > 0 ? value.toString().replace('.', ',') : "";
     setTempValue(stringValue);
     setIsOpen(false);
   };
 
-  // Formata o valor para exibição
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // Se o diálogo está sendo fechado, cancela as mudanças
+      handleCancel();
+    }
+  };
+
+  // Formata o valor para exibição no input
   const displayValue = value === 0 ? "" : 
     allowDecimal ? 
       value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) :
       value.toString();
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Input
           value={displayValue}
