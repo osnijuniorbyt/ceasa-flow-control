@@ -27,17 +27,21 @@ export function NumberInput({
 }: NumberInputProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tempValue, setTempValue] = useState("");
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const handleOpenKeyboard = () => {
     if (!disabled) {
       // Inicializa o valor temporário com o valor atual formatado corretamente
       const stringValue = value > 0 ? value.toString().replace('.', ',') : "";
       setTempValue(stringValue);
+      setIsConfirming(false);
       setIsOpen(true);
     }
   };
 
   const handleConfirm = () => {
+    setIsConfirming(true);
+    
     // Converte vírgula para ponto para parseFloat
     const normalizedValue = tempValue.replace(',', '.');
     const numValue = parseFloat(normalizedValue) || 0;
@@ -46,21 +50,27 @@ export function NumberInput({
     // Aplica a mudança
     onChange(clampedValue);
     
-    // Fecha o diálogo de forma controlada
+    // Fecha o diálogo
     setIsOpen(false);
+    setIsConfirming(false);
   };
 
   const handleCancel = () => {
-    // Restaura o valor original sem aplicar mudanças
-    const stringValue = value > 0 ? value.toString().replace('.', ',') : "";
-    setTempValue(stringValue);
+    if (!isConfirming) {
+      // Restaura o valor original sem aplicar mudanças
+      const stringValue = value > 0 ? value.toString().replace('.', ',') : "";
+      setTempValue(stringValue);
+    }
     setIsOpen(false);
+    setIsConfirming(false);
   };
 
   const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      // Se o diálogo está sendo fechado, cancela as mudanças
+    if (!open && !isConfirming) {
+      // Só cancela se não estamos no processo de confirmação
       handleCancel();
+    } else if (open) {
+      setIsOpen(true);
     }
   };
 
