@@ -1,7 +1,7 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { NumberKeyboard } from "./NumberKeyboard";
 
 interface NumberInputProps {
@@ -28,64 +28,52 @@ export function NumberInput({
   const [isOpen, setIsOpen] = useState(false);
   const [tempValue, setTempValue] = useState("");
 
-  // Debug logging for dialog state changes
-  useEffect(() => {
-    console.log('Dialog state:', { isOpen, tempValue });
-  }, [isOpen, tempValue]);
-
-  // Debug logging to check for unnecessary re-renders
-  useEffect(() => {
-    console.log('NumberInput re-rendered with props:', { value, disabled });
-  });
-
-  const handleOpenKeyboard = () => {
+  // Memoize handlers to prevent unnecessary re-renders
+  const handleOpenKeyboard = useCallback(() => {
     if (!disabled) {
-      // Inicializa o valor temporário com o valor atual formatado corretamente
       const stringValue = value > 0 ? value.toString().replace('.', ',') : "";
-      console.log('Opening keyboard with value:', stringValue);
       setTempValue(stringValue);
       setIsOpen(true);
     }
-  };
+  }, [value, disabled]);
 
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.target.blur(); // Remove focus to prevent native keyboard
+  const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.blur();
     handleOpenKeyboard();
-  };
+  }, [handleOpenKeyboard]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Mouse down event triggered');
     handleOpenKeyboard();
-  };
+  }, [handleOpenKeyboard]);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Touch start event triggered');
     handleOpenKeyboard();
-  };
+  }, [handleOpenKeyboard]);
 
-  const handleConfirm = () => {
-    console.log('Confirming value:', tempValue);
-    // Converte vírgula para ponto para parseFloat
+  const handleConfirm = useCallback(() => {
     const normalizedValue = tempValue.replace(',', '.');
     const numValue = parseFloat(normalizedValue) || 0;
     const clampedValue = Math.max(min, Math.min(max, numValue));
     
-    // Aplica a mudança
     onChange(clampedValue);
-    
-    // Fecha o diálogo
     setIsOpen(false);
-  };
+  }, [tempValue, min, max, onChange]);
 
-  const handleCancel = () => {
-    console.log('Cancelling keyboard input');
-    // Fecha o diálogo sem aplicar mudanças
+  const handleCancel = useCallback(() => {
     setIsOpen(false);
-  };
+  }, []);
+
+  const handleOpenChange = useCallback((open: boolean) => {
+    setIsOpen(open);
+  }, []);
+
+  const handleValueChange = useCallback((newValue: string) => {
+    setTempValue(newValue);
+  }, []);
 
   // Formata o valor para exibição no input
   const displayValue = value === 0 ? "" : 
@@ -96,10 +84,7 @@ export function NumberInput({
   return (
     <Dialog 
       open={isOpen} 
-      onOpenChange={(open) => {
-        console.log('Dialog onOpenChange called with:', open);
-        setIsOpen(open);
-      }}
+      onOpenChange={handleOpenChange}
     >
       <DialogTrigger asChild>
         <Input
@@ -117,26 +102,16 @@ export function NumberInput({
       </DialogTrigger>
       <DialogContent 
         className="p-0 max-w-sm" 
-        aria-describedby="number-keyboard-description"
-        onPointerDownOutside={(e) => {
-          console.log('Pointer down outside detected');
-          e.preventDefault();
-        }}
-        onInteractOutside={(e) => {
-          console.log('Interact outside detected');
-          e.preventDefault();
-        }}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogTitle className="sr-only">Teclado Numérico</DialogTitle>
-        <div id="number-keyboard-description" className="sr-only">
-          Use o teclado numérico para inserir valores
-        </div>
+        <DialogDescription className="sr-only">
+          Use o teclado numérico para inserir valores. Pressione OK para confirmar ou Cancelar para descartar as alterações.
+        </DialogDescription>
         <NumberKeyboard
           value={tempValue}
-          onChange={(newValue) => {
-            console.log('Keyboard value changed to:', newValue);
-            setTempValue(newValue);
-          }}
+          onChange={handleValueChange}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           allowDecimal={allowDecimal}
