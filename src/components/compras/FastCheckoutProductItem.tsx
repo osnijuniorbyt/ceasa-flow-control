@@ -1,11 +1,11 @@
 
-import { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { NumberInput } from "@/components/mobile/NumberInput";
-import { Plus, Minus, ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { ProductHeader } from "./ProductHeader";
+import { ProductInfo } from "./ProductInfo";
+import { ProductBadges } from "./ProductBadges";
+import { ProductInputs } from "./ProductInputs";
+import { ProductTotal } from "./ProductTotal";
+import { ProductCartControls } from "./ProductCartControls";
 
 interface FastCheckoutProduct {
   id: string;
@@ -44,27 +44,9 @@ export function FastCheckoutProductItem({
   onKeyPress
 }: FastCheckoutProductItemProps) {
   const { addItem } = useCart();
-  const [cartQuantity, setCartQuantity] = useState(1);
 
-  const getStockIndicator = (level: string) => {
-    switch (level) {
-      case "critical": return "🔴";
-      case "low": return "🟡";
-      default: return "🟢";
-    }
-  };
-
-  const handleAddToCart = () => {
+  const handleAddToCart = (cartQuantity: number) => {
     addItem(product, cartQuantity);
-    setCartQuantity(1);
-  };
-
-  const handleCartQuantityIncrement = () => {
-    setCartQuantity(prev => Math.min(prev + 1, 999));
-  };
-
-  const handleCartQuantityDecrement = () => {
-    setCartQuantity(prev => Math.max(prev - 1, 1));
   };
 
   const handleTargetQuantityChange = (newQuantity: number) => {
@@ -87,122 +69,48 @@ export function FastCheckoutProductItem({
       <div className="space-y-4">
         {/* Header Row */}
         <div className="flex items-start gap-3">
-          <Checkbox
-            checked={product.isSelected}
-            onCheckedChange={() => onToggle(product.id)}
-            className="h-5 w-5 mt-1"
+          <ProductHeader
+            isSelected={product.isSelected}
+            stockLevel={product.stockLevel}
+            name={product.name}
+            onToggle={() => onToggle(product.id)}
           />
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-base">{getStockIndicator(product.stockLevel)}</span>
-              <h4 className="font-semibold text-base leading-tight">{product.name}</h4>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 text-sm text-muted-foreground mb-2">
-              <span>Estoque: {product.currentStock}{product.unit}</span>
-              <span>•</span>
-              <span>Vende: {product.dailySales}{product.unit}/dia</span>
-            </div>
+            <ProductInfo
+              currentStock={product.currentStock}
+              unit={product.unit}
+              dailySales={product.dailySales}
+            />
 
-            <div className="flex items-center gap-2 mb-2">
-              <Badge variant="secondary" className="text-xs">
-                {product.lastSupplier}
-              </Badge>
-              <Badge className={`text-xs ${
-                product.paymentMethod === "BOLETO" 
-                  ? "bg-blue-100 text-blue-800" 
-                  : "bg-green-100 text-green-800"
-              }`}>
-                {product.paymentMethod}
-              </Badge>
-            </div>
+            <ProductBadges
+              lastSupplier={product.lastSupplier}
+              paymentMethod={product.paymentMethod}
+            />
           </div>
         </div>
 
         {/* Price and Quantity Row */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs text-muted-foreground mb-1 block">Quantidade</label>
-            <NumberInput
-              value={product.targetQuantity}
-              onChange={handleTargetQuantityChange}
-              className="w-full h-12"
-              min={0}
-              max={999}
-              allowDecimal={false}
-            />
-          </div>
-          
-          <div>
-            <label className="text-xs text-muted-foreground mb-1 block">Preço/{product.unit}</label>
-            <NumberInput
-              value={product.unitPrice}
-              onChange={handleUnitPriceChange}
-              className="w-full h-12"
-              min={0}
-              max={9999}
-              allowDecimal={true}
-            />
-          </div>
-        </div>
+        <ProductInputs
+          targetQuantity={product.targetQuantity}
+          unitPrice={product.unitPrice}
+          unit={product.unit}
+          onQuantityChange={handleTargetQuantityChange}
+          onPriceChange={handleUnitPriceChange}
+        />
 
         {/* Total and Action Row */}
         <div className="flex items-center justify-between pt-2 border-t border-border">
-          <div>
-            <div className="text-lg font-bold text-primary">
-              R$ {(product.targetQuantity * product.unitPrice).toLocaleString('pt-BR', { 
-                minimumFractionDigits: 2 
-              })}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Venc: {product.daysToPayment} dias
-            </div>
-          </div>
+          <ProductTotal
+            targetQuantity={product.targetQuantity}
+            unitPrice={product.unitPrice}
+            daysToPayment={product.daysToPayment}
+          />
 
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCartQuantityDecrement();
-                }}
-                className="h-8 w-8 p-0"
-              >
-                <Minus className="h-3 w-3" />
-              </Button>
-              <span className="text-sm font-semibold w-8 text-center">
-                {cartQuantity}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCartQuantityIncrement();
-                }}
-                className="h-8 w-8 p-0"
-              >
-                <Plus className="h-3 w-3" />
-              </Button>
-            </div>
-
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleAddToCart();
-              }}
-              size="sm"
-              className="h-10"
-            >
-              <ShoppingCart className="h-4 w-4 mr-1" />
-              R$ {(cartQuantity * product.unitPrice).toLocaleString('pt-BR', { 
-                minimumFractionDigits: 2 
-              })}
-            </Button>
-          </div>
+          <ProductCartControls
+            unitPrice={product.unitPrice}
+            onAddToCart={handleAddToCart}
+          />
         </div>
       </div>
     </div>
