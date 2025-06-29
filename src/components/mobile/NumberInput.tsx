@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { NumberKeyboard } from "./NumberKeyboard";
@@ -28,31 +28,13 @@ export function NumberInput({
   const [isOpen, setIsOpen] = useState(false);
   const [tempValue, setTempValue] = useState("");
 
-  // Memoize handlers to prevent unnecessary re-renders
-  const handleOpenKeyboard = useCallback(() => {
+  const handleOpenKeyboard = () => {
     if (!disabled) {
       const stringValue = value > 0 ? value.toString().replace('.', ',') : "";
       setTempValue(stringValue);
       setIsOpen(true);
     }
-  }, [value, disabled]);
-
-  const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-    e.target.blur();
-    handleOpenKeyboard();
-  }, [handleOpenKeyboard]);
-
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleOpenKeyboard();
-  }, [handleOpenKeyboard]);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleOpenKeyboard();
-  }, [handleOpenKeyboard]);
+  };
 
   const handleConfirm = useCallback(() => {
     const normalizedValue = tempValue.replace(',', '.');
@@ -88,13 +70,12 @@ export function NumberInput({
     >
       <DialogTrigger asChild>
         <Input
+          type="text"
+          inputMode="none"
+          readOnly
           value={displayValue}
           placeholder={placeholder}
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          onFocus={handleFocus}
-          readOnly
-          inputMode="none"
+          onClick={handleOpenKeyboard}
           className={`text-center font-semibold cursor-pointer select-none ${className}`}
           disabled={disabled}
           style={{ fontSize: '16px' }}
