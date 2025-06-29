@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Delete, Check } from "lucide-react";
+import { Minus, Plus, Delete, Check, X } from "lucide-react";
 
 interface NumberKeyboardProps {
   value: string;
@@ -67,41 +67,43 @@ export function NumberKeyboard({
   ];
 
   return (
-    <div className="bg-background border rounded-lg p-4 shadow-lg max-w-sm mx-auto">
+    <div className="bg-background border rounded-lg p-3 shadow-lg w-full max-w-sm mx-auto">
       {/* Display */}
-      <div className="mb-4 p-4 bg-muted rounded-lg">
-        <div className="text-2xl font-bold text-center font-mono">
+      <div className="mb-3 p-3 bg-muted rounded-lg">
+        <div className="text-xl font-bold text-center font-mono">
           {value || "0"}
         </div>
       </div>
 
       {/* Quick adjust buttons */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-3">
         <Button
           variant="outline"
           size="sm"
           onClick={handleDecrement}
-          className="flex-1 h-12"
+          className="flex-1 h-10 text-sm"
         >
-          <Minus className="h-4 w-4" />
+          <Minus className="h-3 w-3 mr-1" />
+          {allowDecimal ? "0.5" : "1"}
         </Button>
         <Button
           variant="outline"
           size="sm"
           onClick={handleIncrement}
-          className="flex-1 h-12"
+          className="flex-1 h-10 text-sm"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-3 w-3 mr-1" />
+          {allowDecimal ? "0.5" : "1"}
         </Button>
       </div>
 
       {/* Number grid */}
-      <div className="grid grid-cols-3 gap-2 mb-4">
+      <div className="grid grid-cols-3 gap-2 mb-3">
         {numberButtons.flat().map((num) => (
           <Button
             key={num}
             variant="outline"
-            className="h-14 text-lg font-semibold"
+            className="h-12 text-lg font-semibold touch-manipulation"
             onClick={() => handleNumberPress(num)}
           >
             {num}
@@ -110,17 +112,17 @@ export function NumberKeyboard({
       </div>
 
       {/* Bottom row */}
-      <div className="grid grid-cols-3 gap-2 mb-4">
+      <div className="grid grid-cols-3 gap-2 mb-3">
         <Button
           variant="outline"
-          className="h-14 text-lg font-semibold"
+          className="h-12 text-base font-semibold"
           onClick={handleClear}
         >
           C
         </Button>
         <Button
           variant="outline"
-          className="h-14 text-lg font-semibold"
+          className="h-12 text-lg font-semibold"
           onClick={() => handleNumberPress("0")}
         >
           0
@@ -128,30 +130,30 @@ export function NumberKeyboard({
         {allowDecimal ? (
           <Button
             variant="outline"
-            className="h-14 text-lg font-semibold"
+            className="h-12 text-lg font-semibold"
             onClick={handleDecimalPress}
           >
-            .
+            ,
           </Button>
         ) : (
           <Button
             variant="outline"
-            className="h-14"
+            className="h-12"
             onClick={handleBackspace}
           >
-            <Delete className="h-5 w-5" />
+            <Delete className="h-4 w-4" />
           </Button>
         )}
       </div>
 
       {allowDecimal && (
-        <div className="mb-4">
+        <div className="mb-3">
           <Button
             variant="outline"
-            className="w-full h-12"
+            className="w-full h-10 text-sm"
             onClick={handleBackspace}
           >
-            <Delete className="h-4 w-4 mr-2" />
+            <Delete className="h-3 w-3 mr-1" />
             Apagar
           </Button>
         </div>
@@ -164,14 +166,15 @@ export function NumberKeyboard({
           onClick={onCancel}
           className="flex-1 h-12"
         >
+          <X className="h-4 w-4 mr-1" />
           Cancelar
         </Button>
         <Button
           onClick={onConfirm}
           className="flex-1 h-12"
         >
-          <Check className="h-4 w-4 mr-2" />
-          Confirmar
+          <Check className="h-4 w-4 mr-1" />
+          OK
         </Button>
       </div>
     </div>

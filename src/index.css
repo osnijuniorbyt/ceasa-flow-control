@@ -85,33 +85,42 @@
 
   body {
     @apply bg-background text-foreground;
-    font-size: 16px; /* Minimum font size for mobile */
+    font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
+    /* Prevent pull-to-refresh on mobile */
+    overscroll-behavior-y: contain;
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    /* Prevent zoom on form focus */
+    -webkit-text-size-adjust: none;
   }
 
-  /* Mobile-first responsive typography */
-  h1 { @apply text-2xl sm:text-3xl md:text-4xl; }
-  h2 { @apply text-xl sm:text-2xl md:text-3xl; }
-  h3 { @apply text-lg sm:text-xl md:text-2xl; }
-  h4 { @apply text-base sm:text-lg md:text-xl; }
+  /* Mobile-optimized typography */
+  h1 { @apply text-xl sm:text-2xl md:text-3xl font-bold; }
+  h2 { @apply text-lg sm:text-xl md:text-2xl font-semibold; }
+  h3 { @apply text-base sm:text-lg md:text-xl font-medium; }
+  h4 { @apply text-sm sm:text-base md:text-lg font-medium; }
 
-  /* Touch-friendly interactive elements */
+  /* Enhanced touch targets */
   button, [role="button"] {
     min-height: 44px;
     min-width: 44px;
+    /* Prevent text selection on buttons */
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   input, textarea, select {
     min-height: 44px;
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
+    /* Prevent auto-zoom on iOS */
+    -webkit-appearance: none;
   }
 
   /* Safe areas for notched devices */
@@ -136,80 +145,62 @@
     overscroll-behavior: contain;
   }
 
-  /* Touch ripple effect */
-  .touch-ripple {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .touch-ripple::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.1;
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-  }
-
-  .touch-ripple:active::before {
-    width: 300px;
-    height: 300px;
-  }
-
-  /* Smooth touch interactions */
+  /* Touch-friendly interactions */
   .touch-manipulation {
     touch-action: manipulation;
     -webkit-user-select: none;
     user-select: none;
   }
 
-  /* Mobile card shadows */
+  /* Mobile card design */
   .mobile-card {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.2s ease;
+    @apply bg-card border border-border rounded-lg p-4 shadow-sm;
+    transition: all 0.2s ease;
   }
 
-  .mobile-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  .mobile-card:active {
+    @apply scale-[0.98];
   }
 
-  /* Responsive grid */
+  /* Responsive layouts */
   .mobile-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
     gap: 1rem;
   }
 
-  @media (max-width: 640px) {
+  @media (min-width: 640px) {
     .mobile-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+  }
+
+  /* Mobile-specific spacing */
+  .mobile-container {
+    @apply px-4 py-2;
+  }
+
+  @media (min-width: 640px) {
+    .mobile-container {
+      @apply px-6 py-4;
     }
   }
 }
 
 @layer utilities {
-  /* Mobile-specific utilities */
-  .text-mobile-base { font-size: 16px; }
-  .text-mobile-lg { font-size: 18px; }
-  .text-mobile-xl { font-size: 20px; }
-
-  /* Enhanced touch targets */
+  /* Touch-optimized utilities */
   .touch-target {
     min-height: 44px;
     min-width: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
   }
 
-  /* Smooth animations optimized for mobile */
+  /* Smooth mobile transitions */
   .mobile-transition {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Hide scrollbars but keep functionality */
@@ -222,9 +213,37 @@
     display: none;
   }
 
-  /* Mobile-friendly focus states */
+  /* Mobile focus states */
   .mobile-focus:focus-visible {
     outline: 2px solid hsl(var(--ring));
-    outline-offset: 2px;
+    outline-offset: 1px;
+  }
+
+  /* Prevent zoom on double tap */
+  .no-zoom {
+    touch-action: manipulation;
+  }
+
+  /* Mobile typography sizes */
+  .text-mobile-xs { font-size: 12px; line-height: 16px; }
+  .text-mobile-sm { font-size: 14px; line-height: 20px; }
+  .text-mobile-base { font-size: 16px; line-height: 24px; }
+  .text-mobile-lg { font-size: 18px; line-height: 28px; }
+  .text-mobile-xl { font-size: 20px; line-height: 30px; }
+}
+
+/* Prevent iOS bounce effect */
+@supports (-webkit-overflow-scrolling: touch) {
+  body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  #root {
+    overflow: auto;
+    height: 100vh;
+    -webkit-overflow-scrolling: touch;
   }
 }

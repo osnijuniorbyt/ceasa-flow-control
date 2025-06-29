@@ -4,7 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { NumberInput } from "@/components/mobile/NumberInput";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 
 interface FastCheckoutProduct {
@@ -69,138 +69,132 @@ export function FastCheckoutProductItem({
 
   return (
     <div
-      className={`p-4 border-2 rounded-lg transition-all cursor-pointer ${
+      className={`p-4 border-2 rounded-lg transition-all ${
         product.isSelected 
           ? 'border-primary bg-primary/5 shadow-sm' 
           : 'border-border hover:border-primary/50'
       }`}
-      onClick={() => onToggle(product.id)}
-      onKeyDown={(e) => onKeyPress(e, product.id)}
-      tabIndex={0}
     >
-      <div className="flex items-center gap-4">
-        <Checkbox
-          checked={product.isSelected}
-          onCheckedChange={() => onToggle(product.id)}
-          className="h-6 w-6"
-        />
-        
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
-          {/* Product Info */}
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{getStockIndicator(product.stockLevel)}</span>
-              <h4 className="font-semibold">{product.name}</h4>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Estoque: {product.currentStock}{product.unit} | Vende: {product.dailySales}{product.unit}/dia
-            </p>
-          </div>
+      {/* Mobile Layout */}
+      <div className="space-y-4">
+        {/* Header Row */}
+        <div className="flex items-start gap-3">
+          <Checkbox
+            checked={product.isSelected}
+            onCheckedChange={() => onToggle(product.id)}
+            className="h-5 w-5 mt-1"
+          />
           
-          {/* Quantity Controls - Desktop */}
-          <div className="hidden md:flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              {product.originalStock}{product.unit} →
-            </span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-base">{getStockIndicator(product.stockLevel)}</span>
+              <h4 className="font-semibold text-base leading-tight">{product.name}</h4>
+            </div>
+            
+            <div className="flex flex-wrap gap-2 text-sm text-muted-foreground mb-2">
+              <span>Estoque: {product.currentStock}{product.unit}</span>
+              <span>•</span>
+              <span>Vende: {product.dailySales}{product.unit}/dia</span>
+            </div>
+
+            <div className="flex items-center gap-2 mb-2">
+              <Badge variant="secondary" className="text-xs">
+                {product.lastSupplier}
+              </Badge>
+              <Badge className={`text-xs ${
+                product.paymentMethod === "BOLETO" 
+                  ? "bg-blue-100 text-blue-800" 
+                  : "bg-green-100 text-green-800"
+              }`}>
+                {product.paymentMethod}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Price and Quantity Row */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Quantidade</label>
             <NumberInput
               value={product.targetQuantity}
               onChange={(value) => onQuantityChange(product.id, value)}
-              className="w-20 h-10"
+              className="w-full h-12"
               min={0}
               max={999}
               allowDecimal={false}
             />
-            <span className="text-sm">{product.unit}</span>
           </div>
           
-          {/* Supplier */}
           <div>
-            <Badge variant="secondary" className="font-medium">
-              {product.lastSupplier}
-            </Badge>
-            <p className="text-xs text-muted-foreground mt-1">
-              {product.supplierNote}
-            </p>
-          </div>
-          
-          {/* Price */}
-          <div className="flex items-center gap-1">
-            <span className="text-sm">R$</span>
+            <label className="text-xs text-muted-foreground mb-1 block">Preço/{product.unit}</label>
             <NumberInput
               value={product.unitPrice}
               onChange={(value) => onPriceChange(product.id, value)}
-              className="w-24 h-10"
+              className="w-full h-12"
               min={0}
               max={9999}
               allowDecimal={true}
             />
-            <span className="text-sm">/{product.unit}</span>
           </div>
-          
-          {/* Payment Method & Total */}
-          <div className="text-right">
-            <Badge className={`${
-              product.paymentMethod === "BOLETO" 
-                ? "bg-blue-100 text-blue-800" 
-                : "bg-green-100 text-green-800"
-            }`}>
-              {product.paymentMethod}
-            </Badge>
-            <p className="font-bold text-lg mt-1">
+        </div>
+
+        {/* Total and Action Row */}
+        <div className="flex items-center justify-between pt-2 border-t border-border">
+          <div>
+            <div className="text-lg font-bold text-primary">
               R$ {(product.targetQuantity * product.unitPrice).toLocaleString('pt-BR', { 
                 minimumFractionDigits: 2 
               })}
-            </p>
-            <p className="text-xs text-muted-foreground">
+            </div>
+            <div className="text-xs text-muted-foreground">
               Venc: {product.daysToPayment} dias
-            </p>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Mobile Add to Cart Section */}
-      <div className="md:hidden mt-4 pt-4 border-t border-border">
-        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleQuantityDecrement();
-              }}
-            >
-              <Minus className="h-4 w-4" />
-            </Button>
-            <span className="text-lg font-semibold w-12 text-center">
-              {orderQuantity}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleQuantityIncrement();
-              }}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-            <span className="text-sm text-muted-foreground ml-2">
-              {product.unit}
-            </span>
-          </div>
+            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleQuantityDecrement();
+                }}
+                className="h-8 w-8 p-0"
+              >
+                <Minus className="h-3 w-3" />
+              </Button>
+              <span className="text-sm font-semibold w-8 text-center">
+                {orderQuantity}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleQuantityIncrement();
+                }}
+                className="h-8 w-8 p-0"
+              >
+                <Plus className="h-3 w-3" />
+              </Button>
+            </div>
 
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAddToCart();
-            }}
-            className="flex-shrink-0"
-          >
-            Adicionar R$ {(orderQuantity * product.unitPrice).toLocaleString('pt-BR', { 
-              minimumFractionDigits: 2 
-            })}
-          </Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToCart();
+              }}
+              size="sm"
+              className="h-10"
+            >
+              <ShoppingCart className="h-4 w-4 mr-1" />
+              R$ {(orderQuantity * product.unitPrice).toLocaleString('pt-BR', { 
+                minimumFractionDigits: 2 
+              })}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

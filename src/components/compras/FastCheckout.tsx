@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -204,41 +203,63 @@ export function FastCheckout() {
   };
 
   return (
-    <Card className="w-full max-w-5xl mx-auto">
-      <FastCheckoutHeader 
-        totalValue={totalValue}
-        totalItems={totalItems}
-      />
-      
-      <CardContent className="space-y-4">
-        <FastCheckoutBulkControls
-          allSelected={allSelected}
-          selectedCount={selectedProducts.length}
-          totalCount={products.length}
-          onSelectAll={handleSelectAll}
-        />
-
-        <div className="space-y-3">
-          {products.map((product) => (
-            <FastCheckoutProductItem
-              key={product.id}
-              product={product}
-              onToggle={handleProductToggle}
-              onQuantityChange={handleQuantityChange}
-              onPriceChange={handlePriceChange}
-              onKeyPress={handleKeyPress}
-            />
-          ))}
+    <div className="w-full space-y-4">
+      {/* Mobile-optimized header */}
+      <Card>
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-bold flex items-center gap-2">
+              ⚡ Checkout Rápido
+            </h2>
+            <div className="text-right">
+              <div className="text-lg font-bold text-primary">
+                R$ {totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </div>
+              <div className="text-xs text-muted-foreground">{totalItems} itens</div>
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Interface otimizada para pedidos rápidos
+          </p>
         </div>
+      </Card>
+      
+      <Card>
+        <CardContent className="p-4 space-y-4">
+          <FastCheckoutBulkControls
+            allSelected={allSelected}
+            selectedCount={selectedProducts.length}
+            totalCount={products.length}
+            onSelectAll={handleSelectAll}
+          />
 
-        <FastCheckoutActionButtons
-          selectedCount={selectedProducts.length}
-          onConfirm={handleConfirmOrders}
-          onClear={handleClearSelections}
-        />
+          <div className="space-y-3">
+            {products.map((product) => (
+              <FastCheckoutProductItem
+                key={product.id}
+                product={product}
+                onToggle={handleProductToggle}
+                onQuantityChange={handleQuantityChange}
+                onPriceChange={handlePriceChange}
+                onKeyPress={handleKeyPress}
+              />
+            ))}
+          </div>
 
-        <FastCheckoutQuickInfo selectedProducts={selectedProducts} />
-      </CardContent>
-    </Card>
+          <FastCheckoutActionButtons
+            selectedCount={selectedProducts.length}
+            onConfirm={handleConfirmOrders}
+            onClear={handleClearSelections}
+          />
+
+          <div className="text-xs text-muted-foreground text-center p-2 bg-muted/30 rounded">
+            <div className="grid grid-cols-1 gap-1">
+              <span>Atalhos: Toque para selecionar</span>
+              <span>Fornecedores: {new Set(selectedProducts.map(p => p.lastSupplier)).size} únicos</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
