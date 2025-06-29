@@ -37,6 +37,23 @@ export function NumberInput({
     }
   };
 
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.blur(); // Remove focus to prevent native keyboard
+    handleOpenKeyboard();
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleOpenKeyboard();
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleOpenKeyboard();
+  };
+
   const handleConfirm = () => {
     // Converte vírgula para ponto para parseFloat
     const normalizedValue = tempValue.replace(',', '.');
@@ -62,19 +79,30 @@ export function NumberInput({
       value.toString();
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={setIsOpen}
+    >
       <DialogTrigger asChild>
         <Input
           value={displayValue}
           placeholder={placeholder}
-          onClick={handleOpenKeyboard}
-          onFocus={handleOpenKeyboard}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onFocus={handleFocus}
           readOnly
-          className={`text-center font-semibold cursor-pointer ${className}`}
+          inputMode="none"
+          className={`text-center font-semibold cursor-pointer select-none ${className}`}
           disabled={disabled}
+          style={{ fontSize: '16px' }}
         />
       </DialogTrigger>
-      <DialogContent className="p-0 max-w-sm" aria-describedby="number-keyboard-description">
+      <DialogContent 
+        className="p-0 max-w-sm" 
+        aria-describedby="number-keyboard-description"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogTitle className="sr-only">Teclado Numérico</DialogTitle>
         <div id="number-keyboard-description" className="sr-only">
           Use o teclado numérico para inserir valores

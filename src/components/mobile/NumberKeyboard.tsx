@@ -71,6 +71,22 @@ export function NumberKeyboard({
     onChange(stringValue);
   };
 
+  // Wrapper functions for mouse and touch events
+  const wrapEventHandler = (handler: () => void) => {
+    return {
+      onMouseDown: (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handler();
+      },
+      onTouchStart: (e: React.TouchEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handler();
+      }
+    };
+  };
+
   const numberButtons = [
     ['1', '2', '3'],
     ['4', '5', '6'],
@@ -81,7 +97,7 @@ export function NumberKeyboard({
   const displayValue = value === "" ? "0" : value;
 
   return (
-    <div className="bg-background border rounded-lg p-3 shadow-lg w-full max-w-sm mx-auto">
+    <div className="bg-background border rounded-lg p-3 shadow-lg w-full max-w-sm mx-auto select-none">
       {/* Display */}
       <div className="mb-3 p-3 bg-muted rounded-lg">
         <div className="text-xl font-bold text-center font-mono">
@@ -94,8 +110,9 @@ export function NumberKeyboard({
         <Button
           variant="outline"
           size="sm"
-          onClick={handleDecrement}
+          {...wrapEventHandler(handleDecrement)}
           className="flex-1 h-10 text-sm"
+          style={{ touchAction: 'manipulation' }}
         >
           <Minus className="h-3 w-3 mr-1" />
           {allowDecimal ? "0,5" : "1"}
@@ -103,8 +120,9 @@ export function NumberKeyboard({
         <Button
           variant="outline"
           size="sm"
-          onClick={handleIncrement}
+          {...wrapEventHandler(handleIncrement)}
           className="flex-1 h-10 text-sm"
+          style={{ touchAction: 'manipulation' }}
         >
           <Plus className="h-3 w-3 mr-1" />
           {allowDecimal ? "0,5" : "1"}
@@ -118,7 +136,8 @@ export function NumberKeyboard({
             key={num}
             variant="outline"
             className="h-12 text-lg font-semibold touch-manipulation"
-            onClick={() => handleNumberPress(num)}
+            {...wrapEventHandler(() => handleNumberPress(num))}
+            style={{ touchAction: 'manipulation' }}
           >
             {num}
           </Button>
@@ -130,14 +149,16 @@ export function NumberKeyboard({
         <Button
           variant="outline"
           className="h-12 text-base font-semibold"
-          onClick={handleClear}
+          {...wrapEventHandler(handleClear)}
+          style={{ touchAction: 'manipulation' }}
         >
           Limpar
         </Button>
         <Button
           variant="outline"
           className="h-12 text-lg font-semibold"
-          onClick={() => handleNumberPress("0")}
+          {...wrapEventHandler(() => handleNumberPress("0"))}
+          style={{ touchAction: 'manipulation' }}
         >
           0
         </Button>
@@ -145,7 +166,8 @@ export function NumberKeyboard({
           <Button
             variant="outline"
             className="h-12 text-lg font-semibold"
-            onClick={handleDecimalPress}
+            {...wrapEventHandler(handleDecimalPress)}
+            style={{ touchAction: 'manipulation' }}
           >
             ,
           </Button>
@@ -153,7 +175,8 @@ export function NumberKeyboard({
           <Button
             variant="outline"
             className="h-12"
-            onClick={handleBackspace}
+            {...wrapEventHandler(handleBackspace)}
+            style={{ touchAction: 'manipulation' }}
           >
             <Delete className="h-4 w-4" />
           </Button>
@@ -165,7 +188,8 @@ export function NumberKeyboard({
           <Button
             variant="outline"
             className="w-full h-10 text-sm"
-            onClick={handleBackspace}
+            {...wrapEventHandler(handleBackspace)}
+            style={{ touchAction: 'manipulation' }}
           >
             <Delete className="h-3 w-3 mr-1" />
             Apagar
@@ -177,15 +201,17 @@ export function NumberKeyboard({
       <div className="flex gap-2">
         <Button
           variant="outline"
-          onClick={onCancel}
+          {...wrapEventHandler(onCancel)}
           className="flex-1 h-12"
+          style={{ touchAction: 'manipulation' }}
         >
           <X className="h-4 w-4 mr-1" />
           Cancelar
         </Button>
         <Button
-          onClick={onConfirm}
+          {...wrapEventHandler(onConfirm)}
           className="flex-1 h-12"
+          style={{ touchAction: 'manipulation' }}
         >
           <Check className="h-4 w-4 mr-1" />
           OK

@@ -114,13 +114,29 @@
     /* Prevent text selection on buttons */
     -webkit-user-select: none;
     user-select: none;
+    /* Prevent zoom on double tap */
+    touch-action: manipulation;
   }
 
   input, textarea, select {
     min-height: 44px;
-    font-size: 16px;
-    /* Prevent auto-zoom on iOS */
+    /* Prevent auto-zoom on iOS - force 16px font size */
+    font-size: 16px !important;
     -webkit-appearance: none;
+  }
+
+  /* Mobile-specific input handling to prevent zoom */
+  @media screen and (max-width: 768px) {
+    input[type="text"], 
+    input[type="number"], 
+    input[type="email"], 
+    input[type="tel"], 
+    textarea, 
+    select {
+      font-size: 16px !important;
+      -webkit-text-size-adjust: 100%;
+      -webkit-appearance: none;
+    }
   }
 
   /* Safe areas for notched devices */
