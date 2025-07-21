@@ -1,19 +1,36 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Zap, FileText } from "lucide-react";
+import { Search, Zap, FileText, AlertTriangle, TrendingUp, DollarSign } from "lucide-react";
 import { FastCheckout } from "@/components/compras/FastCheckout";
 import { PurchaseOrdersPayment } from "@/components/compras/PurchaseOrdersPayment";
 import { CompradorInterface } from "@/components/mobile/roles/CompradorInterface";
 import { LoadingSkeleton } from "@/components/mobile/LoadingSkeleton";
+import { PurchaseNotifications } from "@/components/compras/PurchaseNotifications";
+import { PurchaseService } from "@/services/purchaseService";
 
 export default function PurchaseOrders() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("mobile-checkout");
   const [isLoading, setIsLoading] = useState(false);
+  const [stats, setStats] = useState({
+    totalOrders: 0,
+    pendingPayments: 0,
+    totalValue: 0,
+    criticalProducts: 0,
+    lowStockProducts: 0
+  });
+
+  // Load stats on component mount and when tab changes
+  useEffect(() => {
+    if (activeTab === "fast-checkout") {
+      const currentStats = PurchaseService.getOrderStats();
+      setStats(currentStats);
+    }
+  }, [activeTab]);
 
   return (
     <div className="space-y-4 md:space-y-6">
@@ -65,37 +82,62 @@ export default function PurchaseOrders() {
             <LoadingSkeleton type="card" count={3} />
           ) : (
             <>
+              <PurchaseNotifications />
               <FastCheckout />
               
-              {/* Quick Stats - Hidden on mobile to save space */}
-              <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Real-time Stats */}
+              <div className="hidden md:grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">Produtos Críticos</CardTitle>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      Produtos Críticos
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-red-600">3</div>
+                    <div className="text-2xl font-bold text-red-600">{stats.criticalProducts}</div>
                     <p className="text-xs text-muted-foreground">Precisam reposição urgente</p>
                   </CardContent>
                 </Card>
                 
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">Fornecedores</CardTitle>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-orange-500" />
+                      Estoque Baixo
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-blue-600">4</div>
-                    <p className="text-xs text-muted-foreground">Ativos no sistema</p>
+                    <div className="text-2xl font-bold text-orange-600">{stats.lowStockProducts}</div>
+                    <p className="text-xs text-muted-foreground">Produtos com estoque baixo</p>
                   </CardContent>
                 </Card>
                 
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">Valor Médio Diário</CardTitle>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-blue-500" />
+                      Pedidos Ativos
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-green-600">R$ 2.450</div>
-                    <p className="text-xs text-muted-foreground">Baseado nos últimos 7 dias</p>
+                    <div className="text-2xl font-bold text-blue-600">{stats.totalOrders}</div>
+                    <p className="text-xs text-muted-foreground">{stats.pendingPayments} pendentes de pagamento</p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-green-500" />
+                      Valor Total
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-600">
+                      R$ {stats.totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Valor total dos pedidos</p>
                   </CardContent>
                 </Card>
               </div>
@@ -104,6 +146,7 @@ export default function PurchaseOrders() {
         </TabsContent>
 
         <TabsContent value="order-history" className="space-y-4 md:space-y-6 px-4 md:px-0">
+          <PurchaseNotifications />
           <PurchaseOrdersPayment />
         </TabsContent>
       </Tabs>

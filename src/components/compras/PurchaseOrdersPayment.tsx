@@ -1,71 +1,37 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, AlertTriangle, Calendar, CreditCard } from "lucide-react";
+import { Plus, Search, AlertTriangle, Calendar, CreditCard, RefreshCw } from "lucide-react";
 import { PurchaseOrder } from "@/types/compras";
 import { toast } from "sonner";
+import { PurchaseService } from "@/services/purchaseService";
 
 export function PurchaseOrdersPayment() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [orders, setOrders] = useState<PurchaseOrder[]>([
-    {
-      id: "PO-001",
-      date: "2024-01-15",
-      supplier: "João Silva",
-      supplierCode: "D22 rua",
-      products: [],
-      totalValue: 1500.00,
-      status: "delivered",
-      paymentStatus: "PENDENTE",
-      paymentMethod: "NOTA FISCAL",
-      dueDate: "2024-01-22",
-      isPaid: false
-    },
-    {
-      id: "PO-002",
-      date: "2024-01-14",
-      supplier: "Maria Santos",
-      supplierCode: "E10",
-      products: [],
-      totalValue: 850.00,
-      status: "delivered",
-      paymentStatus: "VENCIDO",
-      paymentMethod: "BOLETO",
-      dueDate: "2024-01-18",
-      isPaid: false
-    },
-    {
-      id: "PO-003",
-      date: "2024-01-13",
-      supplier: "Carlos Oliveira",
-      supplierCode: "F59",
-      products: [],
-      totalValue: 600.00,
-      status: "delivered",
-      paymentStatus: "PAGO",
-      paymentMethod: "BOLETO",
-      dueDate: "2024-01-20",
-      isPaid: true,
-      paymentDate: "2024-01-19"
-    },
-    {
-      id: "PO-004",
-      date: "2024-01-12",
-      supplier: "Ana Costa",
-      supplierCode: "E104",
-      products: [],
-      totalValue: 750.00,
-      status: "confirmed",
-      paymentStatus: "PENDENTE",
-      paymentMethod: "NOTA FISCAL",
-      dueDate: "2024-01-19",
-      isPaid: false
+  const [orders, setOrders] = useState<PurchaseOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load orders from service
+  useEffect(() => {
+    loadOrders();
+  }, []);
+
+  const loadOrders = () => {
+    try {
+      setLoading(true);
+      const savedOrders = PurchaseService.getPurchaseOrders();
+      setOrders(savedOrders);
+    } catch (error) {
+      console.error('Error loading orders:', error);
+      toast.error('Erro ao carregar pedidos');
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
   const getPaymentStatusColor = (status: string) => {
     switch (status) {
@@ -107,19 +73,28 @@ export function PurchaseOrdersPayment() {
   };
 
   const handlePaymentToggle = (orderId: string, isPaid: boolean) => {
-    setOrders(orders.map(order => {
-      if (order.id === orderId) {
-        return {
-          ...order,
-          isPaid,
-          paymentStatus: isPaid ? "PAGO" : "PENDENTE",
-          paymentDate: isPaid ? new Date().toISOString().split('T')[0] : undefined
-        };
-      }
-      return order;
-    }));
-    
-    toast.success(isPaid ? "Pagamento registrado com sucesso" : "Pagamento desmarcado");
+    try {
+      // Update in service
+      PurchaseService.updatePurchaseOrderPayment(orderId, isPaid);
+      
+      // Update local state
+      setOrders(orders.map(order => {
+        if (order.id === orderId) {
+          return {
+            ...order,
+            isPaid,
+            paymentStatus: isPaid ? "PAGO" : "PENDENTE",
+            paymentDate: isPaid ? new Date().toISOString().split('T')[0] : undefined
+          };
+        }
+        return order;
+      }));
+      
+      toast.success(isPaid ? "Pagamento registrado com sucesso" : "Pagamento desmarcado");
+    } catch (error) {
+      console.error('Error updating payment:', error);
+      toast.error('Erro ao atualizar pagamento');
+    }
   };
 
   const totalOwedBySupplier = (supplier: string) => {
@@ -134,6 +109,26 @@ export function PurchaseOrdersPayment() {
     order.supplierCode.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5" />
+            Carregando Pedidos...
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-32 bg-muted rounded-lg animate-pulse" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -144,13 +139,19 @@ export function PurchaseOrdersPayment() {
               Pedidos de Compra - Controle de Pagamentos
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              Gerencie pedidos e acompanhe status de pagamentos
+              Gerencie pedidos e acompanhe status de pagamentos ({orders.length} pedidos)
             </p>
           </div>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Novo Pedido
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={loadOrders}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Atualizar
+            </Button>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Pedido
+            </Button>
+          </div>
         </div>
         <div className="flex items-center space-x-2">
           <Search className="h-4 w-4" />

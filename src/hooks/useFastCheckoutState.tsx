@@ -1,11 +1,29 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { FastCheckoutProduct } from "@/types/fastCheckout";
-import { mockFastCheckoutProducts } from "@/data/mockFastCheckoutData";
+import { PurchaseService } from "@/services/purchaseService";
 
 export function useFastCheckoutState() {
-  const [products, setProducts] = useState<FastCheckoutProduct[]>(mockFastCheckoutProducts);
+  const [products, setProducts] = useState<FastCheckoutProduct[]>([]);
   const [allSelected, setAllSelected] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Load products from service on mount
+  useEffect(() => {
+    const loadProducts = () => {
+      try {
+        const savedProducts = PurchaseService.getProducts();
+        setProducts(savedProducts);
+      } catch (error) {
+        console.error('Error loading products:', error);
+        toast.error('Erro ao carregar produtos');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadProducts();
+  }, []);
 
   useEffect(() => {
     const selectedCount = products.filter(p => p.isSelected).length;
@@ -65,30 +83,35 @@ export function useFastCheckoutState() {
       return;
     }
 
-    // Simulate order confirmation and payment control integration
-    const ordersBySupplier = selectedProducts.reduce((acc, product) => {
-      const supplier = product.lastSupplier;
-      if (!acc[supplier]) {
-        acc[supplier] = {
-          products: [],
-          total: 0,
-          paymentMethod: product.paymentMethod,
-          dueDate: new Date(Date.now() + product.daysToPayment * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-        };
-      }
-      acc[supplier].products.push(product);
-      acc[supplier].total += product.targetQuantity * product.unitPrice;
-      return acc;
-    }, {} as any);
+    try {
+      // Process orders and save to storage
+      const createdOrders = PurchaseService.processOrdersBySupplier(selectedProducts);
+      
+      // Update local products state with new stock levels
+      const updatedProducts = PurchaseService.getProducts();
+      setProducts(updatedProducts);
 
-    console.log("Orders created in payment control:", ordersBySupplier);
-    
-    toast.success(`${selectedProducts.length} pedidos confirmados! Total: R$ ${totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, {
-      description: "Entradas criadas no controle de pagamentos"
-    });
+      toast.success(
+        `${createdOrders.length} pedido(s) criado(s)! Total: R$ ${totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        {
+          description: `Estoque atualizado para ${selectedProducts.length} produtos`
+        }
+      );
 
-    // Reset selected products
-    setProducts(products.map(product => ({ ...product, isSelected: false })));
+      // Show details of created orders
+      createdOrders.forEach(order => {
+        console.log(`Pedido ${order.id} criado:`, {
+          fornecedor: order.supplier,
+          valor: order.totalValue,
+          produtos: order.products.length,
+          vencimento: order.dueDate
+        });
+      });
+
+    } catch (error) {
+      console.error('Error creating orders:', error);
+      toast.error("Erro ao processar pedidos");
+    }
   };
 
   const handleClearSelections = () => {
@@ -101,6 +124,7 @@ export function useFastCheckoutState() {
     selectedProducts,
     totalValue,
     totalItems,
+    loading,
     handleProductToggle,
     handleQuantityChange,
     handlePriceChange,

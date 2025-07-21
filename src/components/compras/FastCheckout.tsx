@@ -13,6 +13,7 @@ export function FastCheckout() {
     selectedProducts,
     totalValue,
     totalItems,
+    loading,
     handleProductToggle,
     handleQuantityChange,
     handlePriceChange,
@@ -23,6 +24,23 @@ export function FastCheckout() {
   } = useFastCheckoutState();
 
   const uniqueSuppliersCount = new Set(selectedProducts.map(p => p.lastSupplier)).size;
+
+  if (loading) {
+    return (
+      <div className="w-full space-y-4">
+        <div className="h-20 bg-muted rounded-lg animate-pulse" />
+        <Card>
+          <CardContent className="p-4">
+            <div className="space-y-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-32 bg-muted rounded-lg animate-pulse" />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-4">
