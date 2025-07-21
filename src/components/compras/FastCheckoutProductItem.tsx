@@ -1,32 +1,12 @@
 
 import { useCart } from "@/contexts/CartContext";
+import { FastCheckoutProduct } from "@/types/fastCheckout";
 import { ProductHeader } from "./ProductHeader";
 import { ProductInfo } from "./ProductInfo";
 import { ProductBadges } from "./ProductBadges";
 import { ProductInputs } from "./ProductInputs";
 import { ProductTotal } from "./ProductTotal";
 import { ProductCartControls } from "./ProductCartControls";
-
-interface FastCheckoutProduct {
-  id: string;
-  name: string;
-  category: string;
-  currentStock: number;
-  originalStock: number;
-  unit: string;
-  stockLevel: "critical" | "low" | "medium" | "good";
-  suggestedQuantity: number;
-  targetQuantity: number;
-  lastSupplier: string;
-  lastPrice: number;
-  unitPrice: number;
-  supplierRating: "excellent" | "good" | "warning" | "poor";
-  supplierNote: string;
-  dailySales: number;
-  isSelected: boolean;
-  paymentMethod: "BOLETO" | "NOTA FISCAL";
-  daysToPayment: number;
-}
 
 interface FastCheckoutProductItemProps {
   product: FastCheckoutProduct;
