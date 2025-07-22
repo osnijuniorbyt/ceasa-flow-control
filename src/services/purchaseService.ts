@@ -177,6 +177,12 @@ export class PurchaseService {
     localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
   }
 
+  static addNewProduct(product: FastCheckoutProduct): void {
+    const products = this.getProducts();
+    products.push(product);
+    this.saveProducts(products);
+  }
+
   static updateProductStock(productId: string, newStock: number): void {
     const products = this.getProducts();
     const updatedProducts = products.map(product => {

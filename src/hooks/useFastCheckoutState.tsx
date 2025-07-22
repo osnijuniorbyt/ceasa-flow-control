@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { FastCheckoutProduct } from "@/types/fastCheckout";
 import { PurchaseService } from "@/services/purchaseService";
@@ -118,6 +118,11 @@ export function useFastCheckoutState() {
     setProducts(products.map(p => ({ ...p, isSelected: false })));
   };
 
+  const handleAddProduct = useCallback((newProduct: FastCheckoutProduct) => {
+    // Add the product to the list
+    setProducts(prevProducts => [...prevProducts, newProduct]);
+  }, []);
+
   return {
     products,
     allSelected,
@@ -131,6 +136,7 @@ export function useFastCheckoutState() {
     handleSelectAll,
     handleKeyPress,
     handleConfirmOrders,
-    handleClearSelections
+    handleClearSelections,
+    handleAddProduct
   };
 }

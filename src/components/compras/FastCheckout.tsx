@@ -5,6 +5,10 @@ import { FastCheckoutProductItem } from "./FastCheckoutProductItem";
 import { FastCheckoutActionButtons } from "./FastCheckoutActionButtons";
 import { FastCheckoutSummaryHeader } from "./FastCheckoutSummaryHeader";
 import { FastCheckoutShortcuts } from "./FastCheckoutShortcuts";
+import { AddNewProductForm } from "./AddNewProductForm";
+import { DataStorage } from "./DataStorage";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 export function FastCheckout() {
   const {
@@ -20,7 +24,8 @@ export function FastCheckout() {
     handleSelectAll,
     handleKeyPress,
     handleConfirmOrders,
-    handleClearSelections
+    handleClearSelections,
+    handleAddProduct
   } = useFastCheckoutState();
 
   const uniqueSuppliersCount = new Set(selectedProducts.map(p => p.lastSupplier)).size;
@@ -73,8 +78,23 @@ export function FastCheckout() {
             onConfirm={handleConfirmOrders}
             onClear={handleClearSelections}
           />
+          
+          <Separator className="my-4" />
+          
+          <div>
+            <AddNewProductForm onProductAdded={(product) => {
+              // The service already handles adding the product to localStorage
+              // Update the state with the new product
+              handleAddProduct(product);
+              toast.success(`Produto "${product.name}" adicionado à lista de compras`);
+            }} />
+          </div>
 
           <FastCheckoutShortcuts uniqueSuppliersCount={uniqueSuppliersCount} />
+          
+          <Separator className="my-4" />
+          
+          <DataStorage />
         </CardContent>
       </Card>
     </div>
