@@ -12,8 +12,8 @@ import { cn } from "@/lib/utils";
 
 const quickNavItems = [
   {
-    title: "⚡ CEASA",
-    url: "/compras-ceasa",
+    title: "⚡ Rápida",
+    url: "/compra-rapida",
     icon: Bolt,
   },
   {
@@ -27,9 +27,9 @@ const quickNavItems = [
     icon: Warehouse,
   },
   {
-    title: "Cadastros",
-    url: "/cadastros",
-    icon: LayoutDashboard,
+    title: "Preços",
+    url: "/pricing",
+    icon: DollarSign,
   },
   {
     title: "Relatórios",
