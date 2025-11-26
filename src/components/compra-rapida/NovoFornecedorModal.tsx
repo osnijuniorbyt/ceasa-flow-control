@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NovoFornecedorModalProps {
   open: boolean;
@@ -19,6 +20,7 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
   const [tipo, setTipo] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSave = async () => {
     if (!nome.trim()) {
@@ -41,8 +43,14 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
 
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Usuário não autenticado");
+      if (!user?.id) {
+        toast({
+          title: "Erro",
+          description: "Você precisa estar logado para cadastrar fornecedor",
+          variant: "destructive",
+        });
+        return;
+      }
       
       const { data, error } = await supabase
         .from("fornecedores")
@@ -84,57 +92,57 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[92vw] md:w-[88vw] max-w-lg md:max-w-3xl">
+      <DialogContent className="w-[92vw] md:w-[88vw] max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl md:text-3xl">Novo Fornecedor</DialogTitle>
+          <DialogTitle className="text-lg md:text-xl">Novo Fornecedor</DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 py-4">
-          <div className="space-y-3">
-            <Label htmlFor="nome" className="text-lg md:text-xl font-semibold">Nome *</Label>
+        <div className="space-y-4 py-3">
+          <div className="space-y-2">
+            <Label htmlFor="nome" className="text-sm font-semibold">Nome *</Label>
             <Input
               id="nome"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome do fornecedor"
-              className="h-16 md:h-20 text-xl md:text-2xl"
+              className="h-11 text-base"
             />
           </div>
-          <div className="space-y-3">
-            <Label htmlFor="tipo" className="text-lg md:text-xl font-semibold">Local / Tipo *</Label>
+          <div className="space-y-2">
+            <Label htmlFor="tipo" className="text-sm font-semibold">Local / Tipo *</Label>
             <Select value={tipo} onValueChange={setTipo}>
-              <SelectTrigger className="h-16 md:h-20 text-xl md:text-2xl">
+              <SelectTrigger className="h-11 text-base">
                 <SelectValue placeholder="Selecione o local" />
               </SelectTrigger>
-              <SelectContent className="text-xl md:text-2xl">
-                <SelectItem value="CEASA" className="text-xl md:text-2xl py-4">CEASA</SelectItem>
-                <SelectItem value="PEDRA" className="text-xl md:text-2xl py-4">Pedra</SelectItem>
-                <SelectItem value="LOJAS" className="text-xl md:text-2xl py-4">Lojas</SelectItem>
-                <SelectItem value="OUTROS" className="text-xl md:text-2xl py-4">Outros</SelectItem>
+              <SelectContent className="text-base">
+                <SelectItem value="CEASA" className="text-base py-2">🥬 CEASA</SelectItem>
+                <SelectItem value="PEDRA" className="text-base py-2">🪨 Pedra</SelectItem>
+                <SelectItem value="LOJAS" className="text-base py-2">🏪 Lojas</SelectItem>
+                <SelectItem value="OUTROS" className="text-base py-2">📦 Outros</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-3">
-            <Label htmlFor="box" className="text-lg md:text-xl font-semibold">Box / Contato</Label>
+          <div className="space-y-2">
+            <Label htmlFor="box" className="text-sm font-semibold">Box / Contato</Label>
             <Input
               id="box"
               value={box}
               onChange={(e) => setBox(e.target.value)}
               placeholder="Box 123 ou telefone"
-              className="h-16 md:h-20 text-xl md:text-2xl"
+              className="h-11 text-base"
             />
           </div>
-          <div className="flex gap-4 pt-4">
+          <div className="flex gap-3 pt-3">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="flex-1 h-16 md:h-20 text-xl md:text-2xl"
+              className="flex-1 h-11 text-base"
               disabled={loading}
             >
               Cancelar
             </Button>
             <Button
               onClick={handleSave}
-              className="flex-1 h-16 md:h-20 text-xl md:text-2xl"
+              className="flex-1 h-11 text-base"
               disabled={loading}
             >
               {loading ? "Salvando..." : "Salvar"}

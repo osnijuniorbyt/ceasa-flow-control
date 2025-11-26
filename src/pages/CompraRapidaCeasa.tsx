@@ -553,15 +553,15 @@ export default function CompraRapidaCeasa() {
       {/* Seleção de Fornecedor */}
       <Card className="border-2">
         <CardHeader className="pb-3 pt-3 px-3 md:px-6">
-          <CardTitle className="flex items-center gap-3 text-xl md:text-2xl">
-            <Truck className="h-6 w-6 md:h-7 md:w-7" />
+          <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+            <Truck className="h-5 w-5" />
             Fornecedor
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-3 md:px-6 pb-4 space-y-3">
-          <div className="space-y-2">
-            <Label className="text-base md:text-lg">Filtrar por tipo:</Label>
-            <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-3">
+        <CardContent className="px-3 md:px-6 pb-4 space-y-2">
+          <div className="space-y-1.5">
+            <Label className="text-sm">Filtrar por tipo:</Label>
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
               {["TODOS", "CEASA", "PEDRA", "LOJAS", "OUTROS"].map((tipo) => (
                 <button
                   key={tipo}
@@ -570,26 +570,26 @@ export default function CompraRapidaCeasa() {
                     setTipoFornecedorFiltro(tipo);
                     localStorage.setItem("tipo_fornecedor_filtro", tipo);
                   }}
-                  className={`p-4 md:p-5 font-medium rounded-xl border-2 transition-all min-h-[70px] md:min-h-[90px] ${
+                  className={`p-2 font-medium rounded-lg border-2 transition-all min-h-[50px] ${
                     tipoFornecedorFiltro === tipo
                       ? "bg-primary text-primary-foreground border-primary shadow-lg"
                       : "bg-card border-border hover:border-primary/50 hover:shadow-md"
                   }`}
                 >
-                  <div className="text-3xl md:text-4xl">
+                  <div className="text-xl">
                     {tipo === "CEASA" && "🥬"}
                     {tipo === "PEDRA" && "🪨"}
                     {tipo === "LOJAS" && "🏪"}
                     {tipo === "OUTROS" && "📦"}
                     {tipo === "TODOS" && "🔍"}
                   </div>
-                  <div className="text-sm md:text-base mt-1 font-semibold">{tipo}</div>
+                  <div className="text-xs mt-0.5 font-semibold">{tipo}</div>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-2 items-center">
             <Select 
               value={fornecedorSelecionado} 
               onValueChange={(value) => {
@@ -604,21 +604,21 @@ export default function CompraRapidaCeasa() {
                 }, 300);
               }}
             >
-              <SelectTrigger ref={fornecedorSelectRef} className="h-14 md:h-16 text-base md:text-lg border-2">
+              <SelectTrigger ref={fornecedorSelectRef} className="h-11 text-base border-2">
                 <SelectValue placeholder="Selecione o fornecedor" />
               </SelectTrigger>
               <SelectContent>
                 {fornecedores?.map((f: any) => (
-                  <SelectItem key={f.id} value={f.id} className="text-base md:text-lg py-3 md:py-4">
+                  <SelectItem key={f.id} value={f.id} className="text-base py-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl">
+                      <span className="text-base">
                         {f.tipo === "CEASA" && "🥬"}
                         {f.tipo === "PEDRA" && "🪨"}
                         {f.tipo === "LOJAS" && "🏪"}
                         {f.tipo === "OUTROS" && "📦"}
                       </span>
                       <span className="font-semibold">{f.nome_fantasia || f.razao_social}</span>
-                      {f.box && <span className="text-sm text-muted-foreground">({f.box})</span>}
+                      {f.box && <span className="text-xs text-muted-foreground">({f.box})</span>}
                     </div>
                   </SelectItem>
                 ))}
@@ -626,7 +626,7 @@ export default function CompraRapidaCeasa() {
             </Select>
             <Button
               size="icon"
-              className="h-14 md:h-16 w-14 md:w-16 flex-shrink-0"
+              className="h-11 w-11 flex-shrink-0"
               onClick={() => setNovoFornecedorModalOpen(true)}
             >
               <Plus className="h-5 w-5" />
@@ -664,14 +664,14 @@ export default function CompraRapidaCeasa() {
         <Card ref={produtoCardRef} className="border-2">
           <CardHeader className="pb-2 pt-3 px-3 md:px-6">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg md:text-xl">Buscar Produto</CardTitle>
+              <CardTitle className="text-base">Buscar Produto</CardTitle>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setNovoProdutoModalOpen(true)}
-                className="h-10 md:h-12 text-sm md:text-base gap-2 px-3"
+                className="h-9 text-sm gap-1.5 px-2.5"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-3.5 w-3.5" />
                 Novo
               </Button>
             </div>
@@ -710,17 +710,17 @@ export default function CompraRapidaCeasa() {
             />
 
             {produtoSelecionado && (
-              <div className="space-y-3">
-                <div className="bg-primary/10 border-2 border-primary/30 p-3 md:p-4 rounded-xl">
-                  <div className="font-bold text-lg md:text-xl mb-2">
+              <div className="space-y-2.5">
+                <div className="bg-primary/10 border-2 border-primary/30 p-2.5 rounded-lg">
+                  <div className="font-bold text-base mb-2">
                     {produtoSelecionado.codigo} - {produtoSelecionado.descricao}
                   </div>
                   
                   <div className="border-t-2 pt-2">
-                    <label className="text-sm md:text-base text-muted-foreground font-semibold block mb-2">📦 Embalagem:</label>
+                    <label className="text-xs text-muted-foreground font-semibold block mb-1.5">📦 Embalagem:</label>
                     
                     {(produtoSelecionado.vasilhame_padrao || produtoSelecionado.vasilhame_secundario || produtoSelecionado.vasilhame_ultima_compra) ? (
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                         {produtoSelecionado.vasilhame_padrao && (
                           <button
                             type="button"
@@ -728,16 +728,16 @@ export default function CompraRapidaCeasa() {
                               setVasilhameSelecionado("padrao");
                               setVasilhameManualId("");
                             }}
-                            className={`p-4 md:p-5 rounded-xl border-2 transition-all min-h-[80px] md:min-h-[100px] ${
+                            className={`p-2.5 rounded-lg border-2 transition-all min-h-[60px] ${
                               vasilhameSelecionado === "padrao"
                                 ? "bg-blue-500 text-white border-blue-600 shadow-lg"
                                 : "bg-card border-border hover:border-blue-400"
                             }`}
                           >
-                            <div className="text-base md:text-lg font-semibold">
+                            <div className="text-sm font-semibold">
                               {produtoSelecionado.vasilhame_padrao.nome}
                             </div>
-                            <div className="text-xl md:text-2xl font-bold mt-1">
+                            <div className="text-base font-bold mt-0.5">
                               {produtoSelecionado.vasilhame_padrao.peso_kg} kg/cx
                             </div>
                           </button>
@@ -749,7 +749,7 @@ export default function CompraRapidaCeasa() {
                               setVasilhameSelecionado("secundario");
                               setVasilhameManualId("");
                             }}
-                            className={`p-4 md:p-5 rounded-xl border-2 transition-all min-h-[80px] md:min-h-[100px] ${
+                            className={`p-2.5 rounded-lg border-2 transition-all min-h-[60px] ${
                               vasilhameSelecionado === "secundario"
                                 ? "bg-blue-500 text-white border-blue-600 shadow-lg"
                                 : "bg-background border-border hover:border-blue-400"
@@ -758,7 +758,7 @@ export default function CompraRapidaCeasa() {
                             <div className="text-sm font-medium">
                               {produtoSelecionado.vasilhame_secundario.nome}
                             </div>
-                            <div className="text-lg font-bold">
+                            <div className="text-base font-bold">
                               {produtoSelecionado.vasilhame_secundario.peso_kg} kg/cx
                             </div>
                           </button>
@@ -770,13 +770,13 @@ export default function CompraRapidaCeasa() {
                               setVasilhameSelecionado("manual");
                               setVasilhameManualId(produtoSelecionado.vasilhame_ultima_compra.id);
                             }}
-                            className={`flex-1 p-3 rounded border-2 transition-all min-h-[70px] ${
+                            className={`flex-1 p-2 rounded border-2 transition-all min-h-[55px] ${
                               vasilhameSelecionado === "manual" && vasilhameManualId === produtoSelecionado.vasilhame_ultima_compra.id
                                 ? "bg-blue-500 text-white border-blue-600"
                                 : "bg-background border-border hover:border-blue-400"
                             }`}
                           >
-                            <div className="text-sm font-medium">
+                            <div className="text-xs font-medium">
                               {produtoSelecionado.vasilhame_ultima_compra.nome} ⏱️
                             </div>
                             <div className="text-lg font-bold">
@@ -800,20 +800,20 @@ export default function CompraRapidaCeasa() {
                             setVasilhameSelecionado("manual");
                           }}
                         >
-                          <SelectTrigger className="h-16 text-lg border-2">
+                          <SelectTrigger className="h-11 text-base border-2">
                             <SelectValue placeholder="Selecione a embalagem" />
                           </SelectTrigger>
                           <SelectContent>
                             {todosVasilhames.map((vasilhame: any) => (
-                              <SelectItem key={vasilhame.id} value={vasilhame.id} className="text-lg py-4">
+                              <SelectItem key={vasilhame.id} value={vasilhame.id} className="text-base py-2">
                                 {vasilhame.nome} - {vasilhame.peso_kg} {vasilhame.unidade_base}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                         {vasilhameManualId && (
-                          <div className="text-sm text-blue-600 bg-blue-50 p-3 rounded-lg border-2 border-blue-200">
-                            ✓ Embalagem selecionada: {todosVasilhames.find((v: any) => v.id === vasilhameManualId)?.nome}
+                          <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded-md border-2 border-blue-200">
+                            ✓ Embalagem: {todosVasilhames.find((v: any) => v.id === vasilhameManualId)?.nome}
                           </div>
                         )}
                       </div>
@@ -821,7 +821,7 @@ export default function CompraRapidaCeasa() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3 md:gap-4">
+                <div className="grid grid-cols-2 gap-2.5">
                   <div ref={quantidadeRef}>
                     <InputNumericoMobile
                       label="Qtd Caixas"
@@ -852,12 +852,12 @@ export default function CompraRapidaCeasa() {
 
                 <Button
                   size="lg"
-                  className="w-full h-16 md:h-20 text-lg md:text-xl font-bold shadow-lg"
+                  className="w-full h-12 text-base font-bold shadow-lg"
                   onClick={adicionarAoCarrinho}
                   disabled={!produtoSelecionado || !quantidade || 
                     (!produtoSelecionado.vasilhame_padrao && !produtoSelecionado.vasilhame_secundario && !produtoSelecionado.vasilhame_ultima_compra && !vasilhameManualId)}
                 >
-                  <Plus className="h-6 w-6 mr-2" />
+                  <Plus className="h-5 w-5 mr-2" />
                   Adicionar ao Carrinho
                 </Button>
               </div>
@@ -870,16 +870,16 @@ export default function CompraRapidaCeasa() {
       {carrinhoArray.length > 0 && (
         <Card className="border-2 border-green-500/50 shadow-lg">
           <CardHeader className="pb-3 pt-3 px-3 md:px-6">
-            <CardTitle className="flex items-center justify-between text-xl md:text-2xl">
-              <span className="flex items-center gap-3">
-                <List className="h-6 w-6 md:h-7 md:w-7" />
+            <CardTitle className="flex items-center justify-between text-base">
+              <span className="flex items-center gap-2">
+                <List className="h-5 w-5" />
                 Carrinho ({carrinhoArray.length})
               </span>
               <div className="flex flex-col items-end">
-                <span className="text-2xl md:text-3xl font-bold text-green-600">
+                <span className="text-xl font-bold text-green-600">
                   R$ {totalCarrinho.toFixed(2)}
                 </span>
-                <span className="text-base md:text-lg text-muted-foreground font-semibold">
+                <span className="text-xs text-muted-foreground font-semibold">
                   {carrinhoArray.reduce((sum, item) => sum + item.peso_total_kg, 0).toFixed(1)} kg total
                 </span>
               </div>
@@ -897,7 +897,7 @@ export default function CompraRapidaCeasa() {
 
             <Button
               size="lg"
-              className="w-full h-20 md:h-24 text-xl md:text-2xl font-bold bg-green-600 hover:bg-green-700 mt-4 shadow-lg"
+              className="w-full h-14 text-base font-bold bg-green-600 hover:bg-green-700 mt-4 shadow-lg"
               onClick={() => salvarCompraMutation.mutate()}
               disabled={salvarCompraMutation.isPending}
             >
