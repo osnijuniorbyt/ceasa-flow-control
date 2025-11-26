@@ -12,8 +12,7 @@ import { SwipeableHistoricoItem } from "@/components/compras-ceasa/SwipeableHist
 import { SwipeableCarrinhoItem } from "@/components/compras-ceasa/SwipeableCarrinhoItem";
 import { ConferenciaMobile } from "@/components/compras-ceasa/ConferenciaMobile";
 import { PrecificacaoMobile } from "@/components/compras-ceasa/PrecificacaoMobile";
-import { ComparativoLotes } from "@/components/compras-ceasa/ComparativoLotes";
-import { Apple, Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign, FileText } from "lucide-react";
+import { Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import {
@@ -319,18 +318,30 @@ export default function CompraRapidaCeasa() {
   return (
     <div className="min-h-screen pb-20">
       {/* Header Compacto */}
-      <div className="bg-black text-white p-3 sticky top-0 z-10 shadow-lg">
+      <div className="bg-black text-white p-4 sticky top-0 z-10 shadow-lg">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Apple className="h-7 w-7 text-orange-500 fill-orange-500" />
-            HORTII
-          </h1>
+          <div className="flex items-center gap-3 mx-auto">
+            <svg 
+              width="32" 
+              height="32" 
+              viewBox="0 0 32 32" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="16" cy="18" r="10" fill="#FF8C00" />
+              <ellipse cx="16" cy="18" rx="8" ry="9" fill="#FFA500" />
+              <path d="M16 8 Q18 6 20 8 L19 10 Q17 9 16 10 Z" fill="#228B22" />
+            </svg>
+            <h1 className="text-3xl font-light tracking-[0.3em] text-center">
+              HORTII
+            </h1>
+          </div>
           {activeTab === "lancamento" && fornecedorSelecionado && (
             <Button
               variant="ghost"
               size="sm"
               onClick={cancelarCompra}
-              className="text-white hover:bg-white/20 h-8"
+              className="text-white hover:bg-white/20 h-8 absolute right-3"
             >
               <X className="h-4 w-4 mr-1" />
               Cancelar
@@ -341,9 +352,9 @@ export default function CompraRapidaCeasa() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-12 sticky top-[52px] z-10 rounded-none border-b bg-background">
+        <TabsList className="grid w-full grid-cols-3 h-12 sticky top-[60px] z-10 rounded-none border-b bg-background">
           <TabsTrigger value="lancamento" className="text-xs gap-1">
-            <Apple className="h-4 w-4" />
+            <List className="h-4 w-4" />
             Lançar
           </TabsTrigger>
           <TabsTrigger value="conferencia" className="text-xs gap-1">
@@ -353,10 +364,6 @@ export default function CompraRapidaCeasa() {
           <TabsTrigger value="precificacao" className="text-xs gap-1">
             <DollarSign className="h-4 w-4" />
             Preços
-          </TabsTrigger>
-          <TabsTrigger value="relatorios" className="text-xs gap-1">
-            <FileText className="h-4 w-4" />
-            Relatórios
           </TabsTrigger>
         </TabsList>
 
@@ -522,10 +529,6 @@ export default function CompraRapidaCeasa() {
 
         <TabsContent value="precificacao" className="mt-0">
           <PrecificacaoMobile loteData={loteData} onLoteDataChange={setLoteData} />
-        </TabsContent>
-
-        <TabsContent value="relatorios" className="mt-0">
-          <ComparativoLotes />
         </TabsContent>
       </Tabs>
 
