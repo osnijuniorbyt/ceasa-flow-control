@@ -1,13 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BuscaProdutoInteligente } from "@/components/compras-ceasa/BuscaProdutoInteligente";
 import { InputNumericoMobile } from "@/components/compras-ceasa/InputNumericoMobile";
-import { ShoppingCart, Truck, List, Plus, Trash2, Save } from "lucide-react";
+import { ShoppingCart, Truck, List, Plus, Trash2, Save, History } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -20,6 +19,8 @@ interface ItemCarrinho {
   valor_total: string;
 }
 
+const CACHE_KEY = "compra_ceasa_em_andamento";
+
 export default function CompraRapidaCeasa() {
   const [fornecedorSelecionado, setFornecedorSelecionado] = useState<string>("");
   const [produtoSelecionado, setProdutoSelecionado] = useState<any>(null);
@@ -28,6 +29,90 @@ export default function CompraRapidaCeasa() {
   const [valorTotal, setValorTotal] = useState("");
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  // Carregar cache ao montar
+  useEffect(() => {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      try {
+        const data = JSON.parse(cached);
+        setFornecedorSelecionado(data.fornecedor || "");
+        setCarrinho(data.carrinho || []);
+        toast.info("Compra em andamento restaurada");
+      } catch (e) {
+        console.error("Erro ao carregar cache:", e);
+      }
+    }
+  }, []);
+
+  // Salvar cache sempre que mudar
+  useEffect(() => {
+    if (fornecedorSelecionado || carrinho.length > 0) {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        fornecedor: fornecedorSelecionado,
+        carrinho: carrinho
+      }));
+    }
+  }, [fornecedorSelecionado, carrinho]);
+
+  // Buscar produtos do histórico do fornecedor
+  const { data: produtosHistorico } = useQuery({
+    queryKey: ["produtos-fornecedor-historico", fornecedorSelecionado],
+    queryFn: async () => {
+      if (!fornecedorSelecionado) return [];
+
+      // Buscar últimas compras deste fornecedor
+      const { data: compras, error } = await supabase
+        .from("compras")
+        .select(`
+          id,
+          itens_compra (
+            produto_id,
+            peso_total_kg,
+            subtotal,
+            preco_por_kg,
+            produtos (
+              id,
+              codigo,
+              descricao,
+              unidade_venda
+            )
+          )
+        `)
+        .eq("fornecedor_id", fornecedorSelecionado)
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+
+      // Agrupar produtos por frequência
+      const produtosMap = new Map();
+      
+      compras?.forEach((compra: any) => {
+        compra.itens_compra?.forEach((item: any) => {
+          if (item.produtos) {
+            const pid = item.produtos.id;
+            if (!produtosMap.has(pid)) {
+              produtosMap.set(pid, {
+                ...item.produtos,
+                vezes_comprado: 0,
+                ultima_quantidade: 0,
+                ultimo_valor: 0,
+              });
+            }
+            const p = produtosMap.get(pid);
+            p.vezes_comprado += 1;
+            p.ultima_quantidade = item.peso_total_kg;
+            p.ultimo_valor = item.subtotal;
+          }
+        });
+      });
+
+      return Array.from(produtosMap.values())
+        .sort((a, b) => b.vezes_comprado - a.vezes_comprado);
+    },
+    enabled: !!fornecedorSelecionado,
+  });
 
   const { data: fornecedores } = useQuery({
     queryKey: ["fornecedores"],
@@ -64,11 +149,12 @@ export default function CompraRapidaCeasa() {
         throw new Error("Adicione produtos ao carrinho");
       }
 
-      // Criar compra
+      // Calcular total
       const valorTotalCompra = carrinho.reduce((sum, item) => 
         sum + parseFloat(item.valor_total || "0"), 0
       );
 
+      // Criar compra (trigger gera numero_compra automaticamente)
       const { data: compra, error: compraError } = await supabase
         .from("compras")
         .insert([{
@@ -76,7 +162,7 @@ export default function CompraRapidaCeasa() {
           valor_produtos: valorTotalCompra,
           valor_total: valorTotalCompra,
           status: "confirmado",
-          numero_compra: 0, // Será gerado automaticamente pelo trigger
+          numero_compra: 1, // Será substituído pelo trigger
         }])
         .select()
         .single();
@@ -123,10 +209,15 @@ export default function CompraRapidaCeasa() {
     },
     onSuccess: (compra) => {
       toast.success(`Compra #${compra.numero_compra} salva com sucesso!`);
+      // Limpar cache
+      localStorage.removeItem(CACHE_KEY);
       setCarrinho([]);
       setQuantidade("");
       setValorTotal("");
+      setFornecedorSelecionado("");
+      setProdutoSelecionado(null);
       queryClient.invalidateQueries({ queryKey: ["compras"] });
+      queryClient.invalidateQueries({ queryKey: ["produtos-fornecedor-historico"] });
       navigate(`/compra-rapida/${compra.id}`);
     },
     onError: (error: any) => {
@@ -134,6 +225,15 @@ export default function CompraRapidaCeasa() {
       toast.error(`Erro ao salvar: ${error.message}`);
     },
   });
+
+  const adicionarProdutoHistorico = (produto: any) => {
+    setProdutoSelecionado(produto);
+    setQuantidade(produto.ultima_quantidade?.toString() || "");
+    setValorTotal(produto.ultimo_valor?.toString() || "");
+    setTimeout(() => {
+      document.getElementById("quantidade-input")?.focus();
+    }, 100);
+  };
 
   const adicionarAoCarrinho = () => {
     if (!produtoSelecionado) {
@@ -210,6 +310,48 @@ export default function CompraRapidaCeasa() {
           </Select>
         </CardContent>
       </Card>
+
+      {/* Histórico de Produtos do Fornecedor */}
+      {fornecedorSelecionado && produtosHistorico && produtosHistorico.length > 0 && (
+        <Card className="border-2 border-blue-500/30">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <History className="h-5 w-5" />
+              Produtos Recentes ({produtosHistorico.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="text-sm text-muted-foreground mb-3">
+              Clique para adicionar rápido
+            </div>
+            {produtosHistorico.slice(0, 5).map((produto: any) => (
+              <button
+                key={produto.id}
+                onClick={() => adicionarProdutoHistorico(produto)}
+                className="w-full p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors text-left"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="font-bold text-base">
+                      {produto.codigo} - {produto.descricao}
+                    </div>
+                    <div className="text-sm text-muted-foreground flex items-center gap-3 mt-1">
+                      <span>Comprado {produto.vezes_comprado}x</span>
+                      <span>•</span>
+                      <span>Último: {produto.ultima_quantidade} {produto.unidade_venda}</span>
+                      <span>•</span>
+                      <span className="text-green-600 font-semibold">
+                        R$ {Number(produto.ultimo_valor).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <Plus className="h-5 w-5 text-primary" />
+                </div>
+              </button>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Busca de Produto */}
       {fornecedorSelecionado && (
