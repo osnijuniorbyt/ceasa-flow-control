@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { ValidarLoteMobile } from "./ValidarLoteMobile";
 
 interface PrecificacaoMobileProps {
   loteData: string;
@@ -412,6 +413,13 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
           </Card>
         )}
       </div>
+
+      <ValidarLoteMobile
+        loteData={loteData}
+        produtosLote={produtosLote}
+        margens={editando}
+        precosVenda={editandoPrecoVenda}
+      />
     </div>
   );
 }

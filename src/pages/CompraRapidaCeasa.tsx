@@ -13,7 +13,7 @@ import { SwipeableCarrinhoItem } from "@/components/compras-ceasa/SwipeableCarri
 import { ConferenciaMobile } from "@/components/compras-ceasa/ConferenciaMobile";
 import { PrecificacaoMobile } from "@/components/compras-ceasa/PrecificacaoMobile";
 import { ComparativoLotes } from "@/components/compras-ceasa/ComparativoLotes";
-import { ShoppingCart, Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign, BarChart3 } from "lucide-react";
+import { ShoppingCart, Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import {
@@ -354,9 +354,9 @@ export default function CompraRapidaCeasa() {
             <DollarSign className="h-4 w-4" />
             Preços
           </TabsTrigger>
-          <TabsTrigger value="comparativo" className="text-xs gap-1">
-            <BarChart3 className="h-4 w-4" />
-            Comparar
+          <TabsTrigger value="relatorios" className="text-xs gap-1">
+            <FileText className="h-4 w-4" />
+            Relatórios
           </TabsTrigger>
         </TabsList>
 
@@ -524,7 +524,7 @@ export default function CompraRapidaCeasa() {
           <PrecificacaoMobile loteData={loteData} onLoteDataChange={setLoteData} />
         </TabsContent>
 
-        <TabsContent value="comparativo" className="mt-0">
+        <TabsContent value="relatorios" className="mt-0">
           <ComparativoLotes />
         </TabsContent>
       </Tabs>
