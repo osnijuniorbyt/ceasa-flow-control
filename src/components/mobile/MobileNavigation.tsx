@@ -12,14 +12,14 @@ import { cn } from "@/lib/utils";
 
 const quickNavItems = [
   {
-    title: "Dashboard",
-    url: "/",
-    icon: LayoutDashboard,
+    title: "⚡ CEASA",
+    url: "/compras-ceasa",
+    icon: Bolt,
   },
   {
-    title: "⚡ Rápida",
-    url: "/compra-rapida",
-    icon: Bolt,
+    title: "Compras",
+    url: "/compras",
+    icon: ShoppingCart,
   },
   {
     title: "Depósito",
@@ -27,9 +27,9 @@ const quickNavItems = [
     icon: Warehouse,
   },
   {
-    title: "Preços",
-    url: "/pricing",
-    icon: DollarSign,
+    title: "Cadastros",
+    url: "/cadastros",
+    icon: LayoutDashboard,
   },
   {
     title: "Relatórios",
@@ -42,8 +42,8 @@ export function MobileNavigation() {
   const location = useLocation();
 
   return (
-    <nav className="sticky bottom-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
-      <div className="flex items-center justify-around h-20 px-2 safe-area-inset-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="flex items-center justify-around h-16 px-1">
         {quickNavItems.map((item) => {
           const isActive = location.pathname === item.url;
           return (
@@ -51,16 +51,16 @@ export function MobileNavigation() {
               key={item.title}
               to={item.url}
               className={cn(
-                "flex flex-col items-center justify-center min-w-0 flex-1 py-2 touch-manipulation transition-colors",
+                "flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 touch-manipulation transition-colors relative",
                 isActive 
                   ? "text-primary" 
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <item.icon className={cn("h-6 w-6 mb-1", isActive && "scale-110")} />
-              <span className="text-xs font-medium truncate">{item.title}</span>
+              <item.icon className={cn("h-5 w-5 mb-0.5", isActive && "scale-110")} />
+              <span className="text-[10px] font-medium truncate max-w-full">{item.title}</span>
               {isActive && (
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-primary rounded-full" />
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
               )}
             </Link>
           );
