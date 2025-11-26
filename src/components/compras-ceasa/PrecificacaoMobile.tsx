@@ -399,9 +399,9 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                       <Label className="text-[9px] text-muted-foreground">Mrg%</Label>
                       <Input
                         id={`margem-${produto.id}`}
-                        type="number"
+                        type="tel"
                         inputMode="decimal"
-                        step="0.1"
+                        pattern="[0-9]*"
                         value={editando[produto.id] ?? produto.margem}
                         onChange={(e) => {
                           const value = e.target.value;
@@ -409,6 +409,7 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                             handleMargemChange(produto.id, value);
                           }
                         }}
+                        onFocus={(e) => e.target.select()}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             handleSalvarMargem(produto.id);
@@ -419,16 +420,17 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                     </div>
 
                     <div>
-                      <Label className="text-[10px] text-muted-foreground font-medium">Preço Venda R$</Label>
+                      <Label className="text-[9px] text-muted-foreground font-medium">Preço R$</Label>
                       <Input
                         id={`preco-${produto.id}`}
-                        type="number"
+                        type="tel"
                         inputMode="decimal"
-                        step="0.01"
+                        pattern="[0-9.]*"
                         value={editandoPrecoVenda[produto.id] ?? precoVenda.toFixed(2)}
                         onChange={(e) =>
                           setEditandoPrecoVenda({ ...editandoPrecoVenda, [produto.id]: e.target.value })
                         }
+                        onFocus={(e) => e.target.select()}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             handleSalvarPrecoVenda(produto.id);
