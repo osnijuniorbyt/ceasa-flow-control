@@ -89,10 +89,26 @@ export default function CompraRapida() {
     const vasilhame = vasilhames?.find(v => v.id === selectedVasilhame);
     if (!vasilhame) return;
 
-    const peso_total_kg = quantidade * vasilhame.peso_kg;
-    const preco_por_kg = precoVasilhame / vasilhame.peso_kg;
+    // Detecta se é produto por peso (kg) ou por unidade
+    const isPorPeso = vasilhame.unidade_base.toLowerCase() === 'kg';
+    
+    let peso_total_kg: number;
+    let preco_por_kg: number;
+    let preco_venda_sugerido: number;
     const margem = selectedProduct.margem_padrao || 0;
-    const preco_venda_sugerido = preco_por_kg * (1 + margem / 100);
+    
+    if (isPorPeso) {
+      // Produto por peso: calcular normalmente em kg
+      peso_total_kg = quantidade * vasilhame.peso_kg;
+      preco_por_kg = precoVasilhame / vasilhame.peso_kg;
+      preco_venda_sugerido = preco_por_kg * (1 + margem / 100);
+    } else {
+      // Produto por unidade: usar quantidade direta
+      peso_total_kg = quantidade * vasilhame.peso_kg; // quantidade de unidades
+      preco_por_kg = precoVasilhame / vasilhame.peso_kg; // preço por unidade
+      preco_venda_sugerido = preco_por_kg * (1 + margem / 100);
+    }
+    
     const subtotal = quantidade * precoVasilhame;
 
     const item: CartItem = {
@@ -337,11 +353,11 @@ export default function CompraRapida() {
                       <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
                     <SelectContent>
-                      {vasilhames?.map((v) => (
-                        <SelectItem key={v.id} value={v.id}>
-                          {v.nome} ({v.peso_kg}kg)
-                        </SelectItem>
-                      ))}
+                       {vasilhames?.map((v) => (
+                         <SelectItem key={v.id} value={v.id}>
+                           {v.nome} ({v.peso_kg} {v.unidade_base})
+                         </SelectItem>
+                       ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -368,32 +384,42 @@ export default function CompraRapida() {
                 />
               </div>
 
-              {selectedVasilhame && quantidade > 0 && precoVasilhame > 0 && (
-                <div className="bg-muted p-3 rounded-lg space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span>Peso Total:</span>
-                    <span className="font-medium">
-                      {(quantidade * (vasilhames?.find(v => v.id === selectedVasilhame)?.peso_kg || 0)).toFixed(2)} kg
-                    </span>
+              {selectedVasilhame && quantidade > 0 && precoVasilhame > 0 && (() => {
+                const vasilhame = vasilhames?.find(v => v.id === selectedVasilhame);
+                if (!vasilhame) return null;
+                
+                const isPorPeso = vasilhame.unidade_base.toLowerCase() === 'kg';
+                const totalQuantidade = quantidade * vasilhame.peso_kg;
+                const precoUnitario = precoVasilhame / vasilhame.peso_kg;
+                const precoVenda = precoUnitario * (1 + (selectedProduct.margem_padrao || 0) / 100);
+                
+                return (
+                  <div className="bg-muted p-3 rounded-lg space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span>Total {isPorPeso ? 'Peso' : 'Quantidade'}:</span>
+                      <span className="font-medium">
+                        {totalQuantidade.toFixed(2)} {vasilhame.unidade_base}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Preço/{vasilhame.unidade_base}:</span>
+                      <span className="font-medium">
+                        R$ {precoUnitario.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Preço Venda/{vasilhame.unidade_base}:</span>
+                      <span className="font-medium text-green-600">
+                        R$ {precoVenda.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between font-bold">
+                      <span>Subtotal:</span>
+                      <span>R$ {(quantidade * precoVasilhame).toFixed(2)}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Preço/kg:</span>
-                    <span className="font-medium">
-                      R$ {(precoVasilhame / (vasilhames?.find(v => v.id === selectedVasilhame)?.peso_kg || 1)).toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Preço Venda/kg:</span>
-                    <span className="font-medium text-green-600">
-                      R$ {((precoVasilhame / (vasilhames?.find(v => v.id === selectedVasilhame)?.peso_kg || 1)) * (1 + (selectedProduct.margem_padrao || 0) / 100)).toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between font-bold">
-                    <span>Subtotal:</span>
-                    <span>R$ {(quantidade * precoVasilhame).toFixed(2)}</span>
-                  </div>
-                </div>
-              )}
+                );
+              })()}
 
               <Button onClick={handleAddToCart} className="w-full">
                 <ShoppingCart className="w-4 h-4 mr-2" />
@@ -440,8 +466,9 @@ export default function CompraRapida() {
                       </Button>
                     </div>
                     <div className="text-xs text-muted-foreground space-y-0.5">
-                      <div>{item.quantidade}x {item.vasilhame_nome} = {item.peso_total_kg.toFixed(2)}kg</div>
-                      <div>R$ {item.preco_por_kg.toFixed(2)}/kg</div>
+                      <div>{item.quantidade}x {item.vasilhame_nome}</div>
+                      <div>Total: {item.peso_total_kg.toFixed(2)} {vasilhames?.find(v => v.id === item.vasilhame_id)?.unidade_base || 'un'}</div>
+                      <div>R$ {item.preco_por_kg.toFixed(2)}/{vasilhames?.find(v => v.id === item.vasilhame_id)?.unidade_base || 'un'}</div>
                       <div className="font-bold text-foreground text-sm mt-1">R$ {item.subtotal.toFixed(2)}</div>
                     </div>
                   </div>
