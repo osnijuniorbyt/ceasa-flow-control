@@ -465,10 +465,10 @@ export default function CompraRapidaCeasa() {
   );
 
   return (
-    <div className="min-h-screen pb-20">
-      {/* Header Compacto */}
-      <div className="bg-black text-white px-2 py-3 sticky top-0 z-10 shadow-lg">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen pb-20 bg-background">
+      {/* Header Compacto - Full Width */}
+      <div className="bg-black text-white py-3 sticky top-0 z-10 shadow-lg -mx-[100vw] ml-[calc(-50vw+50%)] w-screen">
+        <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-2">
               <svg 
@@ -500,7 +500,7 @@ export default function CompraRapidaCeasa() {
               variant="ghost"
               size="sm"
               onClick={cancelarCompra}
-              className="text-white hover:bg-white/20 h-8 absolute right-3"
+              className="text-white hover:bg-white/20 h-8 absolute right-7"
             >
               <X className="h-4 w-4 mr-1" />
               Cancelar
@@ -509,6 +509,8 @@ export default function CompraRapidaCeasa() {
         </div>
       </div>
 
+      {/* Container Centralizado */}
+      <div className="max-w-6xl mx-auto">
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 sticky top-[52px] z-20 rounded-none border-b bg-background shadow-sm">
@@ -916,6 +918,7 @@ export default function CompraRapidaCeasa() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </div>
     </div>
   );
 }
