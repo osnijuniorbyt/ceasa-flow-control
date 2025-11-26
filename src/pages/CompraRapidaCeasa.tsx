@@ -12,7 +12,8 @@ import { SwipeableHistoricoItem } from "@/components/compras-ceasa/SwipeableHist
 import { SwipeableCarrinhoItem } from "@/components/compras-ceasa/SwipeableCarrinhoItem";
 import { ConferenciaMobile } from "@/components/compras-ceasa/ConferenciaMobile";
 import { PrecificacaoMobile } from "@/components/compras-ceasa/PrecificacaoMobile";
-import { ShoppingCart, Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign } from "lucide-react";
+import { ComparativoLotes } from "@/components/compras-ceasa/ComparativoLotes";
+import { ShoppingCart, Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import {
@@ -340,18 +341,22 @@ export default function CompraRapidaCeasa() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-12 sticky top-[52px] z-10 rounded-none border-b bg-background">
-          <TabsTrigger value="lancamento" className="text-sm gap-1">
+        <TabsList className="grid w-full grid-cols-4 h-12 sticky top-[52px] z-10 rounded-none border-b bg-background">
+          <TabsTrigger value="lancamento" className="text-xs gap-1">
             <ShoppingCart className="h-4 w-4" />
-            Lançamento
+            Lançar
           </TabsTrigger>
-          <TabsTrigger value="conferencia" className="text-sm gap-1">
+          <TabsTrigger value="conferencia" className="text-xs gap-1">
             <ClipboardCheck className="h-4 w-4" />
-            Conferência
+            Conferir
           </TabsTrigger>
-          <TabsTrigger value="precificacao" className="text-sm gap-1">
+          <TabsTrigger value="precificacao" className="text-xs gap-1">
             <DollarSign className="h-4 w-4" />
             Preços
+          </TabsTrigger>
+          <TabsTrigger value="comparativo" className="text-xs gap-1">
+            <BarChart3 className="h-4 w-4" />
+            Comparar
           </TabsTrigger>
         </TabsList>
 
@@ -517,6 +522,10 @@ export default function CompraRapidaCeasa() {
 
         <TabsContent value="precificacao" className="mt-0">
           <PrecificacaoMobile loteData={loteData} onLoteDataChange={setLoteData} />
+        </TabsContent>
+
+        <TabsContent value="comparativo" className="mt-0">
+          <ComparativoLotes />
         </TabsContent>
       </Tabs>
 
