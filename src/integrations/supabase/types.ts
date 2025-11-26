@@ -27,7 +27,6 @@ export type Database = {
           status: string
           valor_produtos: number
           valor_total: number
-          xml_gerado: boolean
         }
         Insert: {
           created_at?: string
@@ -41,7 +40,6 @@ export type Database = {
           status?: string
           valor_produtos?: number
           valor_total?: number
-          xml_gerado?: boolean
         }
         Update: {
           created_at?: string
@@ -55,7 +53,6 @@ export type Database = {
           status?: string
           valor_produtos?: number
           valor_total?: number
-          xml_gerado?: boolean
         }
         Relationships: [
           {
@@ -100,45 +97,75 @@ export type Database = {
         }
         Relationships: []
       }
+      grupos: {
+        Row: {
+          ativo: boolean
+          codigo: number
+          created_at: string
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          codigo: number
+          created_at?: string
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          codigo?: number
+          created_at?: string
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       itens_compra: {
         Row: {
           compra_id: string
           created_at: string
-          desconto: number
           id: string
           margem_aplicada: number | null
-          preco_unitario: number
+          peso_total_kg: number
+          preco_por_kg: number
+          preco_por_vasilhame: number
           preco_venda_sugerido: number | null
           produto_id: string
-          quantidade: number
+          quantidade_vasilhames: number
           subtotal: number
-          unidade: string
+          vasilhame_id: string
         }
         Insert: {
           compra_id: string
           created_at?: string
-          desconto?: number
           id?: string
           margem_aplicada?: number | null
-          preco_unitario: number
+          peso_total_kg: number
+          preco_por_kg: number
+          preco_por_vasilhame: number
           preco_venda_sugerido?: number | null
           produto_id: string
-          quantidade: number
+          quantidade_vasilhames: number
           subtotal: number
-          unidade: string
+          vasilhame_id: string
         }
         Update: {
           compra_id?: string
           created_at?: string
-          desconto?: number
           id?: string
           margem_aplicada?: number | null
-          preco_unitario?: number
+          peso_total_kg?: number
+          preco_por_kg?: number
+          preco_por_vasilhame?: number
           preco_venda_sugerido?: number | null
           produto_id?: string
-          quantidade?: number
+          quantidade_vasilhames?: number
           subtotal?: number
-          unidade?: string
+          vasilhame_id?: string
         }
         Relationships: [
           {
@@ -155,58 +182,155 @@ export type Database = {
             referencedRelation: "produtos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "itens_compra_vasilhame_id_fkey"
+            columns: ["vasilhame_id"]
+            isOneToOne: false
+            referencedRelation: "vasilhames"
+            referencedColumns: ["id"]
+          },
         ]
       }
       produtos: {
         Row: {
           ativo: boolean
-          categoria: string | null
-          codigo_barras: string | null
-          codigo_interno: string
+          codigo: string
           created_at: string
           data_ultima_compra: string | null
+          descricao: string
+          grupo_id: string
           id: string
-          margem_sugerida: number | null
-          ncm: string | null
-          nome: string
+          margem_padrao: number | null
           preco_ultima_compra: number | null
-          subcategoria: string | null
-          unidade_compra: string
-          unidade_venda: string | null
+          referencia: string | null
+          subgrupo_id: string
+          unidade_venda: string
+          updated_at: string
+          vasilhame_ultima_compra_id: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          codigo: string
+          created_at?: string
+          data_ultima_compra?: string | null
+          descricao: string
+          grupo_id: string
+          id?: string
+          margem_padrao?: number | null
+          preco_ultima_compra?: number | null
+          referencia?: string | null
+          subgrupo_id: string
+          unidade_venda: string
+          updated_at?: string
+          vasilhame_ultima_compra_id?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          codigo?: string
+          created_at?: string
+          data_ultima_compra?: string | null
+          descricao?: string
+          grupo_id?: string
+          id?: string
+          margem_padrao?: number | null
+          preco_ultima_compra?: number | null
+          referencia?: string | null
+          subgrupo_id?: string
+          unidade_venda?: string
+          updated_at?: string
+          vasilhame_ultima_compra_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "produtos_grupo_id_fkey"
+            columns: ["grupo_id"]
+            isOneToOne: false
+            referencedRelation: "grupos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produtos_subgrupo_id_fkey"
+            columns: ["subgrupo_id"]
+            isOneToOne: false
+            referencedRelation: "subgrupos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produtos_vasilhame_ultima_compra_id_fkey"
+            columns: ["vasilhame_ultima_compra_id"]
+            isOneToOne: false
+            referencedRelation: "vasilhames"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subgrupos: {
+        Row: {
+          ativo: boolean
+          codigo: number
+          created_at: string
+          grupo_id: string
+          id: string
+          nome: string
           updated_at: string
         }
         Insert: {
           ativo?: boolean
-          categoria?: string | null
-          codigo_barras?: string | null
-          codigo_interno: string
+          codigo: number
           created_at?: string
-          data_ultima_compra?: string | null
+          grupo_id: string
           id?: string
-          margem_sugerida?: number | null
-          ncm?: string | null
           nome: string
-          preco_ultima_compra?: number | null
-          subcategoria?: string | null
-          unidade_compra: string
-          unidade_venda?: string | null
           updated_at?: string
         }
         Update: {
           ativo?: boolean
-          categoria?: string | null
-          codigo_barras?: string | null
-          codigo_interno?: string
+          codigo?: number
           created_at?: string
-          data_ultima_compra?: string | null
+          grupo_id?: string
           id?: string
-          margem_sugerida?: number | null
-          ncm?: string | null
           nome?: string
-          preco_ultima_compra?: number | null
-          subcategoria?: string | null
-          unidade_compra?: string
-          unidade_venda?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subgrupos_grupo_id_fkey"
+            columns: ["grupo_id"]
+            isOneToOne: false
+            referencedRelation: "grupos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vasilhames: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          descricao: string | null
+          id: string
+          nome: string
+          peso_kg: number
+          unidade_base: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+          peso_kg: number
+          unidade_base: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+          peso_kg?: number
+          unidade_base?: string
           updated_at?: string
         }
         Relationships: []
