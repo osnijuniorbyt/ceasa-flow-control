@@ -87,13 +87,13 @@ export function SwipeableHistoricoItem({ produto, fornecedorId, onSelect }: Swip
   return (
     <div className="relative overflow-hidden rounded-lg">
       {/* Botão de deletar atrás */}
-      <div className="absolute right-0 top-0 bottom-0 w-20 bg-destructive flex items-center justify-center">
+      <div className="absolute right-0 top-0 bottom-0 w-24 bg-destructive flex items-center justify-center">
         <button
           onClick={handleDelete}
           disabled={deletarMutation.isPending}
           className="h-full w-full flex items-center justify-center"
         >
-          <Trash2 className="h-5 w-5 text-destructive-foreground" />
+          <Trash2 className="h-6 w-6 text-destructive-foreground" />
         </button>
       </div>
 
@@ -107,23 +107,23 @@ export function SwipeableHistoricoItem({ produto, fornecedorId, onSelect }: Swip
           transform: `translateX(${translateX}px)`,
           transition: isDragging ? "none" : "transform 0.3s ease-out",
         }}
-        className="w-full p-1.5 border rounded hover:bg-muted/50 bg-background text-left relative"
+        className="w-full p-3 border-2 rounded-lg hover:bg-muted/50 bg-background text-left relative min-h-[70px]"
       >
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-xs truncate">
+            <div className="font-semibold text-base truncate">
               {produto.codigo} - {produto.descricao}
             </div>
-            <div className="text-[10px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
-              <span>{produto.vezes_comprado}x</span>
+            <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+              <span className="font-medium">{produto.vezes_comprado}x comprado</span>
               <span>•</span>
-              <span className="text-green-600 font-bold text-sm">
+              <span className="text-green-600 font-bold text-lg">
                 R$ {Number(produto.ultimo_valor).toFixed(2)}
               </span>
             </div>
           </div>
           {translateX === 0 && (
-            <Plus className="h-3.5 w-3.5 text-primary flex-shrink-0 ml-1.5" />
+            <Plus className="h-6 w-6 text-primary flex-shrink-0 ml-3" />
           )}
         </div>
       </button>

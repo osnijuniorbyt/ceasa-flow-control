@@ -95,7 +95,7 @@ export function BuscaProdutoInteligente({ onSelectProduto, placeholder = "Digite
   return (
     <div className="relative w-full">
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground" />
         <Input
           ref={inputRef}
           type="text"
@@ -104,36 +104,36 @@ export function BuscaProdutoInteligente({ onSelectProduto, placeholder = "Digite
           onKeyDown={handleKeyDown}
           onFocus={() => searchTerm && setShowSuggestions(true)}
           placeholder={placeholder}
-          className="h-16 pl-14 pr-4 text-xl font-medium border-2"
+          className="h-20 pl-16 pr-4 text-2xl font-medium border-2"
           autoComplete="off"
         />
       </div>
 
       {showSuggestions && produtos && produtos.length > 0 && (
-        <Card className="absolute z-50 w-full mt-2 max-h-80 overflow-y-auto shadow-lg">
+        <Card className="absolute z-[100] w-full mt-2 max-h-96 overflow-y-auto shadow-xl border-2">
           <div className="divide-y">
             {produtos.map((produto) => (
               <button
                 key={produto.id}
                 onClick={() => handleSelectProduto(produto)}
-                className="w-full p-4 text-left hover:bg-muted/50 transition-colors flex items-start gap-3"
+                className="w-full p-4 text-left hover:bg-muted/50 transition-colors flex items-start gap-3 min-h-[80px]"
               >
-                <Package className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                <Package className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <div className="font-bold text-lg">
+                  <div className="font-bold text-xl">
                     {produto.codigo} - {produto.descricao}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
+                  <div className="text-base text-muted-foreground mt-1 flex items-center gap-2">
                     <span>Un: {produto.unidade_venda}</span>
                     {produto.preco_ultima_compra && (
                       <>
                         <span>•</span>
-                        <span>Último: R$ {Number(produto.preco_ultima_compra).toFixed(2)}</span>
+                        <span className="text-green-600 font-semibold">Último: R$ {Number(produto.preco_ultima_compra).toFixed(2)}</span>
                       </>
                     )}
                   </div>
                   {produto.fornecedores && (
-                    <div className="text-xs text-muted-foreground mt-1">
+                    <div className="text-sm text-muted-foreground mt-1">
                       Fornecedor: {produto.fornecedores.nome_fantasia || produto.fornecedores.razao_social}
                     </div>
                   )}
