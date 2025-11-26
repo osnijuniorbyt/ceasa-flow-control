@@ -8,6 +8,7 @@ import { BuscaProdutoInteligente } from "@/components/compras-ceasa/BuscaProduto
 import { InputNumericoMobile } from "@/components/compras-ceasa/InputNumericoMobile";
 import { NovoFornecedorModal } from "@/components/compra-rapida/NovoFornecedorModal";
 import { SwipeableHistoricoItem } from "@/components/compras-ceasa/SwipeableHistoricoItem";
+import { SwipeableCarrinhoItem } from "@/components/compras-ceasa/SwipeableCarrinhoItem";
 import { ShoppingCart, Truck, List, Plus, Trash2, Save, History } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -412,27 +413,12 @@ export default function CompraRapidaCeasa() {
           </CardHeader>
           <CardContent className="space-y-1 px-3 pb-3">
             {carrinho.map((item, index) => (
-              <div
+              <SwipeableCarrinhoItem
                 key={index}
-                className="bg-muted/50 p-2 rounded-lg flex items-center justify-between"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate">
-                    {item.codigo} - {item.descricao}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-0.5">
-                    {item.quantidade} {item.unidade} • <span className="text-green-600 font-bold text-base">R$ {parseFloat(item.valor_total).toFixed(2)}</span>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removerDoCarrinho(index)}
-                  className="h-8 w-8 flex-shrink-0 ml-2"
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
+                item={item}
+                index={index}
+                onRemove={removerDoCarrinho}
+              />
             ))}
 
             <Button
