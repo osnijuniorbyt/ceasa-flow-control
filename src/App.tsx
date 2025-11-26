@@ -42,6 +42,7 @@ import Desenvolvimento from "./pages/Desenvolvimento";
 import DesenvolvimentoRelatorios from "./pages/DesenvolvimentoRelatorios";
 import ProdutosGestao from "./pages/ProdutosGestao";
 import FornecedoresGestao from "./pages/FornecedoresGestao";
+import Cadastros from "./pages/Cadastros";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -136,6 +137,7 @@ const App = () => {
                 <Route path="deliveries" element={<Deliveries />} />
                 <Route path="reports" element={<Reports />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="cadastros" element={<Cadastros />} />
                 </Route>
                 <Route path="/produtos-gestao" element={<ProtectedRoute><ProdutosGestao /></ProtectedRoute>} />
                 <Route path="/desenvolvimento" element={<ProtectedRoute><Desenvolvimento /></ProtectedRoute>} />

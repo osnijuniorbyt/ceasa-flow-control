@@ -146,7 +146,22 @@ export default function CompraRapidaCeasa() {
               id,
               codigo,
               descricao,
-              unidade_venda
+              unidade_venda,
+              vasilhame_padrao:vasilhames!produtos_vasilhame_padrao_id_fkey (
+                id,
+                nome,
+                peso_kg
+              ),
+              vasilhame_secundario:vasilhames!produtos_vasilhame_secundario_id_fkey (
+                id,
+                nome,
+                peso_kg
+              ),
+              vasilhame_ultima_compra:vasilhames!produtos_vasilhame_ultima_compra_id_fkey (
+                id,
+                nome,
+                peso_kg
+              )
             )
           )
         `)
@@ -322,13 +337,29 @@ export default function CompraRapidaCeasa() {
     setProdutoSelecionado(produto);
     setQuantidade(produto.ultima_quantidade?.toString() || "");
     setValorTotal(produto.ultimo_valor?.toString() || "");
-    setVasilhameManualId("");
+    
+    // Selecionar embalagem automaticamente baseado na prioridade
+    if (produto.vasilhame_padrao) {
+      setVasilhameSelecionado("padrao");
+      setVasilhameManualId("");
+    } else if (produto.vasilhame_secundario) {
+      setVasilhameSelecionado("secundario");
+      setVasilhameManualId("");
+    } else if (produto.vasilhame_ultima_compra) {
+      // Usar automaticamente a última embalagem usada
+      setVasilhameSelecionado("manual");
+      setVasilhameManualId(produto.vasilhame_ultima_compra.id);
+    } else {
+      setVasilhameSelecionado("");
+      setVasilhameManualId("");
+    }
+    
     setTimeout(() => {
       document.getElementById("quantidade-input")?.focus();
     }, 100);
   };
 
-  const adicionarAoCarrinho = () => {
+  const adicionarAoCarrinho = async () => {
     if (!produtoSelecionado) {
       toast.error("Selecione um produto");
       return;
@@ -353,6 +384,18 @@ export default function CompraRapidaCeasa() {
     if (!vasilhameUsado) {
       toast.error("Selecione uma embalagem");
       return;
+    }
+
+    // Salvar a última embalagem usada no produto
+    if (vasilhameSelecionado === "manual" && vasilhameManualId) {
+      try {
+        await supabase
+          .from("produtos")
+          .update({ vasilhame_ultima_compra_id: vasilhameManualId })
+          .eq("id", produtoSelecionado.id);
+      } catch (error) {
+        console.error("Erro ao atualizar embalagem do produto:", error);
+      }
     }
 
     const qtdCaixas = parseFloat(quantidade);
@@ -596,8 +639,21 @@ export default function CompraRapidaCeasa() {
             <BuscaProdutoInteligente
               onSelectProduto={(produto) => {
                 setProdutoSelecionado(produto);
-                setVasilhameSelecionado(produto.vasilhame_padrao ? "padrao" : "secundario");
-                setVasilhameManualId("");
+                // Selecionar embalagem automaticamente baseado na prioridade
+                if (produto.vasilhame_padrao) {
+                  setVasilhameSelecionado("padrao");
+                  setVasilhameManualId("");
+                } else if (produto.vasilhame_secundario) {
+                  setVasilhameSelecionado("secundario");
+                  setVasilhameManualId("");
+                } else if (produto.vasilhame_ultima_compra) {
+                  // Usar automaticamente a última embalagem usada
+                  setVasilhameSelecionado("manual");
+                  setVasilhameManualId(produto.vasilhame_ultima_compra.id);
+                } else {
+                  setVasilhameSelecionado("");
+                  setVasilhameManualId("");
+                }
                 setTimeout(() => {
                   document.getElementById("quantidade-input")?.focus();
                 }, 100);
@@ -615,8 +671,8 @@ export default function CompraRapidaCeasa() {
                   <div className="border-t pt-2">
                     <label className="text-[10px] text-muted-foreground font-medium block mb-1">📦 Embalagem:</label>
                     
-                    {(produtoSelecionado.vasilhame_padrao || produtoSelecionado.vasilhame_secundario) ? (
-                      <div className="flex gap-2">
+                    {(produtoSelecionado.vasilhame_padrao || produtoSelecionado.vasilhame_secundario || produtoSelecionado.vasilhame_ultima_compra) ? (
+                      <div className="flex gap-2 flex-wrap">
                         {produtoSelecionado.vasilhame_padrao && (
                           <button
                             type="button"
@@ -659,10 +715,34 @@ export default function CompraRapidaCeasa() {
                             </div>
                           </button>
                         )}
+                        {produtoSelecionado.vasilhame_ultima_compra && !produtoSelecionado.vasilhame_padrao && !produtoSelecionado.vasilhame_secundario && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setVasilhameSelecionado("manual");
+                              setVasilhameManualId(produtoSelecionado.vasilhame_ultima_compra.id);
+                            }}
+                            className={`flex-1 p-2 rounded border-2 transition-all ${
+                              vasilhameSelecionado === "manual" && vasilhameManualId === produtoSelecionado.vasilhame_ultima_compra.id
+                                ? "bg-blue-500 text-white border-blue-600"
+                                : "bg-background border-border hover:border-blue-400"
+                            }`}
+                          >
+                            <div className="text-[11px] font-medium">
+                              {produtoSelecionado.vasilhame_ultima_compra.nome} ⏱️
+                            </div>
+                            <div className="text-sm font-bold">
+                              {produtoSelecionado.vasilhame_ultima_compra.peso_kg} kg/cx
+                            </div>
+                            <div className="text-[9px]">
+                              Última usada
+                            </div>
+                          </button>
+                        )}
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        <div className="text-xs text-amber-600 font-medium p-2 bg-amber-50 rounded border border-amber-200 mb-2">
+                       <div className="text-xs text-amber-600 font-medium p-2 bg-amber-50 rounded border border-amber-200 mb-2">
                           ℹ️ Produto sem embalagem. Selecione abaixo:
                         </div>
                         <Select
@@ -678,7 +758,7 @@ export default function CompraRapidaCeasa() {
                           <SelectContent>
                             {todosVasilhames.map((vasilhame: any) => (
                               <SelectItem key={vasilhame.id} value={vasilhame.id}>
-                                {vasilhame.nome} - {vasilhame.peso_kg} kg
+                                {vasilhame.nome} - {vasilhame.peso_kg} {vasilhame.unidade_base}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -717,7 +797,7 @@ export default function CompraRapidaCeasa() {
                   className="w-full h-12 text-base font-bold"
                   onClick={adicionarAoCarrinho}
                   disabled={!produtoSelecionado || !quantidade || 
-                    (!produtoSelecionado.vasilhame_padrao && !produtoSelecionado.vasilhame_secundario && !vasilhameManualId)}
+                    (!produtoSelecionado.vasilhame_padrao && !produtoSelecionado.vasilhame_secundario && !produtoSelecionado.vasilhame_ultima_compra && !vasilhameManualId)}
                 >
                   <Plus className="h-5 w-5 mr-2" />
                   Adicionar
