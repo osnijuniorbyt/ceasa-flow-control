@@ -22,6 +22,9 @@ import AutomationRules from "./pages/AutomationRules";
 import Deliveries from "./pages/Deliveries";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Categories from "./pages/Categories";
+import ProductImport from "./pages/ProductImport";
+import ComprasCeasa from "./pages/ComprasCeasa";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -95,6 +98,9 @@ const App = () => {
                 <Route path="warehouse/receiving" element={<WarehouseReceiving />} />
                 <Route path="inventory" element={<Inventory />} />
                 <Route path="product-management" element={<ProductManagement />} />
+                <Route path="categories" element={<Categories />} />
+                <Route path="product-import" element={<ProductImport />} />
+                <Route path="compras-ceasa" element={<ComprasCeasa />} />
                 <Route path="commercial" element={<Commercial />} />
                 <Route path="pricing" element={<Pricing />} />
                 <Route path="automation-rules" element={<AutomationRules />} />

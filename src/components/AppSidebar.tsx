@@ -13,6 +13,7 @@ import {
 import {
   LayoutDashboard,
   ShoppingCart,
+  ShoppingBag,
   Users,
   Warehouse,
   Package,
@@ -23,6 +24,8 @@ import {
   DollarSign,
   CreditCard,
   Zap,
+  FolderTree,
+  FileSpreadsheet,
 } from "lucide-react";
 
 const menuItems = [
@@ -32,14 +35,19 @@ const menuItems = [
     icon: LayoutDashboard,
   },
   {
+    title: "Compras CEASA",
+    url: "/compras-ceasa",
+    icon: ShoppingBag,
+  },
+  {
+    title: "Pedidos (Antigo)",
+    url: "/purchase-orders",
+    icon: Zap,
+  },
+  {
     title: "Controle de Pagamentos",
     url: "/compras",
     icon: CreditCard,
-  },
-  {
-    title: "Compras Rápidas",
-    url: "/purchase-orders",
-    icon: Zap,
   },
   {
     title: "Portal do Comprador",
@@ -55,6 +63,16 @@ const menuItems = [
     title: "Inventário",
     url: "/inventory",
     icon: Package,
+  },
+  {
+    title: "Árvore Mercadológica",
+    url: "/categories",
+    icon: FolderTree,
+  },
+  {
+    title: "Importar Produtos",
+    url: "/product-import",
+    icon: FileSpreadsheet,
   },
   {
     title: "Central Comercial IA",
