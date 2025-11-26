@@ -43,6 +43,7 @@ export default function CompraRapidaCeasa() {
   const [loteData, setLoteData] = useState<string>(new Date().toISOString().split('T')[0]);
   const [fornecedorSelecionado, setFornecedorSelecionado] = useState<string>("");
   const [produtoSelecionado, setProdutoSelecionado] = useState<any>(null);
+  const [vasilhameSelecionado, setVasilhameSelecionado] = useState<string>("padrao");
   const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
   const [quantidade, setQuantidade] = useState("");
   const [valorTotal, setValorTotal] = useState("");
@@ -440,6 +441,7 @@ export default function CompraRapidaCeasa() {
             <BuscaProdutoInteligente
               onSelectProduto={(produto) => {
                 setProdutoSelecionado(produto);
+                setVasilhameSelecionado(produto.vasilhame_padrao ? "padrao" : "secundario");
                 setTimeout(() => {
                   document.getElementById("quantidade-input")?.focus();
                 }, 100);
@@ -454,19 +456,44 @@ export default function CompraRapidaCeasa() {
                     {produtoSelecionado.codigo} - {produtoSelecionado.descricao}
                   </div>
                   {(produtoSelecionado.vasilhame_padrao || produtoSelecionado.vasilhame_secundario) && (
-                    <div className="text-[9px] text-blue-600 font-medium mt-1 flex gap-2">
-                      {produtoSelecionado.vasilhame_padrao && (
-                        <div className="flex items-center gap-1">
-                          <span>📦 {produtoSelecionado.vasilhame_padrao.nome}:</span>
-                          <span className="font-bold">{produtoSelecionado.vasilhame_padrao.peso_kg} un/cx</span>
-                        </div>
-                      )}
-                      {produtoSelecionado.vasilhame_secundario && (
-                        <div className="flex items-center gap-1">
-                          <span>📦 {produtoSelecionado.vasilhame_secundario.nome}:</span>
-                          <span className="font-bold">{produtoSelecionado.vasilhame_secundario.peso_kg} un/cx</span>
-                        </div>
-                      )}
+                    <div className="mt-2">
+                      <label className="text-[9px] text-muted-foreground block mb-1">Embalagem:</label>
+                      <div className="flex gap-2">
+                        {produtoSelecionado.vasilhame_padrao && (
+                          <button
+                            onClick={() => setVasilhameSelecionado("padrao")}
+                            className={`flex-1 p-2 rounded border transition-all ${
+                              vasilhameSelecionado === "padrao"
+                                ? "bg-blue-500 text-white border-blue-600"
+                                : "bg-background border-border hover:border-blue-400"
+                            }`}
+                          >
+                            <div className="text-[10px] font-medium">
+                              📦 {produtoSelecionado.vasilhame_padrao.nome}
+                            </div>
+                            <div className="text-xs font-bold">
+                              {produtoSelecionado.vasilhame_padrao.peso_kg} un/cx
+                            </div>
+                          </button>
+                        )}
+                        {produtoSelecionado.vasilhame_secundario && (
+                          <button
+                            onClick={() => setVasilhameSelecionado("secundario")}
+                            className={`flex-1 p-2 rounded border transition-all ${
+                              vasilhameSelecionado === "secundario"
+                                ? "bg-blue-500 text-white border-blue-600"
+                                : "bg-background border-border hover:border-blue-400"
+                            }`}
+                          >
+                            <div className="text-[10px] font-medium">
+                              📦 {produtoSelecionado.vasilhame_secundario.nome}
+                            </div>
+                            <div className="text-xs font-bold">
+                              {produtoSelecionado.vasilhame_secundario.peso_kg} un/cx
+                            </div>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
