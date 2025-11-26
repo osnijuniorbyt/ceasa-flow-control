@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BuscaProdutoInteligente } from "@/components/compras-ceasa/BuscaProdutoInteligente";
 import { InputNumericoMobile } from "@/components/compras-ceasa/InputNumericoMobile";
+import { NovoFornecedorModal } from "@/components/compra-rapida/NovoFornecedorModal";
 import { ShoppingCart, Truck, List, Plus, Trash2, Save, History } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -27,6 +28,7 @@ export default function CompraRapidaCeasa() {
   const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
   const [quantidade, setQuantidade] = useState("");
   const [valorTotal, setValorTotal] = useState("");
+  const [novoFornecedorModalOpen, setNovoFornecedorModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -290,18 +292,27 @@ export default function CompraRapidaCeasa() {
           </CardTitle>
         </CardHeader>
         <CardContent className="px-3 pb-3">
-          <Select value={fornecedorSelecionado} onValueChange={setFornecedorSelecionado}>
-            <SelectTrigger className="h-12 text-base border-2">
-              <SelectValue placeholder="Selecione o fornecedor" />
-            </SelectTrigger>
-            <SelectContent>
-              {fornecedores?.map((f) => (
-                <SelectItem key={f.id} value={f.id} className="text-base py-2">
-                  {f.nome_fantasia || f.razao_social}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2 items-center">
+            <Select value={fornecedorSelecionado} onValueChange={setFornecedorSelecionado}>
+              <SelectTrigger className="h-12 text-base border-2">
+                <SelectValue placeholder="Selecione o fornecedor" />
+              </SelectTrigger>
+              <SelectContent>
+                {fornecedores?.map((f) => (
+                  <SelectItem key={f.id} value={f.id} className="text-base py-2">
+                    {f.nome_fantasia || f.razao_social}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              size="icon"
+              className="h-12 w-12 flex-shrink-0"
+              onClick={() => setNovoFornecedorModalOpen(true)}
+            >
+              <Plus className="h-5 w-5" />
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -450,6 +461,16 @@ export default function CompraRapidaCeasa() {
           </CardContent>
         </Card>
       )}
+
+      {/* Modal Novo Fornecedor */}
+      <NovoFornecedorModal
+        open={novoFornecedorModalOpen}
+        onOpenChange={setNovoFornecedorModalOpen}
+        onSuccess={(fornecedorId) => {
+          setFornecedorSelecionado(fornecedorId);
+          queryClient.invalidateQueries({ queryKey: ["fornecedores"] });
+        }}
+      />
     </div>
   );
 }
