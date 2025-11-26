@@ -7,9 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, Plus, Pencil, Trash2, Package } from "lucide-react";
+import { Building2, Plus, Pencil, Trash2, Package, History, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { FornecedorProdutos } from "@/components/fornecedores/FornecedorProdutos";
+import { FornecedorHistorico } from "@/components/fornecedores/FornecedorHistorico";
+import { FornecedorPerformance } from "@/components/fornecedores/FornecedorPerformance";
 
 export default function Fornecedores() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -304,11 +306,19 @@ export default function Fornecedores() {
           </DialogHeader>
 
           <Tabs defaultValue="info" className="flex-1 overflow-hidden flex flex-col">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="info">Informações</TabsTrigger>
               <TabsTrigger value="produtos">
                 <Package className="h-4 w-4 mr-2" />
                 Produtos
+              </TabsTrigger>
+              <TabsTrigger value="historico">
+                <History className="h-4 w-4 mr-2" />
+                Histórico
+              </TabsTrigger>
+              <TabsTrigger value="performance">
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Performance
               </TabsTrigger>
             </TabsList>
 
@@ -350,6 +360,18 @@ export default function Fornecedores() {
             <TabsContent value="produtos" className="flex-1 overflow-y-auto">
               {selectedFornecedor && (
                 <FornecedorProdutos fornecedorId={selectedFornecedor.id} />
+              )}
+            </TabsContent>
+
+            <TabsContent value="historico" className="flex-1 overflow-y-auto">
+              {selectedFornecedor && (
+                <FornecedorHistorico fornecedorId={selectedFornecedor.id} />
+              )}
+            </TabsContent>
+
+            <TabsContent value="performance" className="flex-1 overflow-y-auto">
+              {selectedFornecedor && (
+                <FornecedorPerformance fornecedorId={selectedFornecedor.id} />
               )}
             </TabsContent>
           </Tabs>
