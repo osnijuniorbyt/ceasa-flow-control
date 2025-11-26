@@ -38,6 +38,9 @@ import ListaCompras from "./pages/ListaCompras";
 import ListaComprasDetalhes from "./pages/ListaComprasDetalhes";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Desenvolvimento from "./pages/Desenvolvimento";
+import DesenvolvimentoRelatorios from "./pages/DesenvolvimentoRelatorios";
+import ProdutosGestao from "./pages/ProdutosGestao";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -130,6 +133,9 @@ const App = () => {
                 <Route path="reports" element={<Reports />} />
                 <Route path="settings" element={<Settings />} />
                 </Route>
+                <Route path="/produtos-gestao" element={<ProtectedRoute><ProdutosGestao /></ProtectedRoute>} />
+                <Route path="/desenvolvimento" element={<ProtectedRoute><Desenvolvimento /></ProtectedRoute>} />
+                <Route path="/desenvolvimento/relatorios" element={<ProtectedRoute><DesenvolvimentoRelatorios /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </CartProvider>
