@@ -98,13 +98,12 @@ export function ActivityLogs() {
               />
             </div>
             
-            <Select value={moduleFilter} onValueChange={setModuleFilter}>
+            <Select value={moduleFilter || undefined} onValueChange={setModuleFilter}>
               <SelectTrigger className="w-48">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Filtrar por módulo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os módulos</SelectItem>
                 {modules.map(module => (
                   <SelectItem key={module} value={module}>
                     {getModuleTitle(module)}

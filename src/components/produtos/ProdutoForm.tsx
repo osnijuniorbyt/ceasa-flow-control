@@ -296,7 +296,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         <div className="space-y-2">
           <Label htmlFor="fornecedor_padrao_id">Fornecedor Padrão</Label>
           <Select
-            value={formData.fornecedor_padrao_id}
+            value={formData.fornecedor_padrao_id || undefined}
             onValueChange={(value) => setFormData({ ...formData, fornecedor_padrao_id: value })}
             disabled={loading}
           >
@@ -304,7 +304,6 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
               <SelectValue placeholder="Nenhum" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Nenhum</SelectItem>
               {fornecedores.map((fornecedor) => (
                 <SelectItem key={fornecedor.id} value={fornecedor.id}>
                   {fornecedor.razao_social}
@@ -324,7 +323,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         <div className="space-y-2">
           <Label htmlFor="vasilhame_padrao_id">Embalagem Padrão</Label>
           <Select
-            value={formData.vasilhame_padrao_id}
+            value={formData.vasilhame_padrao_id || undefined}
             onValueChange={(value) => setFormData({ ...formData, vasilhame_padrao_id: value })}
             disabled={loading}
           >
@@ -332,7 +331,6 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
               <SelectValue placeholder="Nenhum" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Nenhum</SelectItem>
               {vasilhames.map((vasilhame) => (
                 <SelectItem key={vasilhame.id} value={vasilhame.id}>
                   {vasilhame.nome}
