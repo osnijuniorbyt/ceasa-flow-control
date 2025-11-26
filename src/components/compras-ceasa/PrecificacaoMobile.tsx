@@ -361,7 +361,7 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[10px] text-muted-foreground">{produto.unidade_venda}</span>
                         <span className="text-[10px] text-blue-600 font-medium">
-                          Total: R$ {(produto.quantidadeTotal * produto.precoCustoAtual).toFixed(2)}
+                          {produto.quantidadeTotal?.toFixed(1)} kg • {produto.quantidadeVasilhames || 0} cx
                         </span>
                         <span className="text-[10px] text-blue-600/70">
                           {produto.porcentagemLote?.toFixed(1)}% lote
