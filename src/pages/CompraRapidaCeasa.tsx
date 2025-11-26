@@ -73,7 +73,7 @@ export default function CompraRapidaCeasa() {
   useOfflineSync();
   
   const [quantidade, setQuantidade] = useState("");
-  const [valorTotal, setValorTotal] = useState("");
+  const [valorPorCaixa, setValorPorCaixa] = useState("");
   const [novoFornecedorModalOpen, setNovoFornecedorModalOpen] = useState(false);
   const [novoProdutoModalOpen, setNovoProdutoModalOpen] = useState(false);
   const [vasilhameManualId, setVasilhameManualId] = useState<string>("");
@@ -319,7 +319,7 @@ export default function CompraRapidaCeasa() {
         localStorage.removeItem(CACHE_KEY);
         setCarrinho([]);
         setQuantidade("");
-        setValorTotal("");
+        setValorPorCaixa("");
         setFornecedorSelecionado("");
         setProdutoSelecionado(null);
         queryClient.invalidateQueries({ queryKey: ["compras"] });
@@ -336,7 +336,12 @@ export default function CompraRapidaCeasa() {
   const adicionarProdutoHistorico = (produto: any) => {
     setProdutoSelecionado(produto);
     setQuantidade(produto.ultima_quantidade?.toString() || "");
-    setValorTotal(produto.ultimo_valor?.toString() || "");
+    
+    // Calcular valor por caixa baseado no histórico
+    const qtd = parseFloat(produto.ultima_quantidade || "1");
+    const valorTotal = parseFloat(produto.ultimo_valor || "0");
+    const valorCaixa = qtd > 0 ? (valorTotal / qtd) : valorTotal;
+    setValorPorCaixa(valorCaixa.toString());
     
     // Selecionar embalagem automaticamente baseado na prioridade
     if (produto.vasilhame_padrao) {
@@ -401,6 +406,8 @@ export default function CompraRapidaCeasa() {
     const qtdCaixas = parseFloat(quantidade);
     const pesoUnitario = vasilhameUsado.peso_kg;
     const pesoTotal = qtdCaixas * pesoUnitario;
+    const valorCaixa = parseFloat(valorPorCaixa || "0");
+    const valorTotalCalculado = qtdCaixas * valorCaixa;
 
     const novoItem: ItemCarrinho = {
       produto_id: produtoSelecionado.id,
@@ -408,7 +415,7 @@ export default function CompraRapidaCeasa() {
       descricao: produtoSelecionado.descricao,
       unidade: produtoSelecionado.unidade_venda,
       quantidade: quantidade,
-      valor_total: valorTotal || "0",
+      valor_total: valorTotalCalculado.toString(),
       vasilhame_id: vasilhameUsado.id,
       vasilhame_nome: vasilhameUsado.nome,
       peso_unitario_kg: pesoUnitario,
@@ -418,9 +425,9 @@ export default function CompraRapidaCeasa() {
     setCarrinho([...carrinhoArray, novoItem]);
     setProdutoSelecionado(null);
     setQuantidade("");
-    setValorTotal("");
+    setValorPorCaixa("");
     setVasilhameManualId("");
-    toast.success(`${produtoSelecionado.descricao} adicionado! (${pesoTotal}kg)`);
+    toast.success(`${produtoSelecionado.descricao} adicionado! ${qtdCaixas}cx × R$ ${valorCaixa.toFixed(2)} = R$ ${valorTotalCalculado.toFixed(2)} (${pesoTotal}kg)`);
   };
 
   const removerDoCarrinho = (index: number) => {
@@ -439,7 +446,7 @@ export default function CompraRapidaCeasa() {
   const limparCampos = () => {
     setCarrinho([]);
     setQuantidade("");
-    setValorTotal("");
+    setValorPorCaixa("");
     setProdutoSelecionado(null);
     setVasilhameManualId("");
     setCancelarDialogOpen(false);
@@ -784,9 +791,9 @@ export default function CompraRapidaCeasa() {
                   </div>
 
                   <InputNumericoMobile
-                    label="Valor Total"
-                    value={valorTotal}
-                    onChange={setValorTotal}
+                    label="R$ por Caixa"
+                    value={valorPorCaixa}
+                    onChange={setValorPorCaixa}
                     placeholder="0,00"
                     prefix="R$"
                   />
