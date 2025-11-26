@@ -41,6 +41,7 @@ import NotFound from "./pages/NotFound";
 import Desenvolvimento from "./pages/Desenvolvimento";
 import DesenvolvimentoRelatorios from "./pages/DesenvolvimentoRelatorios";
 import ProdutosGestao from "./pages/ProdutosGestao";
+import FornecedoresGestao from "./pages/FornecedoresGestao";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -117,9 +118,12 @@ const App = () => {
                 <Route path="product-management" element={<ProductManagement />} />
                 <Route path="categories" element={<Categories />} />
                 <Route path="fornecedores" element={<Fornecedores />} />
+                <Route path="fornecedores-gestao" element={<FornecedoresGestao />} />
                 <Route path="produtos" element={<Produtos />} />
+                <Route path="produtos-gestao" element={<ProdutosGestao />} />
                 <Route path="product-import" element={<ImportarProdutos />} />
                 <Route path="lista-compras" element={<ListaCompras />} />
+                <Route path="lista-compras/:listaId" element={<ListaComprasDetalhes />} />
                 <Route path="lista-compras/:listaId" element={<ListaComprasDetalhes />} />
                 <Route path="compras-ceasa" element={<ComprasCeasa />} />
                 <Route path="compras-ceasa-mobile" element={<CompraRapidaCeasa />} />

@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BuscaProdutoInteligente } from "@/components/compras-ceasa/BuscaProdutoInteligente";
 import { InputNumericoMobile } from "@/components/compras-ceasa/InputNumericoMobile";
 import { NovoFornecedorModal } from "@/components/compra-rapida/NovoFornecedorModal";
+import { Label } from "@/components/ui/label";
 import { SwipeableHistoricoItem } from "@/components/compras-ceasa/SwipeableHistoricoItem";
 import { SwipeableCarrinhoItem } from "@/components/compras-ceasa/SwipeableCarrinhoItem";
 import { ConferenciaMobile } from "@/components/compras-ceasa/ConferenciaMobile";
@@ -48,6 +49,9 @@ export default function CompraRapidaCeasa() {
   const [activeTab, setActiveTab] = useState("lancamento");
   const [loteData, setLoteData] = useState<string>(new Date().toISOString().split('T')[0]);
   const [fornecedorSelecionado, setFornecedorSelecionado] = useState<string>("");
+  const [tipoFornecedorFiltro, setTipoFornecedorFiltro] = useState<string>(() => {
+    return localStorage.getItem("tipo_fornecedor_filtro") || "TODOS";
+  });
   const [produtoSelecionado, setProdutoSelecionado] = useState<any>(null);
   const [vasilhameSelecionado, setVasilhameSelecionado] = useState<string>("padrao");
   const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
@@ -63,6 +67,8 @@ export default function CompraRapidaCeasa() {
   // Carregar cache ao montar
   useEffect(() => {
     const cached = localStorage.getItem(CACHE_KEY);
+    const ultimoFornecedor = localStorage.getItem("ultimo_fornecedor");
+    
     if (cached) {
       try {
         const data = JSON.parse(cached);
@@ -72,6 +78,9 @@ export default function CompraRapidaCeasa() {
       } catch (e) {
         console.error("Erro ao carregar cache:", e);
       }
+    } else if (ultimoFornecedor && !fornecedorSelecionado) {
+      // Se não tem compra em andamento, usa o último fornecedor
+      setFornecedorSelecionado(ultimoFornecedor);
     }
   }, []);
 
@@ -160,13 +169,19 @@ export default function CompraRapidaCeasa() {
   });
 
   const { data: fornecedores } = useQuery({
-    queryKey: ["fornecedores"],
+    queryKey: ["fornecedores", tipoFornecedorFiltro],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("fornecedores")
         .select("*")
         .eq("ativo", true)
         .order("nome_fantasia");
+      
+      if (tipoFornecedorFiltro !== "TODOS") {
+        query = query.eq("tipo", tipoFornecedorFiltro);
+      }
+      
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
@@ -434,16 +449,55 @@ export default function CompraRapidaCeasa() {
             Fornecedor
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pb-3">
+        <CardContent className="px-3 pb-3 space-y-3">
+          <div className="space-y-2">
+            <Label className="text-xs text-muted-foreground">Filtrar por tipo:</Label>
+            <div className="grid grid-cols-4 gap-1">
+              {["TODOS", "PEDRA", "LOJAS", "OUTROS"].map((tipo) => (
+                <button
+                  key={tipo}
+                  type="button"
+                  onClick={() => {
+                    setTipoFornecedorFiltro(tipo);
+                    localStorage.setItem("tipo_fornecedor_filtro", tipo);
+                  }}
+                  className={`p-2 text-xs font-medium rounded border-2 transition-all ${
+                    tipoFornecedorFiltro === tipo
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background border-border hover:border-primary/50"
+                  }`}
+                >
+                  {tipo === "PEDRA" && "🪨"}
+                  {tipo === "LOJAS" && "🏪"}
+                  {tipo === "OUTROS" && "📦"}
+                  {tipo === "TODOS" && "🔍"}
+                  <div className="text-[10px] mt-0.5">{tipo}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="flex gap-2 items-center">
-            <Select value={fornecedorSelecionado} onValueChange={setFornecedorSelecionado}>
+            <Select 
+              value={fornecedorSelecionado} 
+              onValueChange={(value) => {
+                setFornecedorSelecionado(value);
+                localStorage.setItem("ultimo_fornecedor", value);
+              }}
+            >
               <SelectTrigger className="h-12 text-base border-2">
                 <SelectValue placeholder="Selecione o fornecedor" />
               </SelectTrigger>
               <SelectContent>
-                {fornecedores?.map((f) => (
+                {fornecedores?.map((f: any) => (
                   <SelectItem key={f.id} value={f.id} className="text-base py-2">
-                    {f.nome_fantasia || f.razao_social}
+                    <div className="flex items-center gap-2">
+                      {f.tipo === "PEDRA" && "🪨"}
+                      {f.tipo === "LOJAS" && "🏪"}
+                      {f.tipo === "OUTROS" && "📦"}
+                      <span className="font-medium">{f.nome_fantasia || f.razao_social}</span>
+                      {f.box && <span className="text-xs text-muted-foreground">({f.box})</span>}
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>

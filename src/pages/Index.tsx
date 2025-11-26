@@ -47,14 +47,24 @@ const Index = () => {
             Visão geral do sistema de controle de fluxo CEASA
           </p>
         </div>
-        <Button
-          onClick={() => navigate("/produtos-gestao")}
-          variant="outline"
-          className="gap-2"
-        >
-          <Settings className="h-4 w-4" />
-          Gestão de Produtos
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => navigate("/fornecedores-gestao")}
+            variant="outline"
+            className="gap-2"
+          >
+            <Truck className="h-4 w-4" />
+            Fornecedores
+          </Button>
+          <Button
+            onClick={() => navigate("/produtos-gestao")}
+            variant="outline"
+            className="gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            Produtos
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
