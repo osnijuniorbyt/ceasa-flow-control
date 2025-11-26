@@ -13,7 +13,7 @@ import { SwipeableCarrinhoItem } from "@/components/compras-ceasa/SwipeableCarri
 import { ConferenciaMobile } from "@/components/compras-ceasa/ConferenciaMobile";
 import { PrecificacaoMobile } from "@/components/compras-ceasa/PrecificacaoMobile";
 import { ComparativoLotes } from "@/components/compras-ceasa/ComparativoLotes";
-import { ShoppingCart, Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign, FileText } from "lucide-react";
+import { Citrus, Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import {
@@ -319,18 +319,18 @@ export default function CompraRapidaCeasa() {
   return (
     <div className="min-h-screen pb-20">
       {/* Header Compacto */}
-      <div className="bg-primary text-primary-foreground p-3 sticky top-0 z-10 shadow-lg">
+      <div className="bg-background text-foreground p-3 sticky top-0 z-10 shadow-lg border-b">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            <ShoppingCart className="h-5 w-5" />
-            CEASA Mobile
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Citrus className="h-7 w-7 text-foreground" />
+            HORTII
           </h1>
           {activeTab === "lancamento" && fornecedorSelecionado && (
             <Button
               variant="ghost"
               size="sm"
               onClick={cancelarCompra}
-              className="text-primary-foreground hover:bg-primary-foreground/20 h-8"
+              className="h-8"
             >
               <X className="h-4 w-4 mr-1" />
               Cancelar
@@ -343,7 +343,7 @@ export default function CompraRapidaCeasa() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4 h-12 sticky top-[52px] z-10 rounded-none border-b bg-background">
           <TabsTrigger value="lancamento" className="text-xs gap-1">
-            <ShoppingCart className="h-4 w-4" />
+            <Citrus className="h-4 w-4" />
             Lançar
           </TabsTrigger>
           <TabsTrigger value="conferencia" className="text-xs gap-1">
