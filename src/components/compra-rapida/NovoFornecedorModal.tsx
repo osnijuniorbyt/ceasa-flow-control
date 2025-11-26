@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,6 +16,7 @@ interface NovoFornecedorModalProps {
 export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoFornecedorModalProps) {
   const [nome, setNome] = useState("");
   const [box, setBox] = useState("");
+  const [tipo, setTipo] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -39,6 +41,7 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
           razao_social: nome,
           nome_fantasia: nome,
           contato: box,
+          tipo: tipo || null,
           ativo: true,
           user_id: user.id
         })
@@ -54,6 +57,7 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
 
       setNome("");
       setBox("");
+      setTipo("");
       onOpenChange(false);
       onSuccess(data.id);
     } catch (error) {
@@ -84,6 +88,19 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
               placeholder="Nome do fornecedor"
               className="h-14 text-lg"
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="tipo" className="text-base">Local / Tipo *</Label>
+            <Select value={tipo} onValueChange={setTipo}>
+              <SelectTrigger className="h-14 text-lg">
+                <SelectValue placeholder="Selecione o local" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="CEASA">CEASA</SelectItem>
+                <SelectItem value="Pedra">Pedra</SelectItem>
+                <SelectItem value="Outros">Outros</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="box" className="text-base">Box / Contato</Label>
