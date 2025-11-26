@@ -25,6 +25,7 @@ import Settings from "./pages/Settings";
 import Categories from "./pages/Categories";
 import ProductImport from "./pages/ProductImport";
 import ComprasCeasa from "./pages/ComprasCeasa";
+import Fornecedores from "./pages/Fornecedores";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -99,6 +100,7 @@ const App = () => {
                 <Route path="inventory" element={<Inventory />} />
                 <Route path="product-management" element={<ProductManagement />} />
                 <Route path="categories" element={<Categories />} />
+                <Route path="fornecedores" element={<Fornecedores />} />
                 <Route path="product-import" element={<ProductImport />} />
                 <Route path="compras-ceasa" element={<ComprasCeasa />} />
                 <Route path="commercial" element={<Commercial />} />

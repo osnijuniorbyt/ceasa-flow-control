@@ -4,10 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Trash2, ShoppingCart } from "lucide-react";
+import { Search, Trash2, ShoppingCart, AlertCircle, Building2, Package } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 interface CartItem {
   produto_id: string;
@@ -35,7 +37,7 @@ export default function CompraRapida() {
   const [quantidade, setQuantidade] = useState(1);
   const [precoVasilhame, setPrecoVasilhame] = useState(0);
 
-  const { data: produtos } = useQuery({
+  const { data: produtos, isLoading: loadingProdutos } = useQuery({
     queryKey: ["produtos", searchTerm],
     queryFn: async () => {
       let query = supabase
@@ -114,7 +116,7 @@ export default function CompraRapida() {
     setSelectedVasilhame("");
     setQuantidade(1);
     setPrecoVasilhame(0);
-    toast.success("Item adicionado ao carrinho");
+    toast.success("✅ Item adicionado ao carrinho!");
   };
 
   const handleRemoveFromCart = (index: number) => {
@@ -176,7 +178,7 @@ export default function CompraRapida() {
           .eq("id", item.produto_id);
       }
 
-      toast.success(`Compra #${compra.numero_compra} registrada!`);
+      toast.success(`✅ Compra #${compra.numero_compra} registrada com sucesso!`);
       setCart([]);
       setFornecedorId("");
       setFormaPagamento("");
@@ -186,6 +188,94 @@ export default function CompraRapida() {
   };
 
   const totalCompra = cart.reduce((sum, item) => sum + item.subtotal, 0);
+
+  // Check if data is missing
+  const semProdutos = !loadingProdutos && (!produtos || produtos.length === 0);
+  const semFornecedores = !fornecedores || fornecedores.length === 0;
+
+  if (semProdutos || semFornecedores) {
+    return (
+      <div className="space-y-4">
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <div className="space-y-2">
+              <p className="font-semibold">Sistema precisa de configuração inicial:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                {semFornecedores && (
+                  <li>
+                    Cadastre fornecedores em{" "}
+                    <Link to="/fornecedores" className="text-primary underline">
+                      Fornecedores
+                    </Link>
+                  </li>
+                )}
+                {semProdutos && (
+                  <>
+                    <li>
+                      Crie grupos/subgrupos em{" "}
+                      <Link to="/categories" className="text-primary underline">
+                        Árvore Mercadológica
+                      </Link>
+                    </li>
+                    <li>
+                      Importe produtos em{" "}
+                      <Link to="/product-import" className="text-primary underline">
+                        Importar Produtos
+                      </Link>
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
+          </AlertDescription>
+        </Alert>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {semFornecedores && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-5 w-5" />
+                  Fornecedores
+                </CardTitle>
+                <CardDescription>Cadastre seus fornecedores</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link to="/fornecedores">
+                  <Button className="w-full">Cadastrar Fornecedores</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+
+          {semProdutos && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  Produtos
+                </CardTitle>
+                <CardDescription>Configure grupos e importe produtos</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Link to="/categories">
+                  <Button variant="outline" className="w-full">
+                    1. Árvore Mercadológica
+                  </Button>
+                </Link>
+                <Link to="/product-import">
+                  <Button variant="outline" className="w-full">
+                    2. Importar Produtos
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -310,51 +400,56 @@ export default function CompraRapida() {
         )}
       </div>
 
-      <Card>
+      <Card className="h-fit sticky top-6">
         <CardHeader>
           <CardTitle>
             <div className="flex items-center gap-2">
               <ShoppingCart className="w-5 h-5" />
-              Carrinho ({cart.length})
+              Carrinho ({cart.length} {cart.length === 1 ? "item" : "itens"})
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
           {cart.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
-              Carrinho vazio
+              <ShoppingCart className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p>Carrinho vazio</p>
+              <p className="text-sm mt-1">Selecione produtos para adicionar</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {cart.map((item, index) => (
-                <div key={index} className="border rounded-lg p-3">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <div className="font-mono text-sm text-muted-foreground">{item.produto_codigo}</div>
-                      <div className="font-medium">{item.produto_descricao}</div>
+              <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                {cart.map((item, index) => (
+                  <div key={index} className="border rounded-lg p-3 bg-muted/30">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex-1">
+                        <div className="font-mono text-xs text-muted-foreground">{item.produto_codigo}</div>
+                        <div className="font-medium text-sm">{item.produto_descricao}</div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveFromCart(index)}
+                        className="h-8 w-8"
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveFromCart(index)}
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
+                    <div className="text-xs text-muted-foreground space-y-0.5">
+                      <div>{item.quantidade}x {item.vasilhame_nome} = {item.peso_total_kg.toFixed(2)}kg</div>
+                      <div>R$ {item.preco_por_kg.toFixed(2)}/kg</div>
+                      <div className="font-bold text-foreground text-sm mt-1">R$ {item.subtotal.toFixed(2)}</div>
+                    </div>
                   </div>
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    <div>{item.quantidade}x {item.vasilhame_nome} = {item.peso_total_kg.toFixed(2)}kg</div>
-                    <div>R$ {item.preco_por_kg.toFixed(2)}/kg</div>
-                    <div className="font-bold text-foreground">R$ {item.subtotal.toFixed(2)}</div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
 
               <div className="space-y-4 pt-4 border-t">
                 <div>
-                  <Label>Fornecedor</Label>
+                  <Label>Fornecedor *</Label>
                   <Select value={fornecedorId} onValueChange={setFornecedorId}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione" />
+                      <SelectValue placeholder="Selecione o fornecedor" />
                     </SelectTrigger>
                     <SelectContent>
                       {fornecedores?.map((f) => (
@@ -367,10 +462,10 @@ export default function CompraRapida() {
                 </div>
 
                 <div>
-                  <Label>Forma de Pagamento</Label>
+                  <Label>Forma de Pagamento *</Label>
                   <Select value={formaPagamento} onValueChange={setFormaPagamento}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione" />
+                      <SelectValue placeholder="Selecione forma de pagamento" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Boleto">Boleto</SelectItem>
@@ -381,12 +476,17 @@ export default function CompraRapida() {
                   </Select>
                 </div>
 
-                <div className="flex justify-between text-lg font-bold pt-2">
+                <div className="flex justify-between text-lg font-bold pt-2 border-t">
                   <span>Total:</span>
-                  <span>R$ {totalCompra.toFixed(2)}</span>
+                  <span className="text-primary">R$ {totalCompra.toFixed(2)}</span>
                 </div>
 
-                <Button onClick={handleFinalizarCompra} className="w-full" size="lg">
+                <Button 
+                  onClick={handleFinalizarCompra} 
+                  className="w-full" 
+                  size="lg"
+                  disabled={!fornecedorId || !formaPagamento}
+                >
                   Finalizar Compra
                 </Button>
               </div>
