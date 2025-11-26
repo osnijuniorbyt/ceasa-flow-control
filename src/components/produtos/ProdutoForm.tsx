@@ -30,6 +30,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
   const [grupos, setGrupos] = useState<Array<{ id: string; nome: string }>>([]);
   const [subgrupos, setSubgrupos] = useState<Array<{ id: string; nome: string }>>([]);
   const [fornecedores, setFornecedores] = useState<Array<{ id: string; razao_social: string; contato: string | null }>>([]);
+  const [vasilhames, setVasilhames] = useState<Array<{ id: string; nome: string; peso_kg: number; unidade_base: string }>>([]);
   
   const [formData, setFormData] = useState({
     codigo: "",
@@ -38,6 +39,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
     subgrupo_id: "",
     unidade_venda: "kg",
     fornecedor_padrao_id: "",
+    vasilhame_padrao_id: "",
     margem_padrao: "",
     preco_ultima_compra: "",
     ativo: true,
@@ -48,6 +50,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
   useEffect(() => {
     loadGrupos();
     loadFornecedores();
+    loadVasilhames();
     if (produtoId) {
       loadProduto();
     }
@@ -90,6 +93,16 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
     if (data) setFornecedores(data);
   };
 
+  const loadVasilhames = async () => {
+    const { data } = await supabase
+      .from("vasilhames")
+      .select("id, nome, peso_kg, unidade_base")
+      .eq("ativo", true)
+      .order("nome");
+
+    if (data) setVasilhames(data);
+  };
+
   const loadProduto = async () => {
     if (!produtoId) return;
 
@@ -110,6 +123,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         subgrupo_id: data.subgrupo_id,
         unidade_venda: data.unidade_venda,
         fornecedor_padrao_id: data.fornecedor_padrao_id || "",
+        vasilhame_padrao_id: data.vasilhame_padrao_id || "",
         margem_padrao: data.margem_padrao?.toString() || "",
         preco_ultima_compra: data.preco_ultima_compra?.toString() || "",
         ativo: data.ativo,
@@ -159,6 +173,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         subgrupo_id: formData.subgrupo_id,
         unidade_venda: formData.unidade_venda,
         fornecedor_padrao_id: formData.fornecedor_padrao_id || null,
+        vasilhame_padrao_id: formData.vasilhame_padrao_id || null,
         margem_padrao: formData.margem_padrao ? parseFloat(formData.margem_padrao) : null,
         preco_ultima_compra: formData.preco_ultima_compra ? parseFloat(formData.preco_ultima_compra) : null,
         ativo: formData.ativo,
@@ -203,6 +218,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
   };
 
   const fornecedorSelecionado = fornecedores.find(f => f.id === formData.fornecedor_padrao_id);
+  const vasilhameSelecionado = vasilhames.find(v => v.id === formData.vasilhame_padrao_id);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -274,26 +290,6 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="unidade_venda">Unidade Padrão *</Label>
-          <Select
-            value={formData.unidade_venda}
-            onValueChange={(value) => setFormData({ ...formData, unidade_venda: value })}
-            disabled={loading}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="kg">Kg</SelectItem>
-              <SelectItem value="cx">Caixa</SelectItem>
-              <SelectItem value="un">Unidade</SelectItem>
-              <SelectItem value="maço">Maço</SelectItem>
-              <SelectItem value="dz">Dúzia</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="fornecedor_padrao_id">Fornecedor Padrão</Label>
           <Select
             value={formData.fornecedor_padrao_id}
@@ -317,6 +313,54 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
               Box: {fornecedorSelecionado.contato}
             </p>
           )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="vasilhame_padrao_id">Embalagem Padrão</Label>
+          <Select
+            value={formData.vasilhame_padrao_id}
+            onValueChange={(value) => setFormData({ ...formData, vasilhame_padrao_id: value })}
+            disabled={loading}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Nenhum" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Nenhum</SelectItem>
+              {vasilhames.map((vasilhame) => (
+                <SelectItem key={vasilhame.id} value={vasilhame.id}>
+                  {vasilhame.nome}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {vasilhameSelecionado && (
+            <p className="text-xs text-muted-foreground">
+              Peso: {vasilhameSelecionado.peso_kg} kg ({vasilhameSelecionado.unidade_base})
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="unidade_venda">Unidade de Venda *</Label>
+          <Select
+            value={formData.unidade_venda}
+            onValueChange={(value) => setFormData({ ...formData, unidade_venda: value })}
+            disabled={loading}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="kg">Kg</SelectItem>
+              <SelectItem value="cx">Caixa</SelectItem>
+              <SelectItem value="un">Unidade</SelectItem>
+              <SelectItem value="maço">Maço</SelectItem>
+              <SelectItem value="dz">Dúzia</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

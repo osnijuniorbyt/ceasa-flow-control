@@ -21,6 +21,11 @@ interface Produto {
   };
   fornecedores: {
     razao_social: string;
+    contato: string | null;
+  } | null;
+  vasilhames: {
+    nome: string;
+    peso_kg: number;
   } | null;
 }
 
@@ -65,7 +70,8 @@ export function ProdutosList({ onEdit }: ProdutosListProps) {
           preco_ultima_compra,
           ativo,
           grupos!inner(nome),
-          fornecedores:fornecedor_padrao_id(razao_social)
+          fornecedores:fornecedor_padrao_id(razao_social, contato),
+          vasilhames!vasilhame_padrao_id(nome, peso_kg)
         `)
         .order("descricao");
 
@@ -202,10 +208,28 @@ export function ProdutosList({ onEdit }: ProdutosListProps) {
                   </div>
                 )}
                 {produto.fornecedores && (
+                  <div className="space-y-0.5">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Fornecedor:</span>
+                      <span className="font-medium text-xs">
+                        {produto.fornecedores.razao_social}
+                      </span>
+                    </div>
+                    {produto.fornecedores.contato && (
+                      <div className="text-[10px] text-muted-foreground text-right">
+                        Box: {produto.fornecedores.contato}
+                      </div>
+                    )}
+                  </div>
+                )}
+                {produto.vasilhames && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Fornecedor:</span>
+                    <span className="text-muted-foreground">Embalagem:</span>
                     <span className="font-medium text-xs">
-                      {produto.fornecedores.razao_social}
+                      {produto.vasilhames.nome}
+                      <span className="text-[10px] text-muted-foreground ml-1">
+                        ({produto.vasilhames.peso_kg} kg)
+                      </span>
                     </span>
                   </div>
                 )}

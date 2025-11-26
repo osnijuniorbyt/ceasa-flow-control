@@ -356,6 +356,7 @@ export type Database = {
           subgrupo_id: string
           unidade_venda: string
           updated_at: string
+          vasilhame_padrao_id: string | null
           vasilhame_ultima_compra_id: string | null
         }
         Insert: {
@@ -373,6 +374,7 @@ export type Database = {
           subgrupo_id: string
           unidade_venda: string
           updated_at?: string
+          vasilhame_padrao_id?: string | null
           vasilhame_ultima_compra_id?: string | null
         }
         Update: {
@@ -390,6 +392,7 @@ export type Database = {
           subgrupo_id?: string
           unidade_venda?: string
           updated_at?: string
+          vasilhame_padrao_id?: string | null
           vasilhame_ultima_compra_id?: string | null
         }
         Relationships: [
@@ -412,6 +415,13 @@ export type Database = {
             columns: ["subgrupo_id"]
             isOneToOne: false
             referencedRelation: "subgrupos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produtos_vasilhame_padrao_id_fkey"
+            columns: ["vasilhame_padrao_id"]
+            isOneToOne: false
+            referencedRelation: "vasilhames"
             referencedColumns: ["id"]
           },
           {
