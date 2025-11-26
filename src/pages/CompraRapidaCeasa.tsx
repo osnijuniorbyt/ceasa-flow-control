@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useOfflineStorage } from "@/hooks/useOfflineStorage";
@@ -80,6 +80,12 @@ export default function CompraRapidaCeasa() {
   const [cancelarDialogOpen, setCancelarDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  
+  // Refs para controle de foco automático
+  const fornecedorSelectRef = useRef<HTMLButtonElement>(null);
+  const produtoCardRef = useRef<HTMLDivElement>(null);
+  const quantidadeRef = useRef<HTMLDivElement>(null);
+  const precoRef = useRef<HTMLDivElement>(null);
 
   // Carregar cache ao montar
   useEffect(() => {
@@ -359,8 +365,15 @@ export default function CompraRapidaCeasa() {
       setVasilhameManualId("");
     }
     
+    // Scroll suave para o card do produto e foco na quantidade
     setTimeout(() => {
-      document.getElementById("quantidade-input")?.focus();
+      produtoCardRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+      setTimeout(() => {
+        quantidadeRef.current?.querySelector('input')?.click();
+      }, 300);
     }, 100);
   };
 
@@ -428,6 +441,11 @@ export default function CompraRapidaCeasa() {
     setValorPorCaixa("");
     setVasilhameManualId("");
     toast.success(`${produtoSelecionado.descricao} adicionado! ${qtdCaixas}cx × R$ ${valorCaixa.toFixed(2)} = R$ ${valorTotalCalculado.toFixed(2)} (${pesoTotal}kg)`);
+    
+    // Voltar foco para busca de produto após adicionar
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   };
 
   const removerDoCarrinho = (index: number) => {
@@ -577,23 +595,30 @@ export default function CompraRapidaCeasa() {
               onValueChange={(value) => {
                 setFornecedorSelecionado(value);
                 localStorage.setItem("ultimo_fornecedor", value);
+                // Scroll suave para a área de produto após selecionar fornecedor
+                setTimeout(() => {
+                  produtoCardRef.current?.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                  });
+                }, 300);
               }}
             >
-              <SelectTrigger className="h-16 md:h-20 text-lg md:text-xl border-2">
+              <SelectTrigger ref={fornecedorSelectRef} className="h-14 md:h-16 text-base md:text-lg border-2">
                 <SelectValue placeholder="Selecione o fornecedor" />
               </SelectTrigger>
               <SelectContent>
                 {fornecedores?.map((f: any) => (
-                  <SelectItem key={f.id} value={f.id} className="text-lg md:text-xl py-4 md:py-5">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">
+                  <SelectItem key={f.id} value={f.id} className="text-base md:text-lg py-3 md:py-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">
                         {f.tipo === "CEASA" && "🥬"}
                         {f.tipo === "PEDRA" && "🪨"}
                         {f.tipo === "LOJAS" && "🏪"}
                         {f.tipo === "OUTROS" && "📦"}
                       </span>
                       <span className="font-semibold">{f.nome_fantasia || f.razao_social}</span>
-                      {f.box && <span className="text-base text-muted-foreground">({f.box})</span>}
+                      {f.box && <span className="text-sm text-muted-foreground">({f.box})</span>}
                     </div>
                   </SelectItem>
                 ))}
@@ -601,10 +626,10 @@ export default function CompraRapidaCeasa() {
             </Select>
             <Button
               size="icon"
-              className="h-16 md:h-20 w-16 md:w-20 flex-shrink-0"
+              className="h-14 md:h-16 w-14 md:w-16 flex-shrink-0"
               onClick={() => setNovoFornecedorModalOpen(true)}
             >
-              <Plus className="h-6 w-6" />
+              <Plus className="h-5 w-5" />
             </Button>
           </div>
         </CardContent>
@@ -636,17 +661,17 @@ export default function CompraRapidaCeasa() {
 
       {/* Busca de Produto */}
       {fornecedorSelecionado && (
-        <Card className="border-2">
+        <Card ref={produtoCardRef} className="border-2">
           <CardHeader className="pb-2 pt-3 px-3 md:px-6">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl md:text-2xl">Buscar Produto</CardTitle>
+              <CardTitle className="text-lg md:text-xl">Buscar Produto</CardTitle>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setNovoProdutoModalOpen(true)}
-                className="h-12 md:h-14 text-base md:text-lg gap-2 px-4"
+                className="h-10 md:h-12 text-sm md:text-base gap-2 px-3"
               >
-                <Plus className="h-5 w-5" />
+                <Plus className="h-4 w-4" />
                 Novo
               </Button>
             </div>
@@ -670,8 +695,15 @@ export default function CompraRapidaCeasa() {
                   setVasilhameSelecionado("");
                   setVasilhameManualId("");
                 }
+                // Scroll e foco automático
                 setTimeout(() => {
-                  document.getElementById("quantidade-input")?.focus();
+                  produtoCardRef.current?.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                  });
+                  setTimeout(() => {
+                    quantidadeRef.current?.querySelector('input')?.click();
+                  }, 300);
                 }, 100);
               }}
               placeholder="Código ou nome"
@@ -680,7 +712,7 @@ export default function CompraRapidaCeasa() {
             {produtoSelecionado && (
               <div className="space-y-3">
                 <div className="bg-primary/10 border-2 border-primary/30 p-3 md:p-4 rounded-xl">
-                  <div className="font-bold text-xl md:text-2xl mb-2">
+                  <div className="font-bold text-lg md:text-xl mb-2">
                     {produtoSelecionado.codigo} - {produtoSelecionado.descricao}
                   </div>
                   
@@ -790,32 +822,42 @@ export default function CompraRapidaCeasa() {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3 md:gap-4">
-                  <div id="quantidade-input">
+                  <div ref={quantidadeRef}>
                     <InputNumericoMobile
                       label="Qtd Caixas"
                       value={quantidade}
-                      onChange={setQuantidade}
+                      onChange={(val) => {
+                        setQuantidade(val);
+                        // Auto-focus no preço quando quantidade é digitada
+                        if (val && parseFloat(val) > 0) {
+                          setTimeout(() => {
+                            precoRef.current?.querySelector('input')?.click();
+                          }, 300);
+                        }
+                      }}
                       placeholder="0"
                     />
                   </div>
 
-                  <InputNumericoMobile
-                    label="R$ por Caixa"
-                    value={valorPorCaixa}
-                    onChange={setValorPorCaixa}
-                    placeholder="0,00"
-                    prefix="R$"
-                  />
+                  <div ref={precoRef}>
+                    <InputNumericoMobile
+                      label="R$ por Caixa"
+                      value={valorPorCaixa}
+                      onChange={setValorPorCaixa}
+                      placeholder="0,00"
+                      prefix="R$"
+                    />
+                  </div>
                 </div>
 
                 <Button
                   size="lg"
-                  className="w-full h-20 md:h-24 text-xl md:text-2xl font-bold shadow-lg"
+                  className="w-full h-16 md:h-20 text-lg md:text-xl font-bold shadow-lg"
                   onClick={adicionarAoCarrinho}
                   disabled={!produtoSelecionado || !quantidade || 
                     (!produtoSelecionado.vasilhame_padrao && !produtoSelecionado.vasilhame_secundario && !produtoSelecionado.vasilhame_ultima_compra && !vasilhameManualId)}
                 >
-                  <Plus className="h-7 w-7 mr-2" />
+                  <Plus className="h-6 w-6 mr-2" />
                   Adicionar ao Carrinho
                 </Button>
               </div>
