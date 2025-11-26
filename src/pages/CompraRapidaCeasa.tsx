@@ -36,6 +36,10 @@ interface ItemCarrinho {
   unidade: string;
   quantidade: string;
   valor_total: string;
+  vasilhame_id: string;
+  vasilhame_nome: string;
+  peso_unitario_kg: number;
+  peso_total_kg: number;
 }
 
 const CACHE_KEY = "compra_ceasa_em_andamento";
@@ -51,6 +55,7 @@ export default function CompraRapidaCeasa() {
   const [valorTotal, setValorTotal] = useState("");
   const [novoFornecedorModalOpen, setNovoFornecedorModalOpen] = useState(false);
   const [novoProdutoModalOpen, setNovoProdutoModalOpen] = useState(false);
+  const [vasilhameManualId, setVasilhameManualId] = useState<string>("");
   const [cancelarDialogOpen, setCancelarDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -79,6 +84,21 @@ export default function CompraRapidaCeasa() {
       }));
     }
   }, [fornecedorSelecionado, carrinho]);
+
+  // Buscar todos os vasilhames disponíveis
+  const { data: todosVasilhames = [] } = useQuery({
+    queryKey: ["vasilhames-todos"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("vasilhames")
+        .select("*")
+        .eq("ativo", true)
+        .order("nome");
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
   // Buscar produtos do histórico do fornecedor
   const { data: produtosHistorico } = useQuery({
@@ -197,26 +217,20 @@ export default function CompraRapidaCeasa() {
         throw compraError;
       }
 
-      // Pegar primeiro vasilhame disponível como padrão
-      const vasilhamePadrao = vasilhames?.[0]?.id;
-      if (!vasilhamePadrao) {
-        throw new Error("Nenhum vasilhame cadastrado");
-      }
-
+      // Pegar vasilhame de cada item do carrinho
       // Criar itens da compra
       const itens = carrinho.map((item) => {
         const qtd = parseFloat(item.quantidade || "1");
         const valor = parseFloat(item.valor_total || "0");
-        const pesoKg = qtd; // Simplificado: assume que quantidade = peso
 
         return {
           compra_id: compra.id,
           produto_id: item.produto_id,
-          vasilhame_id: vasilhamePadrao,
+          vasilhame_id: item.vasilhame_id,
           quantidade_vasilhames: qtd,
-          peso_total_kg: pesoKg,
-          preco_por_vasilhame: valor,
-          preco_por_kg: pesoKg > 0 ? valor / pesoKg : 0,
+          peso_total_kg: item.peso_total_kg,
+          preco_por_vasilhame: qtd > 0 ? valor / qtd : valor,
+          preco_por_kg: item.peso_total_kg > 0 ? valor / item.peso_total_kg : 0,
           subtotal: valor,
         };
       });
@@ -255,6 +269,7 @@ export default function CompraRapidaCeasa() {
     setProdutoSelecionado(produto);
     setQuantidade(produto.ultima_quantidade?.toString() || "");
     setValorTotal(produto.ultimo_valor?.toString() || "");
+    setVasilhameManualId("");
     setTimeout(() => {
       document.getElementById("quantidade-input")?.focus();
     }, 100);
@@ -271,6 +286,26 @@ export default function CompraRapidaCeasa() {
       return;
     }
 
+    // Determinar qual vasilhame usar
+    let vasilhameUsado: any = null;
+    
+    if (vasilhameSelecionado === "padrao" && produtoSelecionado.vasilhame_padrao) {
+      vasilhameUsado = produtoSelecionado.vasilhame_padrao;
+    } else if (vasilhameSelecionado === "secundario" && produtoSelecionado.vasilhame_secundario) {
+      vasilhameUsado = produtoSelecionado.vasilhame_secundario;
+    } else if (vasilhameSelecionado === "manual" && vasilhameManualId) {
+      vasilhameUsado = todosVasilhames.find((v: any) => v.id === vasilhameManualId);
+    }
+
+    if (!vasilhameUsado) {
+      toast.error("Selecione uma embalagem");
+      return;
+    }
+
+    const qtdCaixas = parseFloat(quantidade);
+    const pesoUnitario = vasilhameUsado.peso_kg;
+    const pesoTotal = qtdCaixas * pesoUnitario;
+
     const novoItem: ItemCarrinho = {
       produto_id: produtoSelecionado.id,
       codigo: produtoSelecionado.codigo,
@@ -278,13 +313,18 @@ export default function CompraRapidaCeasa() {
       unidade: produtoSelecionado.unidade_venda,
       quantidade: quantidade,
       valor_total: valorTotal || "0",
+      vasilhame_id: vasilhameUsado.id,
+      vasilhame_nome: vasilhameUsado.nome,
+      peso_unitario_kg: pesoUnitario,
+      peso_total_kg: pesoTotal,
     };
 
     setCarrinho([...carrinho, novoItem]);
     setProdutoSelecionado(null);
     setQuantidade("");
     setValorTotal("");
-    toast.success(`${produtoSelecionado.descricao} adicionado!`);
+    setVasilhameManualId("");
+    toast.success(`${produtoSelecionado.descricao} adicionado! (${pesoTotal}kg)`);
   };
 
   const removerDoCarrinho = (index: number) => {
@@ -305,6 +345,7 @@ export default function CompraRapidaCeasa() {
     setQuantidade("");
     setValorTotal("");
     setProdutoSelecionado(null);
+    setVasilhameManualId("");
     setCancelarDialogOpen(false);
     toast.success("Campos limpos");
   };
@@ -464,6 +505,7 @@ export default function CompraRapidaCeasa() {
               onSelectProduto={(produto) => {
                 setProdutoSelecionado(produto);
                 setVasilhameSelecionado(produto.vasilhame_padrao ? "padrao" : "secundario");
+                setVasilhameManualId("");
                 setTimeout(() => {
                   document.getElementById("quantidade-input")?.focus();
                 }, 100);
@@ -486,7 +528,10 @@ export default function CompraRapidaCeasa() {
                         {produtoSelecionado.vasilhame_padrao && (
                           <button
                             type="button"
-                            onClick={() => setVasilhameSelecionado("padrao")}
+                            onClick={() => {
+                              setVasilhameSelecionado("padrao");
+                              setVasilhameManualId("");
+                            }}
                             className={`flex-1 p-2 rounded border-2 transition-all ${
                               vasilhameSelecionado === "padrao"
                                 ? "bg-blue-500 text-white border-blue-600"
@@ -497,14 +542,17 @@ export default function CompraRapidaCeasa() {
                               {produtoSelecionado.vasilhame_padrao.nome}
                             </div>
                             <div className="text-sm font-bold">
-                              {produtoSelecionado.vasilhame_padrao.peso_kg} un/cx
+                              {produtoSelecionado.vasilhame_padrao.peso_kg} kg/cx
                             </div>
                           </button>
                         )}
                         {produtoSelecionado.vasilhame_secundario && (
                           <button
                             type="button"
-                            onClick={() => setVasilhameSelecionado("secundario")}
+                            onClick={() => {
+                              setVasilhameSelecionado("secundario");
+                              setVasilhameManualId("");
+                            }}
                             className={`flex-1 p-2 rounded border-2 transition-all ${
                               vasilhameSelecionado === "secundario"
                                 ? "bg-blue-500 text-white border-blue-600"
@@ -515,14 +563,39 @@ export default function CompraRapidaCeasa() {
                               {produtoSelecionado.vasilhame_secundario.nome}
                             </div>
                             <div className="text-sm font-bold">
-                              {produtoSelecionado.vasilhame_secundario.peso_kg} un/cx
+                              {produtoSelecionado.vasilhame_secundario.peso_kg} kg/cx
                             </div>
                           </button>
                         )}
                       </div>
                     ) : (
-                      <div className="text-xs text-red-500 font-medium p-2 bg-red-50 rounded border border-red-200">
-                        ⚠️ Produto sem embalagem cadastrada. Configure no módulo Produtos.
+                      <div className="space-y-2">
+                        <div className="text-xs text-amber-600 font-medium p-2 bg-amber-50 rounded border border-amber-200 mb-2">
+                          ℹ️ Produto sem embalagem. Selecione abaixo:
+                        </div>
+                        <Select
+                          value={vasilhameManualId}
+                          onValueChange={(value) => {
+                            setVasilhameManualId(value);
+                            setVasilhameSelecionado("manual");
+                          }}
+                        >
+                          <SelectTrigger className="h-10">
+                            <SelectValue placeholder="Selecione a embalagem" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {todosVasilhames.map((vasilhame: any) => (
+                              <SelectItem key={vasilhame.id} value={vasilhame.id}>
+                                {vasilhame.nome} - {vasilhame.peso_kg} kg
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {vasilhameManualId && (
+                          <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                            ✓ Embalagem selecionada: {todosVasilhames.find((v: any) => v.id === vasilhameManualId)?.nome}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -551,7 +624,8 @@ export default function CompraRapidaCeasa() {
                   size="lg"
                   className="w-full h-12 text-base font-bold"
                   onClick={adicionarAoCarrinho}
-                  disabled={!produtoSelecionado || !quantidade}
+                  disabled={!produtoSelecionado || !quantidade || 
+                    (!produtoSelecionado.vasilhame_padrao && !produtoSelecionado.vasilhame_secundario && !vasilhameManualId)}
                 >
                   <Plus className="h-5 w-5 mr-2" />
                   Adicionar
@@ -573,6 +647,9 @@ export default function CompraRapidaCeasa() {
               </span>
               <span className="text-xl font-bold text-green-600">
                 R$ {totalCarrinho.toFixed(2)}
+              </span>
+              <span className="text-sm text-muted-foreground ml-2">
+                ({carrinho.reduce((sum, item) => sum + item.peso_total_kg, 0).toFixed(1)} kg)
               </span>
             </CardTitle>
           </CardHeader>
