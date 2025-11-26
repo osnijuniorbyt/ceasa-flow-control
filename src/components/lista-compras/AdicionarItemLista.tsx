@@ -16,10 +16,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, ChevronsUpDown, X, Sparkles, Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown, X, Sparkles, Loader2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { CriarProdutoModal } from "./CriarProdutoModal";
 
 interface AdicionarItemListaProps {
   listaId: string;
@@ -53,6 +54,8 @@ export function AdicionarItemLista({ listaId, onSuccess, onCancel }: AdicionarIt
     confianca: string;
     explicacao: string;
   } | null>(null);
+  const [showCriarProduto, setShowCriarProduto] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (produtoSelecionado) {
@@ -128,6 +131,14 @@ export function AdicionarItemLista({ listaId, onSuccess, onCancel }: AdicionarIt
     }
   };
 
+  const handleProdutoCriado = async (produtoId: string) => {
+    await loadProdutos();
+    const produto = produtos.find((p) => p.id === produtoId);
+    if (produto) {
+      setProdutoSelecionado(produto);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!produtoSelecionado || !quantidade) return;
@@ -185,8 +196,26 @@ export function AdicionarItemLista({ listaId, onSuccess, onCancel }: AdicionarIt
               </PopoverTrigger>
               <PopoverContent className="w-[600px] p-0">
                 <Command>
-                  <CommandInput placeholder="Buscar produto..." />
-                  <CommandEmpty>Nenhum produto encontrado.</CommandEmpty>
+                  <CommandInput 
+                    placeholder="Buscar produto..." 
+                    onValueChange={setSearchTerm}
+                  />
+                  <CommandEmpty>
+                    <div className="p-4 text-center">
+                      <p className="text-muted-foreground mb-3">Produto não encontrado</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setOpen(false);
+                          setShowCriarProduto(true);
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Criar Produto "{searchTerm}"
+                      </Button>
+                    </div>
+                  </CommandEmpty>
                   <CommandGroup className="max-h-64 overflow-auto">
                     {produtos.map((produto) => (
                       <CommandItem
@@ -287,6 +316,13 @@ export function AdicionarItemLista({ listaId, onSuccess, onCancel }: AdicionarIt
           </div>
         </form>
       </CardContent>
+
+      <CriarProdutoModal
+        open={showCriarProduto}
+        onOpenChange={setShowCriarProduto}
+        onSuccess={handleProdutoCriado}
+        searchTerm={searchTerm}
+      />
     </Card>
   );
 }

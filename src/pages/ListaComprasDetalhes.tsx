@@ -10,6 +10,7 @@ import { ptBR } from "date-fns/locale";
 import { AdicionarItemLista } from "@/components/lista-compras/AdicionarItemLista";
 import { ItensAgrupadosFornecedor } from "@/components/lista-compras/ItensAgrupadosFornecedor";
 import { ExecutarLista } from "@/components/lista-compras/ExecutarLista";
+import { ItensLista } from "@/components/lista-compras/ItensLista";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Lista {
@@ -143,15 +144,12 @@ export default function ListaComprasDetalhes() {
           </TabsList>
 
           <TabsContent value="itens" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Itens</CardTitle>
-                <Button onClick={() => setShowAddItem(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Item
-                </Button>
-              </CardHeader>
-            </Card>
+            <div className="flex justify-end mb-4">
+              <Button onClick={() => setShowAddItem(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Item
+              </Button>
+            </div>
 
             {showAddItem && (
               <AdicionarItemLista
@@ -163,6 +161,8 @@ export default function ListaComprasDetalhes() {
                 onCancel={() => setShowAddItem(false)}
               />
             )}
+
+            <ItensLista listaId={lista.id} refreshKey={refreshKey} />
           </TabsContent>
 
           <TabsContent value="fornecedores">
