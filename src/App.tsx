@@ -30,6 +30,7 @@ import ComprasCeasa from "./pages/ComprasCeasa";
 import Fornecedores from "./pages/Fornecedores";
 import CompraRapida from "./pages/CompraRapida";
 import Produtos from "./pages/Produtos";
+import ImportarProdutos from "./pages/ImportarProdutos";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -109,7 +110,7 @@ const App = () => {
                 <Route path="categories" element={<Categories />} />
                 <Route path="fornecedores" element={<Fornecedores />} />
                 <Route path="produtos" element={<Produtos />} />
-                <Route path="product-import" element={<ProductImport />} />
+                <Route path="product-import" element={<ImportarProdutos />} />
                 <Route path="compras-ceasa" element={<ComprasCeasa />} />
                 <Route path="compra-rapida" element={<CompraRapida />} />
                 <Route path="commercial" element={<Commercial />} />
