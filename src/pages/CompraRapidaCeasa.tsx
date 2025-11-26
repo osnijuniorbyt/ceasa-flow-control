@@ -451,51 +451,59 @@ export default function CompraRapidaCeasa() {
 
             {produtoSelecionado && (
               <div className="space-y-2">
-                <div className="bg-primary/10 border border-primary/30 p-2 rounded-lg">
-                  <div className="font-semibold text-sm">
+                <div className="bg-primary/10 border border-primary/30 p-3 rounded-lg">
+                  <div className="font-semibold text-base mb-2">
                     {produtoSelecionado.codigo} - {produtoSelecionado.descricao}
                   </div>
-                  {(produtoSelecionado.vasilhame_padrao || produtoSelecionado.vasilhame_secundario) && (
-                    <div className="mt-2">
-                      <label className="text-[9px] text-muted-foreground block mb-1">Embalagem:</label>
+                  
+                  <div className="border-t pt-2">
+                    <label className="text-[10px] text-muted-foreground font-medium block mb-1">📦 Embalagem:</label>
+                    
+                    {(produtoSelecionado.vasilhame_padrao || produtoSelecionado.vasilhame_secundario) ? (
                       <div className="flex gap-2">
                         {produtoSelecionado.vasilhame_padrao && (
                           <button
+                            type="button"
                             onClick={() => setVasilhameSelecionado("padrao")}
-                            className={`flex-1 p-2 rounded border transition-all ${
+                            className={`flex-1 p-2 rounded border-2 transition-all ${
                               vasilhameSelecionado === "padrao"
                                 ? "bg-blue-500 text-white border-blue-600"
                                 : "bg-background border-border hover:border-blue-400"
                             }`}
                           >
-                            <div className="text-[10px] font-medium">
-                              📦 {produtoSelecionado.vasilhame_padrao.nome}
+                            <div className="text-[11px] font-medium">
+                              {produtoSelecionado.vasilhame_padrao.nome}
                             </div>
-                            <div className="text-xs font-bold">
+                            <div className="text-sm font-bold">
                               {produtoSelecionado.vasilhame_padrao.peso_kg} un/cx
                             </div>
                           </button>
                         )}
                         {produtoSelecionado.vasilhame_secundario && (
                           <button
+                            type="button"
                             onClick={() => setVasilhameSelecionado("secundario")}
-                            className={`flex-1 p-2 rounded border transition-all ${
+                            className={`flex-1 p-2 rounded border-2 transition-all ${
                               vasilhameSelecionado === "secundario"
                                 ? "bg-blue-500 text-white border-blue-600"
                                 : "bg-background border-border hover:border-blue-400"
                             }`}
                           >
-                            <div className="text-[10px] font-medium">
-                              📦 {produtoSelecionado.vasilhame_secundario.nome}
+                            <div className="text-[11px] font-medium">
+                              {produtoSelecionado.vasilhame_secundario.nome}
                             </div>
-                            <div className="text-xs font-bold">
+                            <div className="text-sm font-bold">
                               {produtoSelecionado.vasilhame_secundario.peso_kg} un/cx
                             </div>
                           </button>
                         )}
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="text-xs text-red-500 font-medium p-2 bg-red-50 rounded border border-red-200">
+                        ⚠️ Produto sem embalagem cadastrada. Configure no módulo Produtos.
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
