@@ -277,32 +277,31 @@ export default function CompraRapidaCeasa() {
   );
 
   return (
-    <div className="min-h-screen pb-24 p-4 space-y-4">
-      {/* Header */}
-      <div className="bg-primary text-primary-foreground p-6 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          <ShoppingCart className="h-8 w-8" />
+    <div className="min-h-screen pb-20 p-2 space-y-2">
+      {/* Header Compacto */}
+      <div className="bg-primary text-primary-foreground p-3 rounded-lg shadow-lg">
+        <h1 className="text-xl font-bold flex items-center gap-2">
+          <ShoppingCart className="h-5 w-5" />
           Compra CEASA
         </h1>
-        <p className="text-lg mt-1 opacity-90">Lançamento rápido e prático</p>
       </div>
 
       {/* Seleção de Fornecedor */}
-      <Card className="border-2">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <Truck className="h-5 w-5" />
+      <Card className="border">
+        <CardHeader className="pb-2 pt-3 px-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Truck className="h-4 w-4" />
             Fornecedor
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-3 pb-3">
           <Select value={fornecedorSelecionado} onValueChange={setFornecedorSelecionado}>
-            <SelectTrigger className="h-14 text-lg border-2">
+            <SelectTrigger className="h-12 text-base border-2">
               <SelectValue placeholder="Selecione o fornecedor" />
             </SelectTrigger>
             <SelectContent>
               {fornecedores?.map((f) => (
-                <SelectItem key={f.id} value={f.id} className="text-lg py-3">
+                <SelectItem key={f.id} value={f.id} className="text-base py-2">
                   {f.nome_fantasia || f.razao_social}
                 </SelectItem>
               ))}
@@ -311,41 +310,36 @@ export default function CompraRapidaCeasa() {
         </CardContent>
       </Card>
 
-      {/* Histórico de Produtos do Fornecedor */}
+      {/* Histórico de Produtos do Fornecedor - COMPACTO */}
       {fornecedorSelecionado && produtosHistorico && produtosHistorico.length > 0 && (
-        <Card className="border-2 border-blue-500/30">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <History className="h-5 w-5" />
-              Produtos Recentes ({produtosHistorico.length})
+        <Card className="border border-blue-500/30">
+          <CardHeader className="pb-2 pt-3 px-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <History className="h-4 w-4" />
+              Recentes ({produtosHistorico.length})
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="text-sm text-muted-foreground mb-3">
-              Clique para adicionar rápido
-            </div>
+          <CardContent className="space-y-1 px-3 pb-3">
             {produtosHistorico.slice(0, 5).map((produto: any) => (
               <button
                 key={produto.id}
                 onClick={() => adicionarProdutoHistorico(produto)}
-                className="w-full p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                className="w-full p-2 border rounded-lg hover:bg-muted/50 transition-colors text-left"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="font-bold text-base">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm truncate">
                       {produto.codigo} - {produto.descricao}
                     </div>
-                    <div className="text-sm text-muted-foreground flex items-center gap-3 mt-1">
-                      <span>Comprado {produto.vezes_comprado}x</span>
+                    <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
+                      <span>{produto.vezes_comprado}x</span>
                       <span>•</span>
-                      <span>Último: {produto.ultima_quantidade} {produto.unidade_venda}</span>
-                      <span>•</span>
-                      <span className="text-green-600 font-semibold">
+                      <span className="text-green-600 font-bold text-base">
                         R$ {Number(produto.ultimo_valor).toFixed(2)}
                       </span>
                     </div>
                   </div>
-                  <Plus className="h-5 w-5 text-primary" />
+                  <Plus className="h-4 w-4 text-primary flex-shrink-0 ml-2" />
                 </div>
               </button>
             ))}
@@ -353,41 +347,35 @@ export default function CompraRapidaCeasa() {
         </Card>
       )}
 
-      {/* Busca de Produto */}
+      {/* Busca de Produto - COMPACTO */}
       {fornecedorSelecionado && (
-        <Card className="border-2 border-primary/30">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl">Buscar Produto</CardTitle>
+        <Card className="border border-primary/30">
+          <CardHeader className="pb-2 pt-3 px-3">
+            <CardTitle className="text-base">Buscar Produto</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-2 px-3 pb-3">
             <BuscaProdutoInteligente
               onSelectProduto={(produto) => {
                 setProdutoSelecionado(produto);
-                // Após selecionar, focar no campo de quantidade
                 setTimeout(() => {
                   document.getElementById("quantidade-input")?.focus();
                 }, 100);
               }}
-              placeholder="Digite código (ex: 162) ou nome (ex: batata)"
+              placeholder="Código ou nome"
             />
 
             {produtoSelecionado && (
-              <Card className="bg-primary/10 border-primary/30">
-                <CardContent className="pt-4">
-                  <div className="font-bold text-lg">
-                    {produtoSelecionado.codigo} - {produtoSelecionado.descricao}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Un: {produtoSelecionado.unidade_venda}
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="bg-primary/10 border border-primary/30 p-2 rounded-lg">
+                <div className="font-semibold text-sm">
+                  {produtoSelecionado.codigo} - {produtoSelecionado.descricao}
+                </div>
+              </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2">
               <div id="quantidade-input">
                 <InputNumericoMobile
-                  label="Quantidade"
+                  label="Qtd"
                   value={quantidade}
                   onChange={setQuantidade}
                   placeholder="0"
@@ -405,64 +393,64 @@ export default function CompraRapidaCeasa() {
 
             <Button
               size="lg"
-              className="w-full h-16 text-xl font-bold"
+              className="w-full h-12 text-base font-bold"
               onClick={adicionarAoCarrinho}
               disabled={!produtoSelecionado || !quantidade || !valorTotal}
             >
-              <Plus className="h-6 w-6 mr-2" />
-              Adicionar ao Carrinho
+              <Plus className="h-5 w-5 mr-2" />
+              Adicionar
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Carrinho */}
+      {/* Carrinho - COMPACTO */}
       {carrinho.length > 0 && (
-        <Card className="border-2 border-green-500/30">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center justify-between text-xl">
+        <Card className="border border-green-500/30">
+          <CardHeader className="pb-2 pt-3 px-3">
+            <CardTitle className="flex items-center justify-between text-base">
               <span className="flex items-center gap-2">
-                <List className="h-5 w-5" />
+                <List className="h-4 w-4" />
                 Carrinho ({carrinho.length})
               </span>
-              <span className="text-2xl font-bold text-green-600">
+              <span className="text-xl font-bold text-green-600">
                 R$ {totalCarrinho.toFixed(2)}
               </span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-1 px-3 pb-3">
             {carrinho.map((item, index) => (
               <div
                 key={index}
-                className="bg-muted/50 p-4 rounded-lg flex items-center justify-between"
+                className="bg-muted/50 p-2 rounded-lg flex items-center justify-between"
               >
-                <div className="flex-1">
-                  <div className="font-bold text-lg">
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-sm truncate">
                     {item.codigo} - {item.descricao}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {item.quantidade} {item.unidade} • R$ {parseFloat(item.valor_total).toFixed(2)}
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    {item.quantidade} {item.unidade} • <span className="text-green-600 font-bold text-base">R$ {parseFloat(item.valor_total).toFixed(2)}</span>
                   </div>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => removerDoCarrinho(index)}
-                  className="h-12 w-12"
+                  className="h-8 w-8 flex-shrink-0 ml-2"
                 >
-                  <Trash2 className="h-5 w-5 text-destructive" />
+                  <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
             ))}
 
             <Button
               size="lg"
-              className="w-full h-16 text-xl font-bold bg-green-600 hover:bg-green-700"
+              className="w-full h-12 text-base font-bold bg-green-600 hover:bg-green-700 mt-2"
               onClick={() => salvarCompraMutation.mutate()}
               disabled={salvarCompraMutation.isPending}
             >
-              <Save className="h-6 w-6 mr-2" />
-              {salvarCompraMutation.isPending ? "Salvando..." : "Finalizar Compra"}
+              <Save className="h-5 w-5 mr-2" />
+              {salvarCompraMutation.isPending ? "Salvando..." : "Finalizar"}
             </Button>
           </CardContent>
         </Card>

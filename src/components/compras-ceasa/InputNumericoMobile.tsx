@@ -19,11 +19,11 @@ export function InputNumericoMobile({
   autoFocus = false
 }: InputNumericoMobileProps) {
   return (
-    <div className="space-y-2">
-      <Label className="text-base font-semibold">{label}</Label>
+    <div className="space-y-1">
+      <Label className="text-xs font-semibold">{label}</Label>
       <div className="relative">
         {prefix && (
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-muted-foreground">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl font-bold text-muted-foreground">
             {prefix}
           </span>
         )}
@@ -37,8 +37,8 @@ export function InputNumericoMobile({
             onChange(val);
           }}
           placeholder={placeholder}
-          className={`h-20 text-3xl font-bold text-center border-2 ${
-            prefix ? "pl-12" : ""
+          className={`h-14 text-2xl font-bold text-center border-2 ${
+            prefix ? "pl-10" : ""
           }`}
           autoFocus={autoFocus}
         />
