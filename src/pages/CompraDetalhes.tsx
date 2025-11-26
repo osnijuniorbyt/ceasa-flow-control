@@ -44,6 +44,8 @@ interface ItemCompra {
   };
   vasilhames: {
     nome: string;
+    unidade_base: string;
+    tipo_calculo: string;
   };
 }
 
@@ -94,7 +96,7 @@ export default function CompraDetalhes() {
         .select(`
           *,
           produtos:produto_id(codigo, descricao, unidade_venda),
-          vasilhames:vasilhame_id(nome)
+          vasilhames:vasilhame_id(nome, unidade_base, tipo_calculo)
         `)
         .eq("compra_id", compraId);
 
@@ -316,11 +318,11 @@ export default function CompraDetalhes() {
                       <p className="font-medium">{item.quantidade_vasilhames}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Peso Total</p>
-                      <p className="font-medium">{item.peso_total_kg} kg</p>
+                      <p className="text-muted-foreground">{item.vasilhames.tipo_calculo === 'peso' ? 'Peso Total' : 'Quantidade Total'}</p>
+                      <p className="font-medium">{item.peso_total_kg.toFixed(2)} {item.vasilhames.unidade_base}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Preço/kg</p>
+                      <p className="text-muted-foreground">Preço/{item.vasilhames.unidade_base}</p>
                       <p className="font-medium">R$ {item.preco_por_kg.toFixed(2)}</p>
                     </div>
                     <div className="text-right">
