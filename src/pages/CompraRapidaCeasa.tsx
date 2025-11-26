@@ -448,59 +448,59 @@ export default function CompraRapidaCeasa() {
             />
 
             {produtoSelecionado && (
-              <div className="bg-primary/10 border border-primary/30 p-2 rounded-lg space-y-1">
-                <div className="font-semibold text-sm">
-                  {produtoSelecionado.codigo} - {produtoSelecionado.descricao}
-                </div>
-                {(produtoSelecionado.vasilhame_padrao || produtoSelecionado.vasilhame_secundario) && (
-                  <div className="text-[9px] text-muted-foreground flex flex-col gap-0.5">
-                    {produtoSelecionado.vasilhame_padrao && (
-                      <div className="flex items-center gap-1">
-                        <span>📦 Padrão:</span>
-                        <span className="font-medium">{produtoSelecionado.vasilhame_padrao.nome}</span>
-                        <span className="text-blue-600">({produtoSelecionado.vasilhame_padrao.peso_kg} un/cx)</span>
-                      </div>
-                    )}
-                    {produtoSelecionado.vasilhame_secundario && (
-                      <div className="flex items-center gap-1">
-                        <span>📦 Alt:</span>
-                        <span className="font-medium">{produtoSelecionado.vasilhame_secundario.nome}</span>
-                        <span className="text-blue-600">({produtoSelecionado.vasilhame_secundario.peso_kg} un/cx)</span>
-                      </div>
-                    )}
+              <div className="space-y-2">
+                <div className="bg-primary/10 border border-primary/30 p-2 rounded-lg">
+                  <div className="font-semibold text-sm">
+                    {produtoSelecionado.codigo} - {produtoSelecionado.descricao}
                   </div>
-                )}
+                  {(produtoSelecionado.vasilhame_padrao || produtoSelecionado.vasilhame_secundario) && (
+                    <div className="text-[9px] text-blue-600 font-medium mt-1 flex gap-2">
+                      {produtoSelecionado.vasilhame_padrao && (
+                        <div className="flex items-center gap-1">
+                          <span>📦 {produtoSelecionado.vasilhame_padrao.nome}:</span>
+                          <span className="font-bold">{produtoSelecionado.vasilhame_padrao.peso_kg} un/cx</span>
+                        </div>
+                      )}
+                      {produtoSelecionado.vasilhame_secundario && (
+                        <div className="flex items-center gap-1">
+                          <span>📦 {produtoSelecionado.vasilhame_secundario.nome}:</span>
+                          <span className="font-bold">{produtoSelecionado.vasilhame_secundario.peso_kg} un/cx</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <div id="quantidade-input">
+                    <InputNumericoMobile
+                      label="Qtd Caixas"
+                      value={quantidade}
+                      onChange={setQuantidade}
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <InputNumericoMobile
+                    label="Valor Total"
+                    value={valorTotal}
+                    onChange={setValorTotal}
+                    placeholder="0,00"
+                    prefix="R$"
+                  />
+                </div>
+
+                <Button
+                  size="lg"
+                  className="w-full h-12 text-base font-bold"
+                  onClick={adicionarAoCarrinho}
+                  disabled={!produtoSelecionado || !quantidade}
+                >
+                  <Plus className="h-5 w-5 mr-2" />
+                  Adicionar
+                </Button>
               </div>
             )}
-
-            <div className="grid grid-cols-2 gap-2">
-              <div id="quantidade-input">
-                <InputNumericoMobile
-                  label="Qtd"
-                  value={quantidade}
-                  onChange={setQuantidade}
-                  placeholder="0"
-                />
-              </div>
-
-              <InputNumericoMobile
-                label="Valor Total"
-                value={valorTotal}
-                onChange={setValorTotal}
-                placeholder="0,00"
-                prefix="R$"
-              />
-            </div>
-
-            <Button
-              size="lg"
-              className="w-full h-12 text-base font-bold"
-              onClick={adicionarAoCarrinho}
-              disabled={!produtoSelecionado || !quantidade}
-            >
-              <Plus className="h-5 w-5 mr-2" />
-              Adicionar
-            </Button>
           </CardContent>
         </Card>
       )}
