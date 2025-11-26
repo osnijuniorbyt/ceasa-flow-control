@@ -62,6 +62,8 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
           produto_id,
           preco_por_kg,
           preco_venda_sugerido,
+          peso_total_kg,
+          quantidade_vasilhames,
           produtos (
             id,
             codigo,
@@ -76,11 +78,16 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
 
       if (itensError) throw itensError;
 
-      // Agrupar por produto
+      // Agrupar por produto e calcular total
       const produtosMap = new Map();
+      let pesoTotalGeral = 0;
+      
       itens?.forEach((item: any) => {
         if (item.produtos && item.preco_por_kg) {
           const pid = item.produtos.id;
+          const pesoItem = item.peso_total_kg || 0;
+          pesoTotalGeral += pesoItem;
+          
           if (!produtosMap.has(pid)) {
             produtosMap.set(pid, {
               id: item.produtos.id,
@@ -92,9 +99,22 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
               margem: item.produtos.margem_padrao || 30,
               precoCustoAnterior: item.produtos.preco_ultima_compra || null,
               dataUltimaCompra: item.produtos.data_ultima_compra || null,
+              quantidadeTotal: pesoItem,
+              quantidadeVasilhames: item.quantidade_vasilhames || 0,
             });
+          } else {
+            const p = produtosMap.get(pid);
+            p.quantidadeTotal += pesoItem;
+            p.quantidadeVasilhames += item.quantidade_vasilhames || 0;
           }
         }
+      });
+
+      // Calcular porcentagem
+      produtosMap.forEach((produto) => {
+        produto.porcentagemLote = pesoTotalGeral > 0 
+          ? (produto.quantidadeTotal / pesoTotalGeral) * 100 
+          : 0;
       });
 
       let produtos = Array.from(produtosMap.values());
@@ -332,27 +352,35 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                 id={`card-${produto.id}`}
                 className={`border transition-all ${isFocado ? "ring-2 ring-primary shadow-lg" : ""}`}
               >
-                <CardContent className="p-3 space-y-2">
-                  <div>
-                    <div className="font-semibold text-sm">
-                      {produto.codigo} - {produto.descricao}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {produto.unidade_venda}
+                <CardContent className="p-3 space-y-1.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <div className="font-semibold text-base leading-tight">
+                        {produto.codigo} - {produto.descricao}
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] text-muted-foreground">{produto.unidade_venda}</span>
+                        <span className="text-[10px] text-blue-600 font-medium">
+                          {produto.quantidadeTotal?.toFixed(1)} kg ({produto.quantidadeVasilhames || 0} cx)
+                        </span>
+                        <span className="text-[10px] text-blue-600/70">
+                          {produto.porcentagemLote?.toFixed(1)}% lote
+                        </span>
+                      </div>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between text-xs">
                     <div>
-                      <div className="text-muted-foreground text-[10px]">Custo Atual</div>
-                      <div className="font-bold text-base">
+                      <div className="text-muted-foreground text-[9px]">Custo</div>
+                      <div className="font-bold text-sm">
                         R$ {produto.precoCustoAtual.toFixed(2)}
                       </div>
                     </div>
                     <div className="text-right opacity-50">
-                      <div className="text-muted-foreground text-[9px]">Ant</div>
+                      <div className="text-muted-foreground text-[8px]">Ant</div>
                       {produto.precoCustoAnterior ? (
-                        <div className="text-[10px] font-medium">
+                        <div className="text-[9px] font-medium">
                           R$ {produto.precoCustoAnterior.toFixed(2)}
                           {variacao !== null && (
                             <span className={`ml-1 ${variacao > 0 ? "text-red-500" : "text-green-500"}`}>
@@ -361,84 +389,69 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                           )}
                         </div>
                       ) : (
-                        <div className="text-[10px]">-</div>
+                        <div className="text-[9px]">-</div>
                       )}
                     </div>
-                    <div className="text-right">
-                      <div className="text-muted-foreground text-[10px]">Venda</div>
-                      <div className="font-bold text-base text-green-600">
-                        R$ {precoVenda.toFixed(2)}
-                      </div>
-                    </div>
                   </div>
 
-                  <div className="grid grid-cols-[80px_1fr] gap-2">
+                  <div className="grid grid-cols-[60px_1fr] gap-2">
                     <div>
-                      <Label className="text-[10px] text-muted-foreground">Margem %</Label>
-                      <div className="flex gap-1">
-                        <Input
-                          id={`margem-${produto.id}`}
-                          type="number"
-                          step="0.1"
-                          maxLength={3}
-                          value={editando[produto.id] ?? produto.margem}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value.length <= 3 || value.includes('.')) {
-                              handleMargemChange(produto.id, value);
-                            }
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              handleSalvarMargem(produto.id);
-                            }
-                          }}
-                          className="h-9 text-sm"
-                        />
-                        {editando[produto.id] && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleSalvarMargem(produto.id)}
-                            disabled={salvarMargemMutation.isPending}
-                            className="h-9 px-2"
-                          >
-                            <Save className="h-3 w-3" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label className="text-xs text-muted-foreground font-medium">Preço Venda R$</Label>
-                      <div className="flex gap-1">
-                        <Input
-                          id={`preco-${produto.id}`}
-                          type="number"
-                          step="0.01"
-                          value={editandoPrecoVenda[produto.id] ?? precoVenda.toFixed(2)}
-                          onChange={(e) =>
-                            setEditandoPrecoVenda({ ...editandoPrecoVenda, [produto.id]: e.target.value })
+                      <Label className="text-[9px] text-muted-foreground">Mrg%</Label>
+                      <Input
+                        id={`margem-${produto.id}`}
+                        type="number"
+                        step="0.1"
+                        maxLength={3}
+                        value={editando[produto.id] ?? produto.margem}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value.length <= 3 || value.includes('.')) {
+                            handleMargemChange(produto.id, value);
                           }
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              handleSalvarPrecoVenda(produto.id);
-                            }
-                          }}
-                          className="h-10 text-base font-semibold"
-                        />
-                        {editandoPrecoVenda[produto.id] && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleSalvarPrecoVenda(produto.id)}
-                            disabled={salvarMargemMutation.isPending}
-                            className="h-10 px-2"
-                          >
-                            <Save className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSalvarMargem(produto.id);
+                          }
+                        }}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-[10px] text-muted-foreground font-medium">Preço Venda R$</Label>
+                      <Input
+                        id={`preco-${produto.id}`}
+                        type="number"
+                        step="0.01"
+                        value={editandoPrecoVenda[produto.id] ?? precoVenda.toFixed(2)}
+                        onChange={(e) =>
+                          setEditandoPrecoVenda({ ...editandoPrecoVenda, [produto.id]: e.target.value })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSalvarPrecoVenda(produto.id);
+                          }
+                        }}
+                        className="h-8 text-sm font-semibold"
+                      />
                     </div>
                   </div>
+                  
+                  {(editando[produto.id] || editandoPrecoVenda[produto.id]) && (
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        if (editando[produto.id]) handleSalvarMargem(produto.id);
+                        if (editandoPrecoVenda[produto.id]) handleSalvarPrecoVenda(produto.id);
+                      }}
+                      disabled={salvarMargemMutation.isPending}
+                      className="w-full h-7 text-xs"
+                    >
+                      <Save className="h-3 w-3 mr-1" />
+                      Salvar
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             );
