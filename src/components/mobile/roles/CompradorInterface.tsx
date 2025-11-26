@@ -102,6 +102,9 @@ export function CompradorInterface() {
     }
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+      
       // Group by supplier
       const groupedBySupplier = cart.reduce((acc, item) => {
         if (!acc[item.fornecedor_id]) {
@@ -124,6 +127,7 @@ export function CompradorInterface() {
             valor_produtos: totalValue,
             valor_total: totalValue,
             numero_compra: 0,
+            user_id: user.id
           }])
           .select()
           .single();

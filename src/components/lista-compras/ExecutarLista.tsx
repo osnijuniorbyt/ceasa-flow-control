@@ -210,6 +210,9 @@ export function ExecutarLista({ listaId }: ExecutarListaProps) {
         }, 0);
 
         // Criar compra
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Usuário não autenticado");
+        
         const { data: compra, error: compraError } = await supabase
           .from("compras")
           .insert({
@@ -218,6 +221,7 @@ export function ExecutarLista({ listaId }: ExecutarListaProps) {
             valor_produtos: totalFornecedor,
             valor_total: totalFornecedor,
             numero_compra: 0,
+            user_id: user.id
           })
           .select()
           .single();

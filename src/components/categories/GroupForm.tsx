@@ -47,7 +47,13 @@ export function GroupForm({ group, onSuccess }: GroupFormProps) {
         if (error) throw error;
       } else {
         // Create
-        const { error } = await supabase.from("grupos").insert(data);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Usuário não autenticado");
+        
+        const { error } = await supabase.from("grupos").insert({
+          ...data,
+          user_id: user.id
+        });
 
         if (error) throw error;
       }

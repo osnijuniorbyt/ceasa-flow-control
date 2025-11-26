@@ -50,6 +50,9 @@ export default function ListaCompras() {
 
   const criarNovaLista = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+      
       const amanha = format(addDays(new Date(), 1), "yyyy-MM-dd");
       const { data, error } = await supabase
         .from("listas_compras")
@@ -57,6 +60,7 @@ export default function ListaCompras() {
           nome: `Lista ${format(addDays(new Date(), 1), "dd/MM/yyyy", { locale: ptBR })}`,
           data_compra: amanha,
           status: "rascunho",
+          user_id: user.id
         })
         .select()
         .single();

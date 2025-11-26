@@ -148,6 +148,9 @@ export function RegistroCompra() {
 
     setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+      
       // Criar compra
       const { data: compra, error: compraError } = await supabase
         .from("compras")
@@ -157,6 +160,7 @@ export function RegistroCompra() {
           valor_produtos: totalCompra,
           valor_total: totalCompra,
           numero_compra: 0,
+          user_id: user.id
         })
         .select()
         .single();

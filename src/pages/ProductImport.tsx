@@ -163,6 +163,9 @@ export default function ProductImport() {
           }
 
           // Insert product
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) throw new Error("Usuário não autenticado");
+          
           const { error } = await supabase.from("produtos").insert({
             codigo,
             descricao,
@@ -171,6 +174,7 @@ export default function ProductImport() {
             unidade_venda: unidadeVenda || "KG",
             margem_padrao: margemPadrao || null,
             referencia: referencia || null,
+            user_id: user.id
           });
 
           if (error) {

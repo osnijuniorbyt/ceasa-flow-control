@@ -215,9 +215,15 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
           description: "Produto atualizado com sucesso",
         });
       } else {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Usuário não autenticado");
+        
         const { error } = await supabase
           .from("produtos")
-          .insert(dataToSave);
+          .insert({
+            ...dataToSave,
+            user_id: user.id
+          });
 
         if (error) throw error;
 

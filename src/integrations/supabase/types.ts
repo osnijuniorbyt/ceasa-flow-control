@@ -25,6 +25,7 @@ export type Database = {
           numero_compra: number
           observacoes: string | null
           status: string
+          user_id: string
           valor_produtos: number
           valor_total: number
         }
@@ -38,6 +39,7 @@ export type Database = {
           numero_compra: number
           observacoes?: string | null
           status?: string
+          user_id: string
           valor_produtos?: number
           valor_total?: number
         }
@@ -51,6 +53,7 @@ export type Database = {
           numero_compra?: number
           observacoes?: string | null
           status?: string
+          user_id?: string
           valor_produtos?: number
           valor_total?: number
         }
@@ -125,6 +128,7 @@ export type Database = {
           razao_social: string
           telefone: string | null
           tipo: string | null
+          user_id: string
         }
         Insert: {
           ativo?: boolean
@@ -138,6 +142,7 @@ export type Database = {
           razao_social: string
           telefone?: string | null
           tipo?: string | null
+          user_id: string
         }
         Update: {
           ativo?: boolean
@@ -151,6 +156,7 @@ export type Database = {
           razao_social?: string
           telefone?: string | null
           tipo?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -162,6 +168,7 @@ export type Database = {
           id: string
           nome: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           ativo?: boolean
@@ -170,6 +177,7 @@ export type Database = {
           id?: string
           nome: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           ativo?: boolean
@@ -178,6 +186,7 @@ export type Database = {
           id?: string
           nome?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -331,6 +340,7 @@ export type Database = {
           observacoes: string | null
           status: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           created_at?: string
@@ -340,6 +350,7 @@ export type Database = {
           observacoes?: string | null
           status?: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           created_at?: string
@@ -349,6 +360,7 @@ export type Database = {
           observacoes?: string | null
           status?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -370,6 +382,7 @@ export type Database = {
           subgrupo_id: string
           unidade_venda: string
           updated_at: string
+          user_id: string
           vasilhame_padrao_id: string | null
           vasilhame_secundario_id: string | null
           vasilhame_ultima_compra_id: string | null
@@ -391,6 +404,7 @@ export type Database = {
           subgrupo_id: string
           unidade_venda: string
           updated_at?: string
+          user_id: string
           vasilhame_padrao_id?: string | null
           vasilhame_secundario_id?: string | null
           vasilhame_ultima_compra_id?: string | null
@@ -412,6 +426,7 @@ export type Database = {
           subgrupo_id?: string
           unidade_venda?: string
           updated_at?: string
+          user_id?: string
           vasilhame_padrao_id?: string | null
           vasilhame_secundario_id?: string | null
           vasilhame_ultima_compra_id?: string | null
@@ -494,6 +509,7 @@ export type Database = {
           id: string
           nome: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           ativo?: boolean
@@ -503,6 +519,7 @@ export type Database = {
           id?: string
           nome: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           ativo?: boolean
@@ -512,6 +529,7 @@ export type Database = {
           id?: string
           nome?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -533,6 +551,7 @@ export type Database = {
           peso_kg: number
           unidade_base: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           ativo?: boolean
@@ -543,6 +562,7 @@ export type Database = {
           peso_kg: number
           unidade_base: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           ativo?: boolean
@@ -553,6 +573,7 @@ export type Database = {
           peso_kg?: number
           unidade_base?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

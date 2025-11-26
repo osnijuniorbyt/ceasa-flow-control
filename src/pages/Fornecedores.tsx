@@ -42,7 +42,13 @@ export default function Fornecedores() {
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from("fornecedores").insert([data]);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+      
+      const { error } = await supabase.from("fornecedores").insert([{
+        ...data,
+        user_id: user.id
+      }]);
       if (error) throw error;
     },
     onSuccess: () => {
