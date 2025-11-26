@@ -26,6 +26,7 @@ import Categories from "./pages/Categories";
 import ProductImport from "./pages/ProductImport";
 import ComprasCeasa from "./pages/ComprasCeasa";
 import Fornecedores from "./pages/Fornecedores";
+import CompraRapida from "./pages/CompraRapida";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -103,6 +104,7 @@ const App = () => {
                 <Route path="fornecedores" element={<Fornecedores />} />
                 <Route path="product-import" element={<ProductImport />} />
                 <Route path="compras-ceasa" element={<ComprasCeasa />} />
+                <Route path="compra-rapida" element={<CompraRapida />} />
                 <Route path="commercial" element={<Commercial />} />
                 <Route path="pricing" element={<Pricing />} />
                 <Route path="automation-rules" element={<AutomationRules />} />

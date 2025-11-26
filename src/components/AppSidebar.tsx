@@ -27,6 +27,7 @@ import {
   FolderTree,
   FileSpreadsheet,
   Building2,
+  Bolt,
 } from "lucide-react";
 
 const menuItems = [
@@ -34,6 +35,11 @@ const menuItems = [
     title: "Dashboard",
     url: "/",
     icon: LayoutDashboard,
+  },
+  {
+    title: "⚡ Compra Rápida",
+    url: "/compra-rapida",
+    icon: Bolt,
   },
   {
     title: "Compras CEASA",
