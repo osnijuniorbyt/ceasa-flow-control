@@ -29,6 +29,7 @@ import {
   Building2,
   Bolt,
   ClipboardList,
+  Construction,
 } from "lucide-react";
 
 const menuItems = [
@@ -93,6 +94,11 @@ const menuItems = [
     icon: Package,
   },
   {
+    title: "🔧 Gestão de Produtos",
+    url: "/produtos-gestao",
+    icon: Package,
+  },
+  {
     title: "Importar Produtos",
     url: "/product-import",
     icon: FileSpreadsheet,
@@ -121,6 +127,11 @@ const menuItems = [
     title: "Configurações",
     url: "/settings",
     icon: Settings,
+  },
+  {
+    title: "🚧 Desenvolvimento",
+    url: "/desenvolvimento",
+    icon: Construction,
   },
 ];
 

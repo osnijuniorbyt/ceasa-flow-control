@@ -444,10 +444,20 @@ export default function CompraRapidaCeasa() {
             />
 
             {produtoSelecionado && (
-              <div className="bg-primary/10 border border-primary/30 p-2 rounded-lg">
+              <div className="bg-primary/10 border border-primary/30 p-2 rounded-lg space-y-1">
                 <div className="font-semibold text-sm">
                   {produtoSelecionado.codigo} - {produtoSelecionado.descricao}
                 </div>
+                {(produtoSelecionado.vasilhame_padrao || produtoSelecionado.vasilhame_secundario) && (
+                  <div className="text-[10px] text-muted-foreground flex gap-2">
+                    {produtoSelecionado.vasilhame_padrao && (
+                      <span>📦 Padrão: {produtoSelecionado.vasilhame_padrao.nome} ({produtoSelecionado.vasilhame_padrao.peso_kg}kg)</span>
+                    )}
+                    {produtoSelecionado.vasilhame_secundario && (
+                      <span>📦 Alt: {produtoSelecionado.vasilhame_secundario.nome} ({produtoSelecionado.vasilhame_secundario.peso_kg}kg)</span>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
