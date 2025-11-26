@@ -100,7 +100,7 @@ export default function CompraRapidaCeasa() {
         `)
         .eq("fornecedor_id", fornecedorSelecionado)
         .order("created_at", { ascending: false })
-        .limit(5);
+        .limit(20);
 
       if (error) throw error;
 
@@ -290,19 +290,23 @@ export default function CompraRapidaCeasa() {
     if (carrinho.length > 0) {
       setCancelarDialogOpen(true);
     } else {
-      limparTudo();
+      limparCampos();
     }
+  };
+
+  const limparCampos = () => {
+    setCarrinho([]);
+    setQuantidade("");
+    setValorTotal("");
+    setProdutoSelecionado(null);
+    setCancelarDialogOpen(false);
+    toast.success("Campos limpos");
   };
 
   const limparTudo = () => {
     localStorage.removeItem(CACHE_KEY);
-    setCarrinho([]);
-    setQuantidade("");
-    setValorTotal("");
+    limparCampos();
     setFornecedorSelecionado("");
-    setProdutoSelecionado(null);
-    setCancelarDialogOpen(false);
-    toast.success("Compra cancelada");
     navigate("/");
   };
 
@@ -386,24 +390,26 @@ export default function CompraRapidaCeasa() {
         </CardContent>
       </Card>
 
-      {/* Histórico de Produtos do Fornecedor - COMPACTO */}
+      {/* Histórico de Produtos do Fornecedor - COMPACTO COM SCROLL */}
       {fornecedorSelecionado && produtosHistorico && produtosHistorico.length > 0 && (
         <Card className="border border-blue-500/30">
           <CardHeader className="pb-2 pt-3 px-3">
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2 text-sm">
               <History className="h-4 w-4" />
-              Recentes ({produtosHistorico.length})
+              Histórico ({produtosHistorico.length})
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-1 px-3 pb-3">
-            {produtosHistorico.slice(0, 5).map((produto: any) => (
-              <SwipeableHistoricoItem
-                key={produto.id}
-                produto={produto}
-                fornecedorId={fornecedorSelecionado}
-                onSelect={adicionarProdutoHistorico}
-              />
-            ))}
+          <CardContent className="px-3 pb-3">
+            <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
+              {produtosHistorico.map((produto: any) => (
+                <SwipeableHistoricoItem
+                  key={produto.id}
+                  produto={produto}
+                  fornecedorId={fornecedorSelecionado}
+                  onSelect={adicionarProdutoHistorico}
+                />
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}
@@ -523,20 +529,20 @@ export default function CompraRapidaCeasa() {
         }}
       />
 
-      {/* Dialog de Confirmação de Cancelamento */}
+      {/* Dialog de Confirmação */}
       <AlertDialog open={cancelarDialogOpen} onOpenChange={setCancelarDialogOpen}>
         <AlertDialogContent className="w-[90vw] max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancelar Compra?</AlertDialogTitle>
+            <AlertDialogTitle>Limpar Lançamento?</AlertDialogTitle>
             <AlertDialogDescription>
               Você tem {carrinho.length} {carrinho.length === 1 ? "item" : "itens"} no carrinho.
-              Tem certeza que deseja cancelar esta compra? Todos os dados serão perdidos.
+              Deseja limpar o carrinho atual? O fornecedor permanecerá selecionado.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
             <AlertDialogCancel className="h-12 text-base">Não</AlertDialogCancel>
-            <AlertDialogAction onClick={limparTudo} className="h-12 text-base bg-destructive hover:bg-destructive/90">
-              Sim, Cancelar
+            <AlertDialogAction onClick={limparCampos} className="h-12 text-base">
+              Sim, Limpar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

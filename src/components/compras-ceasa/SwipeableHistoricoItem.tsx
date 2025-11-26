@@ -107,23 +107,23 @@ export function SwipeableHistoricoItem({ produto, fornecedorId, onSelect }: Swip
           transform: `translateX(${translateX}px)`,
           transition: isDragging ? "none" : "transform 0.3s ease-out",
         }}
-        className="w-full p-2 border rounded-lg hover:bg-muted/50 bg-background text-left relative"
+        className="w-full p-1.5 border rounded hover:bg-muted/50 bg-background text-left relative"
       >
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-sm truncate">
+            <div className="font-semibold text-xs truncate">
               {produto.codigo} - {produto.descricao}
             </div>
-            <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
+            <div className="text-[10px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
               <span>{produto.vezes_comprado}x</span>
               <span>•</span>
-              <span className="text-green-600 font-bold text-base">
+              <span className="text-green-600 font-bold text-sm">
                 R$ {Number(produto.ultimo_valor).toFixed(2)}
               </span>
             </div>
           </div>
           {translateX === 0 && (
-            <Plus className="h-4 w-4 text-primary flex-shrink-0 ml-2" />
+            <Plus className="h-3.5 w-3.5 text-primary flex-shrink-0 ml-1.5" />
           )}
         </div>
       </button>
