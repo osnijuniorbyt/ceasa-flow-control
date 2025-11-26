@@ -84,56 +84,56 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] md:w-[85vw] max-w-md md:max-w-2xl">
+      <DialogContent className="w-[92vw] md:w-[88vw] max-w-lg md:max-w-3xl">
         <DialogHeader>
-          <DialogTitle className="text-xl md:text-2xl">Novo Fornecedor</DialogTitle>
+          <DialogTitle className="text-2xl md:text-3xl">Novo Fornecedor</DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="nome" className="text-base md:text-lg">Nome *</Label>
+          <div className="space-y-3">
+            <Label htmlFor="nome" className="text-lg md:text-xl font-semibold">Nome *</Label>
             <Input
               id="nome"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome do fornecedor"
-              className="h-14 md:h-16 text-lg md:text-xl"
+              className="h-16 md:h-20 text-xl md:text-2xl"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="tipo" className="text-base md:text-lg">Local / Tipo *</Label>
+          <div className="space-y-3">
+            <Label htmlFor="tipo" className="text-lg md:text-xl font-semibold">Local / Tipo *</Label>
             <Select value={tipo} onValueChange={setTipo}>
-              <SelectTrigger className="h-14 md:h-16 text-lg md:text-xl">
+              <SelectTrigger className="h-16 md:h-20 text-xl md:text-2xl">
                 <SelectValue placeholder="Selecione o local" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="CEASA">CEASA</SelectItem>
-                <SelectItem value="Pedra">Pedra</SelectItem>
-                <SelectItem value="Outros">Outros</SelectItem>
+              <SelectContent className="text-xl md:text-2xl">
+                <SelectItem value="CEASA" className="text-xl md:text-2xl py-4">CEASA</SelectItem>
+                <SelectItem value="Pedra" className="text-xl md:text-2xl py-4">Pedra</SelectItem>
+                <SelectItem value="Outros" className="text-xl md:text-2xl py-4">Outros</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="box" className="text-base md:text-lg">Box / Contato</Label>
+          <div className="space-y-3">
+            <Label htmlFor="box" className="text-lg md:text-xl font-semibold">Box / Contato</Label>
             <Input
               id="box"
               value={box}
               onChange={(e) => setBox(e.target.value)}
               placeholder="Box 123 ou telefone"
-              className="h-14 md:h-16 text-lg md:text-xl"
+              className="h-16 md:h-20 text-xl md:text-2xl"
             />
           </div>
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-4 pt-4">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="flex-1 h-14 md:h-16 text-lg md:text-xl"
+              className="flex-1 h-16 md:h-20 text-xl md:text-2xl"
               disabled={loading}
             >
               Cancelar
             </Button>
             <Button
               onClick={handleSave}
-              className="flex-1 h-14 md:h-16 text-lg md:text-xl"
+              className="flex-1 h-16 md:h-20 text-xl md:text-2xl"
               disabled={loading}
             >
               {loading ? "Salvando..." : "Salvar"}

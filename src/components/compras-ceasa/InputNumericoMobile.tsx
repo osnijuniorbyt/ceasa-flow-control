@@ -19,11 +19,11 @@ export function InputNumericoMobile({
   autoFocus = false
 }: InputNumericoMobileProps) {
   return (
-    <div className="space-y-1">
-      <Label className="text-xs md:text-sm font-semibold">{label}</Label>
+    <div className="space-y-2">
+      <Label className="text-base md:text-lg font-semibold">{label}</Label>
       <div className="relative">
         {prefix && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl md:text-2xl font-bold text-muted-foreground">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl md:text-3xl font-bold text-muted-foreground">
             {prefix}
           </span>
         )}
@@ -32,13 +32,12 @@ export function InputNumericoMobile({
           inputMode="decimal"
           value={value}
           onChange={(e) => {
-            // Permite apenas números e vírgula/ponto
             const val = e.target.value.replace(/[^\d.,]/g, "").replace(",", ".");
             onChange(val);
           }}
           placeholder={placeholder}
-          className={`h-14 md:h-16 text-2xl md:text-3xl font-bold text-center border-2 ${
-            prefix ? "pl-10 md:pl-12" : ""
+          className={`h-20 md:h-24 text-3xl md:text-4xl font-bold text-center border-2 ${
+            prefix ? "pl-14 md:pl-16" : ""
           }`}
           autoFocus={autoFocus}
         />
