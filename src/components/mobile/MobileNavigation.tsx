@@ -5,7 +5,8 @@ import {
   ShoppingCart, 
   Warehouse, 
   BarChart3,
-  DollarSign 
+  DollarSign,
+  Bolt
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,9 +17,9 @@ const quickNavItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Compras",
-    url: "/purchase-orders",
-    icon: ShoppingCart,
+    title: "⚡ Rápida",
+    url: "/compra-rapida",
+    icon: Bolt,
   },
   {
     title: "Depósito",
