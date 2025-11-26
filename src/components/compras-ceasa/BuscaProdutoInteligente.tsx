@@ -32,10 +32,17 @@ export function BuscaProdutoInteligente({ onSelectProduto, placeholder = "Digite
           preco_ultima_compra,
           fornecedor_padrao_id,
           vasilhame_padrao:vasilhames!produtos_vasilhame_padrao_id_fkey (
+            id,
             nome,
             peso_kg
           ),
           vasilhame_secundario:vasilhames!produtos_vasilhame_secundario_id_fkey (
+            id,
+            nome,
+            peso_kg
+          ),
+          vasilhame_ultima_compra:vasilhames!produtos_vasilhame_ultima_compra_id_fkey (
+            id,
             nome,
             peso_kg
           ),

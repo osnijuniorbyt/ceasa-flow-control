@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Package, ShoppingCart, Truck, AlertTriangle, Settings } from "lucide-react";
+import { Package, ShoppingCart, Truck, AlertTriangle, FolderCog } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
@@ -49,20 +49,12 @@ const Index = () => {
         </div>
         <div className="flex gap-2">
           <Button
-            onClick={() => navigate("/fornecedores-gestao")}
+            onClick={() => navigate("/cadastros")}
             variant="outline"
             className="gap-2"
           >
-            <Truck className="h-4 w-4" />
-            Fornecedores
-          </Button>
-          <Button
-            onClick={() => navigate("/produtos-gestao")}
-            variant="outline"
-            className="gap-2"
-          >
-            <Settings className="h-4 w-4" />
-            Produtos
+            <FolderCog className="h-4 w-4" />
+            Cadastros
           </Button>
         </div>
       </div>
