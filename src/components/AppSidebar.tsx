@@ -49,17 +49,17 @@ const menuItems = [
     icon: ClipboardList,
   },
   {
-    title: "Compra",
+    title: "🛒 Compra",
     url: "/compras-ceasa-mobile",
     icon: ShoppingCart,
   },
   {
-    title: "Produtos",
+    title: "📦 Produtos",
     url: "/produtos-gestao",
     icon: Package,
   },
   {
-    title: "Preços",
+    title: "💰 Preços",
     url: "/pricing",
     icon: DollarSign,
   },
