@@ -400,8 +400,8 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                       <Input
                         id={`margem-${produto.id}`}
                         type="number"
+                        inputMode="decimal"
                         step="0.1"
-                        maxLength={3}
                         value={editando[produto.id] ?? produto.margem}
                         onChange={(e) => {
                           const value = e.target.value;
@@ -423,6 +423,7 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                       <Input
                         id={`preco-${produto.id}`}
                         type="number"
+                        inputMode="decimal"
                         step="0.01"
                         value={editandoPrecoVenda[produto.id] ?? precoVenda.toFixed(2)}
                         onChange={(e) =>
