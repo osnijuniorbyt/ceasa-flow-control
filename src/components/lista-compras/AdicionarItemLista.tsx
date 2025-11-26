@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Command,
   CommandEmpty,
@@ -15,7 +16,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, ChevronsUpDown, X } from "lucide-react";
+import { Check, ChevronsUpDown, X, Sparkles, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -46,6 +47,60 @@ export function AdicionarItemLista({ listaId, onSuccess, onCancel }: AdicionarIt
   const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(null);
   const [quantidade, setQuantidade] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingSugestao, setLoadingSugestao] = useState(false);
+  const [sugestao, setSugestao] = useState<{
+    quantidade_sugerida: number;
+    confianca: string;
+    explicacao: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (produtoSelecionado) {
+      buscarSugestao();
+    } else {
+      setSugestao(null);
+      setQuantidade("");
+    }
+  }, [produtoSelecionado]);
+
+  const buscarSugestao = async () => {
+    if (!produtoSelecionado) return;
+
+    setLoadingSugestao(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sugerir-quantidade", {
+        body: { produtoId: produtoSelecionado.id },
+      });
+
+      if (error) {
+        if (error.message?.includes("429")) {
+          toast({
+            title: "Muitas requisições",
+            description: "Aguarde alguns instantes e tente novamente",
+            variant: "destructive",
+          });
+        } else if (error.message?.includes("402")) {
+          toast({
+            title: "Créditos esgotados",
+            description: "Adicione créditos no workspace para continuar usando sugestões inteligentes",
+            variant: "destructive",
+          });
+        } else {
+          console.error("Erro ao buscar sugestão:", error);
+        }
+        return;
+      }
+
+      if (data && data.quantidade_sugerida) {
+        setSugestao(data);
+        setQuantidade(data.quantidade_sugerida.toString());
+      }
+    } catch (error) {
+      console.error("Erro ao buscar sugestão:", error);
+    } finally {
+      setLoadingSugestao(false);
+    }
+  };
 
   useEffect(() => {
     loadProdutos();
@@ -170,7 +225,30 @@ export function AdicionarItemLista({ listaId, onSuccess, onCancel }: AdicionarIt
           {produtoSelecionado && (
             <>
               <div className="space-y-2">
-                <Label>Quantidade ({produtoSelecionado.unidade_venda})</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Quantidade ({produtoSelecionado.unidade_venda})</Label>
+                  {loadingSugestao && (
+                    <Badge variant="outline" className="gap-1">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Analisando...
+                    </Badge>
+                  )}
+                  {sugestao && !loadingSugestao && (
+                    <Badge 
+                      variant={
+                        sugestao.confianca === "alta" 
+                          ? "default" 
+                          : sugestao.confianca === "media" 
+                          ? "secondary" 
+                          : "outline"
+                      }
+                      className="gap-1"
+                    >
+                      <Sparkles className="h-3 w-3" />
+                      Sugestão IA: {sugestao.quantidade_sugerida}
+                    </Badge>
+                  )}
+                </div>
                 <Input
                   type="number"
                   step="0.01"
@@ -179,6 +257,12 @@ export function AdicionarItemLista({ listaId, onSuccess, onCancel }: AdicionarIt
                   placeholder="Ex: 10"
                   required
                 />
+                {sugestao && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    {sugestao.explicacao}
+                  </p>
+                )}
               </div>
 
               {produtoSelecionado.fornecedores && (
