@@ -12,6 +12,7 @@ import { SwipeableHistoricoItem } from "@/components/compras-ceasa/SwipeableHist
 import { SwipeableCarrinhoItem } from "@/components/compras-ceasa/SwipeableCarrinhoItem";
 import { ConferenciaMobile } from "@/components/compras-ceasa/ConferenciaMobile";
 import { PrecificacaoMobile } from "@/components/compras-ceasa/PrecificacaoMobile";
+import { HistoricoLote } from "@/components/compras-ceasa/HistoricoLote";
 import { Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -367,7 +368,10 @@ export default function CompraRapidaCeasa() {
         </TabsList>
 
         <TabsContent value="lancamento" className="mt-0">
-          <div className="space-y-2 p-2">{/* ... keep existing code */}
+          <div className="space-y-2 p-2">
+      
+      {/* Histórico de Compras do Lote */}
+      <HistoricoLote loteData={loteData} />
 
       {/* Seleção de Fornecedor */}
       <Card className="border">
