@@ -1,14 +1,14 @@
-
-import { Package, Menu, Wifi, WifiOff } from "lucide-react";
+import { Package, Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MobileHeaderProps {
   onMenuClick: () => void;
-  isOnline: boolean;
 }
 
-export function MobileHeader({ onMenuClick, isOnline }: MobileHeaderProps) {
+export function MobileHeader({ onMenuClick }: MobileHeaderProps) {
+  const { signOut, user } = useAuth();
+  
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
       <div className="flex h-16 items-center justify-between px-4">
@@ -24,20 +24,24 @@ export function MobileHeader({ onMenuClick, isOnline }: MobileHeaderProps) {
         <div className="flex items-center gap-3">
           <Package className="h-8 w-8 text-primary" />
           <div className="flex flex-col">
-            <span className="font-bold text-lg">HORTECH</span>
+            <span className="font-bold text-lg">CEASA</span>
             <span className="text-xs text-muted-foreground">Mobile</span>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          {isOnline ? (
-            <Wifi className="h-5 w-5 text-green-600" />
-          ) : (
-            <WifiOff className="h-5 w-5 text-red-600" />
-          )}
-          <Badge variant={isOnline ? "default" : "destructive"} className="text-xs">
-            {isOnline ? "Online" : "Offline"}
-          </Badge>
+          <span className="text-xs text-muted-foreground hidden sm:inline">
+            {user?.email?.split('@')[0]}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={signOut}
+            className="h-10 w-10"
+            title="Sair"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </header>
