@@ -12,6 +12,13 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -34,6 +41,7 @@ interface Produto {
   descricao: string;
   unidade_venda: string;
   fornecedor_padrao_id: string | null;
+  categoria?: string;
   fornecedores?: {
     id: string;
     razao_social: string;
@@ -56,6 +64,8 @@ export function AdicionarItemLista({ listaId, onSuccess, onCancel }: AdicionarIt
   } | null>(null);
   const [showCriarProduto, setShowCriarProduto] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [categoriaFiltro, setCategoriaFiltro] = useState<string>("todas");
+  const [ordenacao, setOrdenacao] = useState<"nome" | "codigo">("nome");
 
   useEffect(() => {
     if (produtoSelecionado) {
@@ -111,17 +121,31 @@ export function AdicionarItemLista({ listaId, onSuccess, onCancel }: AdicionarIt
 
   const loadProdutos = async () => {
     try {
+      const { data: grupos, error: gruposError } = await supabase
+        .from("grupos")
+        .select("id, nome");
+
+      if (gruposError) throw gruposError;
+
+      const grupoMap = new Map(grupos?.map(g => [g.id, g.nome.toLowerCase()]) || []);
+
       const { data, error } = await supabase
         .from("produtos")
         .select(`
           *,
           fornecedores:fornecedor_padrao_id(id, razao_social, nome_fantasia)
         `)
-        .eq("ativo", true)
-        .order("descricao");
+        .eq("ativo", true);
 
       if (error) throw error;
-      setProdutos(data || []);
+
+      // Mapear categoria baseado no grupo
+      const produtosComCategoria = (data || []).map(p => ({
+        ...p,
+        categoria: grupoMap.get(p.grupo_id) || "outros"
+      }));
+
+      setProdutos(produtosComCategoria as any);
     } catch (error: any) {
       toast({
         title: "Erro",
@@ -178,6 +202,37 @@ export function AdicionarItemLista({ listaId, onSuccess, onCancel }: AdicionarIt
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="space-y-2">
+              <Label className="text-xs">Filtrar por Categoria</Label>
+              <Select value={categoriaFiltro} onValueChange={setCategoriaFiltro}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todas">Todas</SelectItem>
+                  <SelectItem value="frutas">Frutas</SelectItem>
+                  <SelectItem value="legumes">Legumes</SelectItem>
+                  <SelectItem value="verduras">Verduras</SelectItem>
+                  <SelectItem value="ovos">Ovos</SelectItem>
+                  <SelectItem value="outros">Outros</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Ordenar por</Label>
+              <Select value={ordenacao} onValueChange={(v) => setOrdenacao(v as "nome" | "codigo")}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="nome">Nome</SelectItem>
+                  <SelectItem value="codigo">Código</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label>Produto</Label>
             <Popover open={open} onOpenChange={setOpen}>
@@ -217,7 +272,15 @@ export function AdicionarItemLista({ listaId, onSuccess, onCancel }: AdicionarIt
                     </div>
                   </CommandEmpty>
                   <CommandGroup className="max-h-64 overflow-auto">
-                    {produtos.map((produto) => (
+                    {produtos
+                      .filter(p => categoriaFiltro === "todas" || p.categoria === categoriaFiltro)
+                      .sort((a, b) => {
+                        if (ordenacao === "nome") {
+                          return a.descricao.localeCompare(b.descricao);
+                        }
+                        return a.codigo.localeCompare(b.codigo);
+                      })
+                      .map((produto) => (
                       <CommandItem
                         key={produto.id}
                         value={`${produto.codigo} ${produto.descricao}`}
