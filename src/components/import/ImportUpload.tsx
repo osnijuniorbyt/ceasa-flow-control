@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Upload, FileSpreadsheet, AlertCircle } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Upload, FileSpreadsheet, AlertCircle, ClipboardPaste } from "lucide-react";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +16,7 @@ interface ImportUploadProps {
 export function ImportUpload({ onFileLoaded }: ImportUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [pastedText, setPastedText] = useState("");
   const { toast } = useToast();
 
   const handleFile = async (file: File) => {
@@ -25,6 +28,7 @@ export function ImportUpload({ onFileLoaded }: ImportUploadProps) {
         Papa.parse(file, {
           header: true,
           skipEmptyLines: true,
+          delimiter: ";", // Detecta automaticamente mas prioriza ponto-e-vírgula
           complete: (results) => {
             if (results.data && results.data.length > 0) {
               const headers = Object.keys(results.data[0]);
@@ -123,64 +127,152 @@ export function ImportUpload({ onFileLoaded }: ImportUploadProps) {
     }
   };
 
+  const handlePastedText = () => {
+    if (!pastedText.trim()) {
+      toast({
+        title: "Erro",
+        description: "Cole o conteúdo CSV na área de texto",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      Papa.parse(pastedText, {
+        header: true,
+        skipEmptyLines: true,
+        delimiter: ";",
+        complete: (results) => {
+          if (results.data && results.data.length > 0) {
+            const headers = Object.keys(results.data[0]);
+            onFileLoaded(results.data, headers);
+          } else {
+            toast({
+              title: "Erro",
+              description: "Nenhum dado encontrado no texto colado",
+              variant: "destructive",
+            });
+          }
+          setLoading(false);
+        },
+        error: (error) => {
+          toast({
+            title: "Erro",
+            description: `Erro ao processar CSV: ${error.message}`,
+            variant: "destructive",
+          });
+          setLoading(false);
+        },
+      });
+    } catch (error) {
+      console.error("Erro ao processar texto:", error);
+      toast({
+        title: "Erro",
+        description: "Erro ao processar texto colado",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
+  };
+
   return (
     <Card>
-      <CardContent className="p-12">
-        <div
-          className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
-            isDragging
-              ? "border-primary bg-primary/5"
-              : "border-border hover:border-primary/50"
-          }`}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setIsDragging(true);
-          }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={handleDrop}
-        >
-          <FileSpreadsheet className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-          
-          {loading ? (
-            <p className="text-lg font-medium mb-2">Processando arquivo...</p>
-          ) : (
-            <>
-              <h3 className="text-lg font-semibold mb-2">
-                Arraste e solte seu arquivo aqui
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                ou clique para selecionar
-              </p>
+      <CardContent className="p-6">
+        <Tabs defaultValue="upload" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="upload">
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Arquivo
+            </TabsTrigger>
+            <TabsTrigger value="paste">
+              <ClipboardPaste className="h-4 w-4 mr-2" />
+              Colar CSV
+            </TabsTrigger>
+          </TabsList>
 
-              <input
-                type="file"
-                id="file-upload"
-                className="hidden"
-                accept=".csv,.xlsx,.xls"
-                onChange={handleFileInput}
-                disabled={loading}
-              />
-              <label htmlFor="file-upload">
-                <Button asChild disabled={loading}>
-                  <span>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Selecionar Arquivo
-                  </span>
-                </Button>
-              </label>
+          <TabsContent value="upload" className="mt-6">
+            <div
+              className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
+                isDragging
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50"
+              }`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDrop}
+            >
+              <FileSpreadsheet className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+              
+              {loading ? (
+                <p className="text-lg font-medium mb-2">Processando arquivo...</p>
+              ) : (
+                <>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Arraste e solte seu arquivo aqui
+                  </h3>
+                  <p className="text-muted-foreground mb-6">
+                    ou clique para selecionar
+                  </p>
 
-              <p className="text-xs text-muted-foreground mt-4">
-                Formatos aceitos: CSV, XLS, XLSX
-              </p>
-            </>
-          )}
-        </div>
+                  <input
+                    type="file"
+                    id="file-upload"
+                    className="hidden"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={handleFileInput}
+                    disabled={loading}
+                  />
+                  <label htmlFor="file-upload">
+                    <Button asChild disabled={loading}>
+                      <span>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Selecionar Arquivo
+                      </span>
+                    </Button>
+                  </label>
+
+                  <p className="text-xs text-muted-foreground mt-4">
+                    Formatos aceitos: CSV (;), XLS, XLSX
+                  </p>
+                </>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="paste" className="mt-6">
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Cole aqui o conteúdo do CSV (separado por ponto-e-vírgula)
+                </label>
+                <Textarea
+                  placeholder="CODIGO;DESCRICAO;SUBGRUPO;UNIDADE&#10;001;Maçã;FRUTAS;QUILO&#10;002;Alface;VERDURAS;UNIDADE"
+                  className="min-h-[300px] font-mono text-sm"
+                  value={pastedText}
+                  onChange={(e) => setPastedText(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+              
+              <Button 
+                onClick={handlePastedText} 
+                disabled={loading || !pastedText.trim()}
+                className="w-full"
+              >
+                {loading ? "Processando..." : "Processar CSV"}
+              </Button>
+            </div>
+          </TabsContent>
+        </Tabs>
 
         <Alert className="mt-6">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <strong>Dica:</strong> Seu arquivo deve conter pelo menos as colunas de código e
-            nome do produto. As outras colunas podem ser mapeadas na próxima etapa.
+            <strong>Formato esperado:</strong> CSV com separador ponto-e-vírgula (;) contendo as colunas CODIGO, DESCRICAO, SUBGRUPO e UNIDADE.
           </AlertDescription>
         </Alert>
       </CardContent>
