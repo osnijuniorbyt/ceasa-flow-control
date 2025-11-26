@@ -13,7 +13,8 @@ import { Loader2 } from "lucide-react";
 
 const vasilhameSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
-  peso_kg: z.number().positive("Peso deve ser maior que zero"),
+  peso_embalagem_kg: z.number().min(0, "Peso da embalagem não pode ser negativo"),
+  peso_kg: z.number().positive("Peso líquido deve ser maior que zero"),
   unidade_base: z.string().min(1, "Unidade é obrigatória"),
   descricao: z.string().optional(),
   ativo: z.boolean(),
@@ -41,6 +42,7 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
     resolver: zodResolver(vasilhameSchema),
     defaultValues: {
       nome: "",
+      peso_embalagem_kg: 0,
       peso_kg: 1,
       unidade_base: "kg",
       descricao: "",
@@ -76,6 +78,7 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
 
     if (data) {
       setValue("nome", data.nome);
+      setValue("peso_embalagem_kg", data.peso_embalagem_kg || 0);
       setValue("peso_kg", data.peso_kg);
       setValue("unidade_base", data.unidade_base);
       setValue("descricao", data.descricao || "");
@@ -95,6 +98,7 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
           .from("vasilhames")
           .update({
             nome: data.nome,
+            peso_embalagem_kg: data.peso_embalagem_kg,
             peso_kg: data.peso_kg,
             unidade_base: data.unidade_base,
             descricao: data.descricao || null,
@@ -114,6 +118,7 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
           .from("vasilhames")
           .insert({
             nome: data.nome,
+            peso_embalagem_kg: data.peso_embalagem_kg,
             peso_kg: data.peso_kg,
             unidade_base: data.unidade_base,
             descricao: data.descricao || null,
@@ -156,29 +161,53 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
         )}
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="unidade_base">Unidade *</Label>
+        <Input
+          id="unidade_base"
+          {...register("unidade_base")}
+          placeholder="kg, un, dz, cx, sc"
+        />
+        <p className="text-xs text-muted-foreground">
+          Ex: kg (quilos), un (unidades), dz (dúzias), cx (caixas), sc (sacos)
+        </p>
+        {errors.unidade_base && (
+          <p className="text-sm text-destructive">{errors.unidade_base.message}</p>
+        )}
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="peso_kg">Peso/Quantidade *</Label>
+          <Label htmlFor="peso_embalagem_kg">Peso Embalagem (kg)</Label>
+          <Input
+            id="peso_embalagem_kg"
+            type="number"
+            step="0.01"
+            {...register("peso_embalagem_kg", { valueAsNumber: true })}
+            placeholder="Ex: 2"
+          />
+          <p className="text-xs text-muted-foreground">
+            Peso da embalagem vazia
+          </p>
+          {errors.peso_embalagem_kg && (
+            <p className="text-sm text-destructive">{errors.peso_embalagem_kg.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="peso_kg">Peso/Qtd Líquido *</Label>
           <Input
             id="peso_kg"
             type="number"
             step="0.01"
             {...register("peso_kg", { valueAsNumber: true })}
+            placeholder="Ex: 18"
           />
+          <p className="text-xs text-muted-foreground">
+            Peso/quantidade do produto
+          </p>
           {errors.peso_kg && (
             <p className="text-sm text-destructive">{errors.peso_kg.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="unidade_base">Unidade *</Label>
-          <Input
-            id="unidade_base"
-            {...register("unidade_base")}
-            placeholder="kg, un, dz"
-          />
-          {errors.unidade_base && (
-            <p className="text-sm text-destructive">{errors.unidade_base.message}</p>
           )}
         </div>
       </div>

@@ -548,6 +548,7 @@ export type Database = {
           descricao: string | null
           id: string
           nome: string
+          peso_embalagem_kg: number
           peso_kg: number
           unidade_base: string
           updated_at: string
@@ -559,6 +560,7 @@ export type Database = {
           descricao?: string | null
           id?: string
           nome: string
+          peso_embalagem_kg?: number
           peso_kg: number
           unidade_base: string
           updated_at?: string
@@ -570,6 +572,7 @@ export type Database = {
           descricao?: string | null
           id?: string
           nome?: string
+          peso_embalagem_kg?: number
           peso_kg?: number
           unidade_base?: string
           updated_at?: string
