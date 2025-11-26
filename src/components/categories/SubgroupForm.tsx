@@ -48,9 +48,12 @@ export function SubgroupForm({ grupoId, subgroup, onSuccess }: SubgroupFormProps
         if (error) throw error;
       } else {
         // Create
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Usuário não autenticado");
+        
         const { error } = await supabase
           .from("subgrupos")
-          .insert({ ...data, grupo_id: grupoId });
+          .insert({ ...data, grupo_id: grupoId, user_id: user.id });
 
         if (error) throw error;
       }

@@ -136,9 +136,15 @@ export function FornecedorForm({ fornecedorId, onSuccess, onCancel }: Fornecedor
           description: "Fornecedor atualizado com sucesso",
         });
       } else {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Usuário não autenticado");
+        
         const { error } = await supabase
           .from("fornecedores")
-          .insert(dataToSave);
+          .insert({
+            ...dataToSave,
+            user_id: user.id
+          });
 
         if (error) throw error;
 

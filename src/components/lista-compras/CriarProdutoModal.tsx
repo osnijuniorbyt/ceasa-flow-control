@@ -71,6 +71,9 @@ export function CriarProdutoModal({
       const ultimoCodigo = ultimoProduto?.codigo || "0";
       const novoCodigo = (parseInt(ultimoCodigo) + 1).toString().padStart(4, "0");
 
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+      
       // Criar produto
       const { data: produto, error } = await supabase
         .from("produtos")
@@ -81,6 +84,7 @@ export function CriarProdutoModal({
           grupo_id: grupoId,
           subgrupo_id: subgrupoId,
           ativo: true,
+          user_id: user.id
         })
         .select()
         .single();

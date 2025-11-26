@@ -99,9 +99,12 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
             grupoId = grupoExistente.id;
           } else {
             // Criar novo grupo
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error("Usuário não autenticado");
+            
             const { data: novoGrupo, error: grupoError } = await supabase
               .from("grupos")
-              .insert({ nome: categoriaNormalizada, codigo: Math.floor(Math.random() * 10000) })
+              .insert({ nome: categoriaNormalizada, codigo: Math.floor(Math.random() * 10000), user_id: user.id })
               .select()
               .single();
 
@@ -118,12 +121,16 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
           subgrupoId = subgrupoExistente.id;
         } else {
           // Criar subgrupo padrão
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) throw new Error("Usuário não autenticado");
+          
           const { data: novoSubgrupo, error: subgrupoError } = await supabase
             .from("subgrupos")
             .insert({ 
               nome: "Padrão", 
               codigo: Math.floor(Math.random() * 10000),
-              grupo_id: grupoId 
+              grupo_id: grupoId,
+              user_id: user.id
             })
             .select()
             .single();
@@ -139,6 +146,9 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
         const margem = reverseMapping.margem ? parseFloat(row[reverseMapping.margem]) : null;
 
         // Inserir produto
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Usuário não autenticado");
+        
         const { error: produtoError } = await supabase
           .from("produtos")
           .insert({
@@ -150,6 +160,7 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
             preco_ultima_compra: preco,
             margem_padrao: margem,
             ativo: true,
+            user_id: user.id
           });
 
         if (produtoError) throw produtoError;

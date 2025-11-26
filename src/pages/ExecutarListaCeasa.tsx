@@ -158,6 +158,9 @@ export default function ExecutarListaCeasa() {
       for (const [fornecedorId, itens] of Object.entries(itensPorFornecedor)) {
         const valorTotal = itens.reduce((sum, item) => sum + parseFloat(item.valor_pago), 0);
 
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Usuário não autenticado");
+        
         const { data: compra, error: compraError } = await supabase
           .from("compras")
           .insert([{
@@ -166,6 +169,7 @@ export default function ExecutarListaCeasa() {
             valor_total: valorTotal,
             status: "confirmado",
             numero_compra: 0,
+            user_id: user.id
           }])
           .select()
           .single();

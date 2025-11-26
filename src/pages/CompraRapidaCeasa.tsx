@@ -215,6 +215,9 @@ export default function CompraRapidaCeasa() {
       );
 
       // Criar compra (trigger gera numero_compra automaticamente)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+      
       const { data: compra, error: compraError } = await supabase
         .from("compras")
         .insert([{
@@ -223,6 +226,7 @@ export default function CompraRapidaCeasa() {
           valor_total: valorTotalCompra,
           status: "confirmado",
           numero_compra: 1, // Será substituído pelo trigger
+          user_id: user.id
         }])
         .select()
         .single();

@@ -30,6 +30,9 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
 
     setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+      
       const { data, error } = await supabase
         .from("fornecedores")
         .insert({
@@ -37,6 +40,7 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
           nome_fantasia: nome,
           contato: box,
           ativo: true,
+          user_id: user.id
         })
         .select()
         .single();

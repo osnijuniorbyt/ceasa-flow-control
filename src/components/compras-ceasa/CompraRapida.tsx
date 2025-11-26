@@ -136,6 +136,9 @@ export default function CompraRapida() {
     }
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+      
       const { data: compra, error: compraError } = await supabase
         .from("compras")
         .insert([{
@@ -145,6 +148,7 @@ export default function CompraRapida() {
           valor_produtos: cart.reduce((sum, item) => sum + item.subtotal, 0),
           valor_total: cart.reduce((sum, item) => sum + item.subtotal, 0),
           numero_compra: 0,
+          user_id: user.id
         }])
         .select()
         .single();
