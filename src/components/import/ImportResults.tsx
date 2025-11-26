@@ -3,10 +3,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle2, XCircle, AlertCircle, Loader2, RotateCcw } from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle, Loader2, RotateCcw, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { ImportResult } from "@/pages/ImportarProdutos";
+
+// Função para converter unidades do ERP
+const convertUnit = (unit: string): string => {
+  const unitMap: Record<string, string> = {
+    "QUILO": "kg",
+    "UNIDADE": "un",
+    "BANDEJA": "bdj",
+  };
+  return unitMap[unit.toUpperCase()] || unit.toLowerCase();
+};
+
+// Função para normalizar categoria
+const normalizeCategory = (category: string): string => {
+  return category.toLowerCase().trim();
+};
 
 interface ImportResultsProps {
   data: any[];
@@ -19,6 +34,7 @@ interface ImportResultsProps {
 export function ImportResults({ data, mapping, onComplete, onReset, result }: ImportResultsProps) {
   const [progress, setProgress] = useState(0);
   const [importing, setImporting] = useState(false);
+  const [skipped, setSkipped] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -31,6 +47,14 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
     setImporting(true);
     const errors: Array<{ linha: number; erro: string }> = [];
     let successCount = 0;
+    let skippedCount = 0;
+
+    // Buscar todos os códigos existentes para verificar duplicatas
+    const { data: existingProducts } = await supabase
+      .from("produtos")
+      .select("codigo");
+    
+    const existingCodes = new Set(existingProducts?.map(p => p.codigo) || []);
 
     // Primeiro, buscar grupos e subgrupos existentes
     const { data: grupos } = await supabase.from("grupos").select("id, nome").eq("ativo", true);
@@ -55,15 +79,9 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
           continue;
         }
 
-        // Verificar se já existe
-        const { data: existing } = await supabase
-          .from("produtos")
-          .select("id")
-          .eq("codigo", codigo)
-          .maybeSingle();
-
-        if (existing) {
-          errors.push({ linha, erro: `Produto com código ${codigo} já existe` });
+        // Verificar duplicata
+        if (existingCodes.has(codigo)) {
+          skippedCount++;
           continue;
         }
 
@@ -72,8 +90,9 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
         const categoriaValue = reverseMapping.categoria ? row[reverseMapping.categoria] : null;
         
         if (categoriaValue) {
+          const categoriaNormalizada = normalizeCategory(categoriaValue);
           const grupoExistente = grupos?.find(g => 
-            g.nome.toLowerCase() === categoriaValue.toLowerCase()
+            g.nome.toLowerCase() === categoriaNormalizada
           );
           
           if (grupoExistente) {
@@ -82,7 +101,7 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
             // Criar novo grupo
             const { data: novoGrupo, error: grupoError } = await supabase
               .from("grupos")
-              .insert({ nome: categoriaValue, codigo: Math.floor(Math.random() * 10000) })
+              .insert({ nome: categoriaNormalizada, codigo: Math.floor(Math.random() * 10000) })
               .select()
               .single();
 
@@ -114,7 +133,8 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
         }
 
         // Preparar dados do produto
-        const unidade = reverseMapping.unidade ? row[reverseMapping.unidade] : "kg";
+        const unidadeRaw = reverseMapping.unidade ? row[reverseMapping.unidade] : "kg";
+        const unidade = convertUnit(unidadeRaw);
         const preco = reverseMapping.preco ? parseFloat(row[reverseMapping.preco]) : null;
         const margem = reverseMapping.margem ? parseFloat(row[reverseMapping.margem]) : null;
 
@@ -135,6 +155,7 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
         if (produtoError) throw produtoError;
 
         successCount++;
+        existingCodes.add(codigo); // Adiciona ao set para evitar duplicatas no mesmo lote
       } catch (error: any) {
         console.error(`Erro na linha ${linha}:`, error);
         errors.push({ linha, erro: error.message || "Erro desconhecido" });
@@ -144,6 +165,7 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
     }
 
     setImporting(false);
+    setSkipped(skippedCount);
     
     const finalResult = { success: successCount, errors };
     onComplete(finalResult);
@@ -151,7 +173,7 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
     if (successCount > 0) {
       toast({
         title: "Importação concluída",
-        description: `${successCount} produtos importados com sucesso`,
+        description: `${successCount} produtos importados com sucesso${skippedCount > 0 ? `, ${skippedCount} duplicatas ignoradas` : ''}`,
       });
     }
   };
@@ -184,7 +206,10 @@ export function ImportResults({ data, mapping, onComplete, onReset, result }: Im
         <Alert>
           <CheckCircle2 className="h-4 w-4" />
           <AlertDescription>
-            <strong>{result.success} produtos</strong> importados com sucesso!
+            <div className="space-y-1">
+              <p><strong>✅ {result.success} produtos importados com sucesso!</strong></p>
+              {skipped > 0 && <p className="flex items-center gap-1"><Info className="h-4 w-4" />🔄 {skipped} produtos ignorados (duplicatas)</p>}
+            </div>
           </AlertDescription>
         </Alert>
       )}

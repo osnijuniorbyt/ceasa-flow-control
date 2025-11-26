@@ -13,9 +13,9 @@ interface ImportMappingProps {
 }
 
 const SYSTEM_FIELDS = [
-  { value: "codigo", label: "Código", required: true },
+  { value: "codigo", label: "Código Interno", required: true },
   { value: "descricao", label: "Nome/Descrição", required: true },
-  { value: "categoria", label: "Categoria", required: false },
+  { value: "categoria", label: "Categoria (Subgrupo)", required: false },
   { value: "unidade", label: "Unidade", required: false },
   { value: "preco", label: "Preço", required: false },
   { value: "margem", label: "Margem (%)", required: false },
@@ -31,22 +31,37 @@ export function ImportMapping({ headers, onStartImport, onBack }: ImportMappingP
     const autoMapping: Record<string, string> = {};
     
     headers.forEach((header) => {
-      const headerLower = header.toLowerCase().trim();
+      const headerUpper = header.toUpperCase().trim();
       
-      if (headerLower.includes("codigo") || headerLower.includes("cod")) {
+      // Mapeamento específico para o ERP
+      if (headerUpper === "CODIGO") {
         autoMapping[header] = "codigo";
-      } else if (headerLower.includes("descri") || headerLower.includes("nome") || headerLower.includes("produto")) {
+      } else if (headerUpper === "DESCRICAO") {
         autoMapping[header] = "descricao";
-      } else if (headerLower.includes("categ") || headerLower.includes("grupo")) {
+      } else if (headerUpper === "SUBGRUPO") {
         autoMapping[header] = "categoria";
-      } else if (headerLower.includes("unid") || headerLower.includes("un")) {
+      } else if (headerUpper === "UNIDADE") {
         autoMapping[header] = "unidade";
-      } else if (headerLower.includes("preco") || headerLower.includes("valor")) {
-        autoMapping[header] = "preco";
-      } else if (headerLower.includes("margem")) {
-        autoMapping[header] = "margem";
-      } else {
+      } else if (headerUpper === "GRUPO" || headerUpper === "MARCA") {
         autoMapping[header] = "ignore";
+      } else {
+        // Fallback para mapeamento genérico
+        const headerLower = header.toLowerCase().trim();
+        if (headerLower.includes("codigo") || headerLower.includes("cod")) {
+          autoMapping[header] = "codigo";
+        } else if (headerLower.includes("descri") || headerLower.includes("nome") || headerLower.includes("produto")) {
+          autoMapping[header] = "descricao";
+        } else if (headerLower.includes("categ") || headerLower.includes("grupo")) {
+          autoMapping[header] = "categoria";
+        } else if (headerLower.includes("unid") || headerLower.includes("un")) {
+          autoMapping[header] = "unidade";
+        } else if (headerLower.includes("preco") || headerLower.includes("valor")) {
+          autoMapping[header] = "preco";
+        } else if (headerLower.includes("margem")) {
+          autoMapping[header] = "margem";
+        } else {
+          autoMapping[header] = "ignore";
+        }
       }
     });
 
