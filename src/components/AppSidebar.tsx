@@ -53,6 +53,11 @@ const menuItems = [
     icon: ShoppingBag,
   },
   {
+    title: "📱 CEASA Mobile",
+    url: "/compras-ceasa-mobile",
+    icon: ShoppingBag,
+  },
+  {
     title: "Pedidos (Antigo)",
     url: "/purchase-orders",
     icon: Zap,
