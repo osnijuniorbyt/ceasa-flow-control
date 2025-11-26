@@ -4,12 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BuscaProdutoInteligente } from "@/components/compras-ceasa/BuscaProdutoInteligente";
 import { InputNumericoMobile } from "@/components/compras-ceasa/InputNumericoMobile";
 import { NovoFornecedorModal } from "@/components/compra-rapida/NovoFornecedorModal";
 import { SwipeableHistoricoItem } from "@/components/compras-ceasa/SwipeableHistoricoItem";
 import { SwipeableCarrinhoItem } from "@/components/compras-ceasa/SwipeableCarrinhoItem";
-import { ShoppingCart, Truck, List, Plus, Trash2, Save, History, X } from "lucide-react";
+import { ConferenciaMobile } from "@/components/compras-ceasa/ConferenciaMobile";
+import { PrecificacaoMobile } from "@/components/compras-ceasa/PrecificacaoMobile";
+import { ShoppingCart, Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import {
@@ -35,6 +38,7 @@ interface ItemCarrinho {
 const CACHE_KEY = "compra_ceasa_em_andamento";
 
 export default function CompraRapidaCeasa() {
+  const [activeTab, setActiveTab] = useState("lancamento");
   const [fornecedorSelecionado, setFornecedorSelecionado] = useState<string>("");
   const [produtoSelecionado, setProdutoSelecionado] = useState<any>(null);
   const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
@@ -307,15 +311,15 @@ export default function CompraRapidaCeasa() {
   );
 
   return (
-    <div className="min-h-screen pb-20 p-2 space-y-2">
+    <div className="min-h-screen pb-20">
       {/* Header Compacto */}
-      <div className="bg-primary text-primary-foreground p-3 rounded-lg shadow-lg">
+      <div className="bg-primary text-primary-foreground p-3 sticky top-0 z-10 shadow-lg">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
-            Compra CEASA
+            CEASA Mobile
           </h1>
-          {fornecedorSelecionado && (
+          {activeTab === "lancamento" && fornecedorSelecionado && (
             <Button
               variant="ghost"
               size="sm"
@@ -328,6 +332,26 @@ export default function CompraRapidaCeasa() {
           )}
         </div>
       </div>
+
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3 h-12 sticky top-[52px] z-10 rounded-none border-b bg-background">
+          <TabsTrigger value="lancamento" className="text-sm gap-1">
+            <ShoppingCart className="h-4 w-4" />
+            Lançamento
+          </TabsTrigger>
+          <TabsTrigger value="conferencia" className="text-sm gap-1">
+            <ClipboardCheck className="h-4 w-4" />
+            Conferência
+          </TabsTrigger>
+          <TabsTrigger value="precificacao" className="text-sm gap-1">
+            <DollarSign className="h-4 w-4" />
+            Preços
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="lancamento" className="mt-0">
+          <div className="space-y-2 p-2">{/* ... keep existing code */}
 
       {/* Seleção de Fornecedor */}
       <Card className="border">
@@ -477,6 +501,17 @@ export default function CompraRapidaCeasa() {
           </CardContent>
         </Card>
       )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="conferencia" className="mt-0">
+          <ConferenciaMobile />
+        </TabsContent>
+
+        <TabsContent value="precificacao" className="mt-0">
+          <PrecificacaoMobile />
+        </TabsContent>
+      </Tabs>
 
       {/* Modal Novo Fornecedor */}
       <NovoFornecedorModal
