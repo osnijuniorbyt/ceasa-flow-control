@@ -13,7 +13,7 @@ import { SwipeableCarrinhoItem } from "@/components/compras-ceasa/SwipeableCarri
 import { ConferenciaMobile } from "@/components/compras-ceasa/ConferenciaMobile";
 import { PrecificacaoMobile } from "@/components/compras-ceasa/PrecificacaoMobile";
 import { HistoricoLote } from "@/components/compras-ceasa/HistoricoLote";
-import { Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign, Package } from "lucide-react";
+import { Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign, Package, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import {
@@ -26,6 +26,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ProdutoForm } from "@/components/produtos/ProdutoForm";
 
 interface ItemCarrinho {
   produto_id: string;
@@ -48,6 +50,7 @@ export default function CompraRapidaCeasa() {
   const [quantidade, setQuantidade] = useState("");
   const [valorTotal, setValorTotal] = useState("");
   const [novoFornecedorModalOpen, setNovoFornecedorModalOpen] = useState(false);
+  const [novoProdutoModalOpen, setNovoProdutoModalOpen] = useState(false);
   const [cancelarDialogOpen, setCancelarDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -322,20 +325,31 @@ export default function CompraRapidaCeasa() {
       {/* Header Compacto */}
       <div className="bg-black text-white p-4 sticky top-0 z-10 shadow-lg">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 mx-auto">
-            <svg 
-              width="40" 
-              height="40" 
-              viewBox="0 0 40 40" 
-              fill="none" 
-              xmlns="http://www.w3.org/2000/svg"
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-3">
+              <svg 
+                width="40" 
+                height="40" 
+                viewBox="0 0 40 40" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="20" cy="22" r="12" stroke="white" strokeWidth="2" fill="none" />
+                <path d="M20 10 Q23 7 26 10 L25 12 Q22 10 20 12 Z" stroke="white" strokeWidth="2" fill="none" strokeLinejoin="round" />
+              </svg>
+              <h1 className="text-3xl font-light tracking-[0.3em]">
+                HORTII
+              </h1>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/produtos-gestao")}
+              className="text-white hover:bg-white/20"
             >
-              <circle cx="20" cy="22" r="12" stroke="white" strokeWidth="2" fill="none" />
-              <path d="M20 10 Q23 7 26 10 L25 12 Q22 10 20 12 Z" stroke="white" strokeWidth="2" fill="none" strokeLinejoin="round" />
-            </svg>
-            <h1 className="text-3xl font-light tracking-[0.3em] text-center">
-              HORTII
-            </h1>
+              <Settings className="h-4 w-4 mr-1" />
+              Gestão
+            </Button>
           </div>
           {activeTab === "lancamento" && fornecedorSelecionado && (
             <Button
@@ -437,11 +451,11 @@ export default function CompraRapidaCeasa() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate("/produtos-gestao")}
+                onClick={() => setNovoProdutoModalOpen(true)}
                 className="h-7 text-xs gap-1"
               >
-                <Package className="h-3 w-3" />
-                Cadastrar
+                <Plus className="h-3 w-3" />
+                Novo Produto
               </Button>
             </div>
           </CardHeader>
@@ -605,6 +619,24 @@ export default function CompraRapidaCeasa() {
           queryClient.invalidateQueries({ queryKey: ["fornecedores"] });
         }}
       />
+
+      {/* Modal Novo Produto */}
+      <Dialog open={novoProdutoModalOpen} onOpenChange={setNovoProdutoModalOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Cadastrar Novo Produto</DialogTitle>
+          </DialogHeader>
+          <ProdutoForm
+            produtoId={null}
+            onSuccess={() => {
+              setNovoProdutoModalOpen(false);
+              queryClient.invalidateQueries({ queryKey: ["produtos-todos"] });
+              toast.success("Produto cadastrado com sucesso!");
+            }}
+            onCancel={() => setNovoProdutoModalOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog de Confirmação */}
       <AlertDialog open={cancelarDialogOpen} onOpenChange={setCancelarDialogOpen}>

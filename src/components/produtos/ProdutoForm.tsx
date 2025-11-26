@@ -105,12 +105,8 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
   };
 
   const loadProduto = async () => {
-    if (!produtoId) {
-      console.log("⚠️ Nenhum produtoId fornecido");
-      return;
-    }
+    if (!produtoId) return;
 
-    console.log("📥 Carregando produto com ID:", produtoId);
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -119,13 +115,9 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         .eq("id", produtoId)
         .maybeSingle();
 
-      if (error) {
-        console.error("❌ Erro na query:", error);
-        throw error;
-      }
+      if (error) throw error;
 
       if (!data) {
-        console.error("❌ Produto não encontrado!");
         toast({
           title: "Erro",
           description: "Produto não encontrado",
@@ -133,8 +125,6 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         });
         return;
       }
-
-      console.log("✅ Produto carregado:", data);
 
       setFormData({
         codigo: data.codigo,
@@ -149,10 +139,8 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         preco_ultima_compra: data.preco_ultima_compra?.toString() || "",
         ativo: data.ativo,
       });
-      
-      console.log("✅ FormData atualizado com sucesso");
     } catch (error) {
-      console.error("❌ Erro ao carregar produto:", error);
+      console.error("Erro ao carregar produto:", error);
       toast({
         title: "Erro",
         description: "Erro ao carregar produto",
@@ -166,9 +154,6 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    console.log("🔍 DEBUG: produtoId recebido:", produtoId);
-    console.log("🔍 DEBUG: formData atual:", formData);
 
     try {
       const dataToValidate = {
@@ -206,37 +191,26 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         ativo: formData.ativo,
       };
 
-      console.log("🔍 DEBUG: Verificando produtoId antes de salvar:", produtoId);
       
       if (produtoId) {
-        console.log("✏️ ATUALIZANDO produto existente com ID:", produtoId);
         const { error } = await supabase
           .from("produtos")
           .update(dataToSave)
           .eq("id", produtoId);
 
-        if (error) {
-          console.error("❌ Erro ao atualizar:", error);
-          throw error;
-        }
+        if (error) throw error;
 
-        console.log("✅ Produto atualizado com sucesso!");
         toast({
           title: "Sucesso",
           description: "Produto atualizado com sucesso",
         });
       } else {
-        console.log("➕ CRIANDO novo produto");
         const { error } = await supabase
           .from("produtos")
           .insert(dataToSave);
 
-        if (error) {
-          console.error("❌ Erro ao criar:", error);
-          throw error;
-        }
+        if (error) throw error;
 
-        console.log("✅ Produto criado com sucesso!");
         toast({
           title: "Sucesso",
           description: "Produto cadastrado com sucesso",

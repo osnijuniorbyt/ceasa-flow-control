@@ -1,8 +1,12 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, ShoppingCart, Truck, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Package, ShoppingCart, Truck, AlertTriangle, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+  
   const stats = [
     {
       title: "Produtos em Estoque",
@@ -35,12 +39,22 @@ const Index = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <p className="text-muted-foreground">
-          Visão geral do sistema de controle de fluxo CEASA
-        </p>
+      <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <p className="text-muted-foreground">
+            Visão geral do sistema de controle de fluxo CEASA
+          </p>
+        </div>
+        <Button
+          onClick={() => navigate("/produtos-gestao")}
+          variant="outline"
+          className="gap-2"
+        >
+          <Settings className="h-4 w-4" />
+          Gestão de Produtos
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
