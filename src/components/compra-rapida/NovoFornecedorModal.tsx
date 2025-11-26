@@ -108,6 +108,7 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
               <SelectContent className="text-xl md:text-2xl">
                 <SelectItem value="CEASA" className="text-xl md:text-2xl py-4">CEASA</SelectItem>
                 <SelectItem value="PEDRA" className="text-xl md:text-2xl py-4">Pedra</SelectItem>
+                <SelectItem value="LOJAS" className="text-xl md:text-2xl py-4">Lojas</SelectItem>
                 <SelectItem value="OUTROS" className="text-xl md:text-2xl py-4">Outros</SelectItem>
               </SelectContent>
             </Select>

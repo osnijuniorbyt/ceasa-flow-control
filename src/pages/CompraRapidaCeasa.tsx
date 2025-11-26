@@ -543,8 +543,8 @@ export default function CompraRapidaCeasa() {
         <CardContent className="px-3 md:px-6 pb-4 space-y-3">
           <div className="space-y-2">
             <Label className="text-base md:text-lg">Filtrar por tipo:</Label>
-            <div className="grid grid-cols-4 gap-2 md:gap-3">
-              {["TODOS", "PEDRA", "LOJAS", "OUTROS"].map((tipo) => (
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-3">
+              {["TODOS", "CEASA", "PEDRA", "LOJAS", "OUTROS"].map((tipo) => (
                 <button
                   key={tipo}
                   type="button"
@@ -559,6 +559,7 @@ export default function CompraRapidaCeasa() {
                   }`}
                 >
                   <div className="text-3xl md:text-4xl">
+                    {tipo === "CEASA" && "🥬"}
                     {tipo === "PEDRA" && "🪨"}
                     {tipo === "LOJAS" && "🏪"}
                     {tipo === "OUTROS" && "📦"}
@@ -586,6 +587,7 @@ export default function CompraRapidaCeasa() {
                   <SelectItem key={f.id} value={f.id} className="text-lg md:text-xl py-4 md:py-5">
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">
+                        {f.tipo === "CEASA" && "🥬"}
                         {f.tipo === "PEDRA" && "🪨"}
                         {f.tipo === "LOJAS" && "🏪"}
                         {f.tipo === "OUTROS" && "📦"}
