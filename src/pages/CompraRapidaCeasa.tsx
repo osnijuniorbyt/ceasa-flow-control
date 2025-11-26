@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useOfflineStorage } from "@/hooks/useOfflineStorage";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -29,6 +31,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ProdutoForm } from "@/components/produtos/ProdutoForm";
+import { MobileLayout } from "@/components/mobile/MobileLayout";
+import { OfflineIndicator } from "@/components/mobile/OfflineIndicator";
 
 interface ItemCarrinho {
   produto_id: string;
@@ -54,7 +58,17 @@ export default function CompraRapidaCeasa() {
   });
   const [produtoSelecionado, setProdutoSelecionado] = useState<any>(null);
   const [vasilhameSelecionado, setVasilhameSelecionado] = useState<string>("padrao");
-  const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
+  
+  // Carrinho com persistência offline
+  const { 
+    value: carrinho, 
+    setValue: setCarrinho, 
+    isOnline 
+  } = useOfflineStorage<ItemCarrinho[]>('carrinho_compra_ceasa', []);
+  
+  // Sincronização offline
+  useOfflineSync();
+  
   const [quantidade, setQuantidade] = useState("");
   const [valorTotal, setValorTotal] = useState("");
   const [novoFornecedorModalOpen, setNovoFornecedorModalOpen] = useState(false);
@@ -201,6 +215,17 @@ export default function CompraRapidaCeasa() {
 
   const salvarCompraMutation = useMutation({
     mutationFn: async () => {
+      // Se estiver offline, salva localmente
+      if (!isOnline) {
+        toast.warning('Sem conexão - compra será enviada quando voltar online');
+        localStorage.setItem('compra_pendente', JSON.stringify({
+          fornecedor: fornecedorSelecionado,
+          carrinho: carrinho,
+          timestamp: Date.now()
+        }));
+        return { numero_compra: 'PENDENTE', pendente: true };
+      }
+
       if (!fornecedorSelecionado) {
         throw new Error("Selecione um fornecedor");
       }
@@ -265,18 +290,24 @@ export default function CompraRapidaCeasa() {
 
       return compra;
     },
-    onSuccess: (compra) => {
-      toast.success(`Compra #${compra.numero_compra} salva com sucesso!`);
-      // Limpar cache
-      localStorage.removeItem(CACHE_KEY);
-      setCarrinho([]);
-      setQuantidade("");
-      setValorTotal("");
-      setFornecedorSelecionado("");
-      setProdutoSelecionado(null);
-      queryClient.invalidateQueries({ queryKey: ["compras"] });
-      queryClient.invalidateQueries({ queryKey: ["produtos-fornecedor-historico"] });
-      navigate(`/compra-rapida/${compra.id}`);
+    onSuccess: (compra: any) => {
+      if (compra?.pendente) {
+        toast.info('Compra salva offline - será enviada automaticamente quando houver conexão');
+        // Limpar cache mas não o carrinho (manter para quando sincronizar)
+        localStorage.removeItem(CACHE_KEY);
+      } else {
+        toast.success(`Compra #${compra.numero_compra} salva com sucesso!`);
+        // Limpar cache
+        localStorage.removeItem(CACHE_KEY);
+        setCarrinho([]);
+        setQuantidade("");
+        setValorTotal("");
+        setFornecedorSelecionado("");
+        setProdutoSelecionado(null);
+        queryClient.invalidateQueries({ queryKey: ["compras"] });
+        queryClient.invalidateQueries({ queryKey: ["produtos-fornecedor-historico"] });
+        navigate(`/compra-rapida/${compra.id}`);
+      }
     },
     onError: (error: any) => {
       console.error("Erro detalhado:", error);
@@ -791,6 +822,7 @@ export default function CompraRapidaCeasa() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </MobileLayout>
   );
 }
