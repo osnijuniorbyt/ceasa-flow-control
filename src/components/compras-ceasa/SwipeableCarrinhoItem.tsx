@@ -62,12 +62,12 @@ export function SwipeableCarrinhoItem({ item, index, onRemove }: SwipeableCarrin
   return (
     <div className="relative overflow-hidden rounded-lg">
       {/* Botão de deletar atrás */}
-      <div className="absolute right-0 top-0 bottom-0 w-20 bg-destructive flex items-center justify-center">
+      <div className="absolute right-0 top-0 bottom-0 w-24 bg-destructive flex items-center justify-center">
         <button
           onClick={handleDelete}
           className="h-full w-full flex items-center justify-center"
         >
-          <Trash2 className="h-5 w-5 text-destructive-foreground" />
+          <Trash2 className="h-6 w-6 text-destructive-foreground" />
         </button>
       </div>
 
@@ -80,19 +80,19 @@ export function SwipeableCarrinhoItem({ item, index, onRemove }: SwipeableCarrin
           transform: `translateX(${translateX}px)`,
           transition: isDragging ? "none" : "transform 0.3s ease-out",
         }}
-        className="bg-muted/50 p-2 rounded-lg flex items-center justify-between relative"
+        className="bg-muted/50 p-3 rounded-lg flex items-center justify-between relative min-h-[80px]"
       >
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-sm truncate">
+          <div className="font-semibold text-base truncate">
             {item.codigo} - {item.descricao}
           </div>
-          <div className="text-xs text-muted-foreground mt-0.5">
+          <div className="text-sm text-muted-foreground mt-1">
             <span className="font-medium">{item.quantidade} cx</span> × {item.vasilhame_nome} 
-            <span className="mx-1">•</span>
+            <span className="mx-2">•</span>
             <span className="text-blue-600 font-bold">{item.peso_total_kg.toFixed(1)} kg</span>
           </div>
-          <div className="text-xs mt-0.5">
-            <span className="text-green-600 font-bold text-base">R$ {parseFloat(item.valor_total).toFixed(2)}</span>
+          <div className="text-sm mt-1">
+            <span className="text-green-600 font-bold text-xl">R$ {parseFloat(item.valor_total).toFixed(2)}</span>
             <span className="text-muted-foreground ml-2">(R$ {(parseFloat(item.valor_total) / item.peso_total_kg).toFixed(2)}/kg)</span>
           </div>
         </div>

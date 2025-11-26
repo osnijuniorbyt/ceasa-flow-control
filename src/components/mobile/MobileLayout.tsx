@@ -45,7 +45,7 @@ export function MobileLayout() {
           onSwipeLeft={() => setSidebarOpen(false)}
         >
           <main className="flex-1 overflow-auto pb-20 md:pb-24" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
-            <div className="w-full h-full px-4 md:px-6 py-4 md:py-6">
+            <div className="w-full h-full">
               <Outlet />
             </div>
           </main>
