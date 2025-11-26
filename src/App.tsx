@@ -27,6 +27,7 @@ import Settings from "./pages/Settings";
 import Categories from "./pages/Categories";
 import ProductImport from "./pages/ProductImport";
 import ComprasCeasa from "./pages/ComprasCeasa";
+import CompraRapidaCeasa from "./pages/CompraRapidaCeasa";
 import Fornecedores from "./pages/Fornecedores";
 import CompraRapida from "./pages/CompraRapida";
 import CompraDetalhes from "./pages/CompraDetalhes";
@@ -117,6 +118,7 @@ const App = () => {
                 <Route path="lista-compras" element={<ListaCompras />} />
                 <Route path="lista-compras/:listaId" element={<ListaComprasDetalhes />} />
                 <Route path="compras-ceasa" element={<ComprasCeasa />} />
+                <Route path="compras-ceasa-mobile" element={<CompraRapidaCeasa />} />
                 <Route path="compra-rapida" element={<CompraRapida />} />
                 <Route path="compra-rapida/:compraId" element={<CompraDetalhes />} />
                 <Route path="commercial" element={<Commercial />} />
