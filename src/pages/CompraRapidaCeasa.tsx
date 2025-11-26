@@ -404,7 +404,7 @@ export default function CompraRapidaCeasa() {
       </Card>
 
       {/* Histórico de Compras do Lote */}
-      {fornecedorSelecionado && <HistoricoLote loteData={loteData} />}
+      <HistoricoLote loteData={loteData} />
 
       {/* Histórico de Produtos do Fornecedor - COMPACTO COM SCROLL */}
       {fornecedorSelecionado && produtosHistorico && produtosHistorico.length > 0 && (
