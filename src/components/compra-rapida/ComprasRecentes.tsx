@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ interface Compra {
 
 export function ComprasRecentes() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [compras, setCompras] = useState<Compra[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -166,7 +168,7 @@ export function ComprasRecentes() {
                 <DollarSign className="h-4 w-4" />
                 R$ {compra.valor_total.toFixed(2)}
               </div>
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" onClick={() => navigate(`/compra-rapida/${compra.id}`)}>
                 <Eye className="h-4 w-4 mr-2" />
                 Ver Detalhes
               </Button>

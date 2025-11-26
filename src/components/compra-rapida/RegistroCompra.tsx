@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ interface ItemCompra {
 }
 
 export function RegistroCompra() {
+  const navigate = useNavigate();
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [fornecedorSelecionado, setFornecedorSelecionado] = useState<Fornecedor | null>(null);
   const [buscaFornecedor, setBuscaFornecedor] = useState("");
@@ -197,6 +199,9 @@ export function RegistroCompra() {
       setItensCompra([]);
       setFornecedorSelecionado(null);
       setBuscaFornecedor("");
+      
+      // Navegar para a tela da compra criada
+      navigate(`/compra-rapida/${compra.id}`);
     } catch (error) {
       console.error("Erro ao salvar compra:", error);
       toast({
