@@ -105,17 +105,36 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
   };
 
   const loadProduto = async () => {
-    if (!produtoId) return;
+    if (!produtoId) {
+      console.log("⚠️ Nenhum produtoId fornecido");
+      return;
+    }
 
+    console.log("📥 Carregando produto com ID:", produtoId);
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from("produtos")
         .select("*")
         .eq("id", produtoId)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Erro na query:", error);
+        throw error;
+      }
+
+      if (!data) {
+        console.error("❌ Produto não encontrado!");
+        toast({
+          title: "Erro",
+          description: "Produto não encontrado",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log("✅ Produto carregado:", data);
 
       setFormData({
         codigo: data.codigo,
@@ -130,8 +149,10 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         preco_ultima_compra: data.preco_ultima_compra?.toString() || "",
         ativo: data.ativo,
       });
+      
+      console.log("✅ FormData atualizado com sucesso");
     } catch (error) {
-      console.error("Erro ao carregar produto:", error);
+      console.error("❌ Erro ao carregar produto:", error);
       toast({
         title: "Erro",
         description: "Erro ao carregar produto",
@@ -361,24 +382,49 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="unidade_venda">Unidade de Venda *</Label>
+          <Label htmlFor="vasilhame_secundario_id">Embalagem Alternativa</Label>
           <Select
-            value={formData.unidade_venda}
-            onValueChange={(value) => setFormData({ ...formData, unidade_venda: value })}
+            value={formData.vasilhame_secundario_id || undefined}
+            onValueChange={(value) => setFormData({ ...formData, vasilhame_secundario_id: value })}
             disabled={loading}
           >
             <SelectTrigger>
-              <SelectValue />
+              <SelectValue placeholder="Nenhum" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="kg">Kg</SelectItem>
-              <SelectItem value="cx">Caixa</SelectItem>
-              <SelectItem value="un">Unidade</SelectItem>
-              <SelectItem value="maço">Maço</SelectItem>
-              <SelectItem value="dz">Dúzia</SelectItem>
+              {vasilhames.map((vasilhame) => (
+                <SelectItem key={vasilhame.id} value={vasilhame.id}>
+                  {vasilhame.nome}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
+          {vasilhameSecundarioSelecionado && (
+            <p className="text-xs text-muted-foreground">
+              Peso: {vasilhameSecundarioSelecionado.peso_kg} kg ({vasilhameSecundarioSelecionado.unidade_base})
+            </p>
+          )}
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="unidade_venda">Unidade de Venda *</Label>
+        <Select
+          value={formData.unidade_venda}
+          onValueChange={(value) => setFormData({ ...formData, unidade_venda: value })}
+          disabled={loading}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="kg">Kg</SelectItem>
+            <SelectItem value="cx">Caixa</SelectItem>
+            <SelectItem value="un">Unidade</SelectItem>
+            <SelectItem value="maço">Maço</SelectItem>
+            <SelectItem value="dz">Dúzia</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
