@@ -64,6 +64,11 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
           preco_venda_sugerido,
           peso_total_kg,
           quantidade_vasilhames,
+          vasilhame_id,
+          vasilhames (
+            nome,
+            peso_kg
+          ),
           produtos (
             id,
             codigo,
@@ -86,6 +91,11 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
         if (item.produtos && item.preco_por_kg) {
           const pid = item.produtos.id;
           const pesoItem = item.peso_total_kg || 0;
+          const pesoVasilhame = item.vasilhames?.peso_kg || 1;
+          const quantidadeCaixas = item.quantidade_vasilhames || 0;
+          const unidadesPorCaixa = pesoVasilhame; // Assumindo que peso_kg representa unidades
+          const totalUnidades = quantidadeCaixas * unidadesPorCaixa;
+          
           pesoTotalGeral += pesoItem;
           
           if (!produtosMap.has(pid)) {
@@ -100,12 +110,14 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
               precoCustoAnterior: item.produtos.preco_ultima_compra || null,
               dataUltimaCompra: item.produtos.data_ultima_compra || null,
               quantidadeTotal: pesoItem,
-              quantidadeVasilhames: item.quantidade_vasilhames || 0,
+              quantidadeVasilhames: quantidadeCaixas,
+              totalUnidades: totalUnidades,
             });
           } else {
             const p = produtosMap.get(pid);
             p.quantidadeTotal += pesoItem;
-            p.quantidadeVasilhames += item.quantidade_vasilhames || 0;
+            p.quantidadeVasilhames += quantidadeCaixas;
+            p.totalUnidades += totalUnidades;
           }
         }
       });
@@ -361,7 +373,7 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[10px] text-muted-foreground">{produto.unidade_venda}</span>
                         <span className="text-[10px] text-blue-600 font-medium">
-                          {produto.quantidadeTotal?.toFixed(1)} kg • {produto.quantidadeVasilhames || 0} cx
+                          {produto.quantidadeVasilhames || 0} cx × {(produto.quantidadeTotal / (produto.quantidadeVasilhames || 1)).toFixed(0)} = {produto.totalUnidades?.toFixed(0)} un
                         </span>
                         <span className="text-[10px] text-blue-600/70">
                           {produto.porcentagemLote?.toFixed(1)}% lote
