@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MobileLayout } from "@/components/mobile/MobileLayout";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -121,7 +121,7 @@ const App = () => {
                 <Route path="compras-ceasa" element={<ComprasCeasa />} />
                 <Route path="compras-ceasa-mobile" element={<CompraRapidaCeasa />} />
                 <Route path="executar-lista-ceasa" element={<ExecutarListaCeasa />} />
-                <Route path="compra-rapida" element={<CompraRapida />} />
+                <Route path="compra-rapida" element={<Navigate to="/compras-ceasa-mobile" replace />} />
                 <Route path="compra-rapida/:compraId" element={<CompraDetalhes />} />
                 <Route path="commercial" element={<Commercial />} />
                 <Route path="pricing" element={<Pricing />} />
