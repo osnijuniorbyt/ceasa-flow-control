@@ -186,6 +186,7 @@ export type Database = {
           quantidade_vasilhames: number
           subtotal: number
           vasilhame_id: string
+          vasilhame_usado: string | null
         }
         Insert: {
           compra_id: string
@@ -200,6 +201,7 @@ export type Database = {
           quantidade_vasilhames: number
           subtotal: number
           vasilhame_id: string
+          vasilhame_usado?: string | null
         }
         Update: {
           compra_id?: string
@@ -214,6 +216,7 @@ export type Database = {
           quantidade_vasilhames?: number
           subtotal?: number
           vasilhame_id?: string
+          vasilhame_usado?: string | null
         }
         Relationships: [
           {
@@ -346,17 +349,20 @@ export type Database = {
           codigo: string
           created_at: string
           data_ultima_compra: string | null
+          data_ultima_venda: string | null
           descricao: string
           fornecedor_padrao_id: string | null
           grupo_id: string
           id: string
           margem_padrao: number | null
           preco_ultima_compra: number | null
+          preco_venda_atual: number | null
           referencia: string | null
           subgrupo_id: string
           unidade_venda: string
           updated_at: string
           vasilhame_padrao_id: string | null
+          vasilhame_secundario_id: string | null
           vasilhame_ultima_compra_id: string | null
         }
         Insert: {
@@ -364,17 +370,20 @@ export type Database = {
           codigo: string
           created_at?: string
           data_ultima_compra?: string | null
+          data_ultima_venda?: string | null
           descricao: string
           fornecedor_padrao_id?: string | null
           grupo_id: string
           id?: string
           margem_padrao?: number | null
           preco_ultima_compra?: number | null
+          preco_venda_atual?: number | null
           referencia?: string | null
           subgrupo_id: string
           unidade_venda: string
           updated_at?: string
           vasilhame_padrao_id?: string | null
+          vasilhame_secundario_id?: string | null
           vasilhame_ultima_compra_id?: string | null
         }
         Update: {
@@ -382,17 +391,20 @@ export type Database = {
           codigo?: string
           created_at?: string
           data_ultima_compra?: string | null
+          data_ultima_venda?: string | null
           descricao?: string
           fornecedor_padrao_id?: string | null
           grupo_id?: string
           id?: string
           margem_padrao?: number | null
           preco_ultima_compra?: number | null
+          preco_venda_atual?: number | null
           referencia?: string | null
           subgrupo_id?: string
           unidade_venda?: string
           updated_at?: string
           vasilhame_padrao_id?: string | null
+          vasilhame_secundario_id?: string | null
           vasilhame_ultima_compra_id?: string | null
         }
         Relationships: [
@@ -420,6 +432,13 @@ export type Database = {
           {
             foreignKeyName: "produtos_vasilhame_padrao_id_fkey"
             columns: ["vasilhame_padrao_id"]
+            isOneToOne: false
+            referencedRelation: "vasilhames"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produtos_vasilhame_secundario_id_fkey"
+            columns: ["vasilhame_secundario_id"]
             isOneToOne: false
             referencedRelation: "vasilhames"
             referencedColumns: ["id"]

@@ -40,6 +40,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
     unidade_venda: "kg",
     fornecedor_padrao_id: "",
     vasilhame_padrao_id: "",
+    vasilhame_secundario_id: "",
     margem_padrao: "",
     preco_ultima_compra: "",
     ativo: true,
@@ -124,6 +125,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         unidade_venda: data.unidade_venda,
         fornecedor_padrao_id: data.fornecedor_padrao_id || "",
         vasilhame_padrao_id: data.vasilhame_padrao_id || "",
+        vasilhame_secundario_id: data.vasilhame_secundario_id || "",
         margem_padrao: data.margem_padrao?.toString() || "",
         preco_ultima_compra: data.preco_ultima_compra?.toString() || "",
         ativo: data.ativo,
@@ -174,6 +176,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         unidade_venda: formData.unidade_venda,
         fornecedor_padrao_id: formData.fornecedor_padrao_id || null,
         vasilhame_padrao_id: formData.vasilhame_padrao_id || null,
+        vasilhame_secundario_id: formData.vasilhame_secundario_id || null,
         margem_padrao: formData.margem_padrao ? parseFloat(formData.margem_padrao) : null,
         preco_ultima_compra: formData.preco_ultima_compra ? parseFloat(formData.preco_ultima_compra) : null,
         ativo: formData.ativo,
@@ -218,7 +221,8 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
   };
 
   const fornecedorSelecionado = fornecedores.find(f => f.id === formData.fornecedor_padrao_id);
-  const vasilhameSelecionado = vasilhames.find(v => v.id === formData.vasilhame_padrao_id);
+  const vasilhamePadraoSelecionado = vasilhames.find(v => v.id === formData.vasilhame_padrao_id);
+  const vasilhameSecundarioSelecionado = vasilhames.find(v => v.id === formData.vasilhame_secundario_id);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -336,9 +340,9 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
               ))}
             </SelectContent>
           </Select>
-          {vasilhameSelecionado && (
+          {vasilhamePadraoSelecionado && (
             <p className="text-xs text-muted-foreground">
-              Peso: {vasilhameSelecionado.peso_kg} kg ({vasilhameSelecionado.unidade_base})
+              Peso: {vasilhamePadraoSelecionado.peso_kg} kg ({vasilhamePadraoSelecionado.unidade_base})
             </p>
           )}
         </div>
