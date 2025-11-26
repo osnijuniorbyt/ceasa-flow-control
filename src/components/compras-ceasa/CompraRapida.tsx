@@ -467,8 +467,18 @@ export default function CompraRapida() {
                     </div>
                     <div className="text-xs text-muted-foreground space-y-0.5">
                       <div>{item.quantidade}x {item.vasilhame_nome}</div>
-                      <div>Total: {item.peso_total_kg.toFixed(2)} {vasilhames?.find(v => v.id === item.vasilhame_id)?.unidade_base || 'un'}</div>
-                      <div>R$ {item.preco_por_kg.toFixed(2)}/{vasilhames?.find(v => v.id === item.vasilhame_id)?.unidade_base || 'un'}</div>
+                      {(() => {
+                        const vasilhame = vasilhames?.find(v => v.id === item.vasilhame_id);
+                        const unidade = vasilhame?.unidade_base || 'un';
+                        const tipoCalculo = vasilhame?.tipo_calculo || 'peso';
+                        const label = tipoCalculo === 'peso' ? 'Peso' : 'Quantidade';
+                        return (
+                          <>
+                            <div>{label}: {item.peso_total_kg.toFixed(2)} {unidade}</div>
+                            <div>R$ {item.preco_por_kg.toFixed(2)}/{unidade}</div>
+                          </>
+                        );
+                      })()}
                       <div className="font-bold text-foreground text-sm mt-1">R$ {item.subtotal.toFixed(2)}</div>
                     </div>
                   </div>
