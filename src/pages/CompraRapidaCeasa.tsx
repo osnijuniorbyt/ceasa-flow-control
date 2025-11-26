@@ -322,15 +322,14 @@ export default function CompraRapidaCeasa() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 mx-auto">
             <svg 
-              width="32" 
-              height="32" 
-              viewBox="0 0 32 32" 
+              width="40" 
+              height="40" 
+              viewBox="0 0 40 40" 
               fill="none" 
               xmlns="http://www.w3.org/2000/svg"
             >
-              <circle cx="16" cy="18" r="10" fill="#FF8C00" />
-              <ellipse cx="16" cy="18" rx="8" ry="9" fill="#FFA500" />
-              <path d="M16 8 Q18 6 20 8 L19 10 Q17 9 16 10 Z" fill="#228B22" />
+              <circle cx="20" cy="22" r="12" stroke="white" strokeWidth="2" fill="none" />
+              <path d="M20 10 Q23 7 26 10 L25 12 Q22 10 20 12 Z" stroke="white" strokeWidth="2" fill="none" strokeLinejoin="round" />
             </svg>
             <h1 className="text-3xl font-light tracking-[0.3em] text-center">
               HORTII

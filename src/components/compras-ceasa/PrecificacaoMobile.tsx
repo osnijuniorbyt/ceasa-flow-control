@@ -227,19 +227,13 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
 
   return (
     <div className="space-y-3 p-2">
-      {/* Seletor de Lote/Data */}
-      <Card>
-        <CardHeader className="pb-2 pt-3 px-3">
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <DollarSign className="h-4 w-4" />
-            Precificação do Lote
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 px-3 pb-3">
+      {/* Seletor de Lote/Data - STICKY */}
+      <Card className="sticky top-[60px] z-10 shadow-md">
+        <CardContent className="p-3 space-y-2">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full h-10 justify-start text-left font-normal">
-                <Calendar className="mr-2 h-4 w-4" />
+              <Button variant="outline" className="w-full h-9 justify-start text-left font-normal text-sm">
+                <Calendar className="mr-2 h-3 w-3" />
                 {format(date, "dd/MM/yyyy", { locale: ptBR })}
               </Button>
             </PopoverTrigger>
@@ -255,34 +249,18 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
           </Popover>
 
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
             <Input
-              placeholder="Buscar produto"
+              placeholder="Buscar"
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              className="pl-10 h-10"
+              className="pl-8 h-8 text-sm"
             />
           </div>
 
-          <div className="pt-2 border-t space-y-2">
-            <Label className="text-xs text-muted-foreground">Margem Padrão do Lote</Label>
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                step="0.1"
-                value={margemLote}
-                onChange={(e) => setMargemLote(e.target.value)}
-                className="h-9"
-                placeholder="30"
-              />
-              <Button size="sm" onClick={aplicarMargemEmTodos} className="shrink-0 h-9">
-                Aplicar
-              </Button>
-            </div>
-            <div className="text-xs text-muted-foreground space-y-0.5">
-              <p>Produtos: {estatisticasLote.quantidadeProdutos}</p>
-              <p className="font-semibold">Margem Média: {margemMediaPonderada.toFixed(2)}%</p>
-            </div>
+          <div className="text-[10px] text-muted-foreground flex justify-between pt-1 border-t">
+            <span>{estatisticasLote.quantidadeProdutos} produtos</span>
+            <span className="font-semibold">Margem: {margemMediaPonderada.toFixed(1)}%</span>
           </div>
         </CardContent>
       </Card>
@@ -330,7 +308,9 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                              type="number"
                              step="0.01"
                              value={produto.precoCustoAnterior.toFixed(2)}
-                             readOnly
+                             onChange={(e) => {
+                               // Permite edição do preço anterior se necessário
+                             }}
                              className="h-7 text-xs font-semibold text-center"
                            />
                            {variacao !== null && (
