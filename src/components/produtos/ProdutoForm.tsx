@@ -146,6 +146,9 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
     e.preventDefault();
     setLoading(true);
 
+    console.log("🔍 DEBUG: produtoId recebido:", produtoId);
+    console.log("🔍 DEBUG: formData atual:", formData);
+
     try {
       const dataToValidate = {
         codigo: formData.codigo,
@@ -182,25 +185,37 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
         ativo: formData.ativo,
       };
 
+      console.log("🔍 DEBUG: Verificando produtoId antes de salvar:", produtoId);
+      
       if (produtoId) {
+        console.log("✏️ ATUALIZANDO produto existente com ID:", produtoId);
         const { error } = await supabase
           .from("produtos")
           .update(dataToSave)
           .eq("id", produtoId);
 
-        if (error) throw error;
+        if (error) {
+          console.error("❌ Erro ao atualizar:", error);
+          throw error;
+        }
 
+        console.log("✅ Produto atualizado com sucesso!");
         toast({
           title: "Sucesso",
           description: "Produto atualizado com sucesso",
         });
       } else {
+        console.log("➕ CRIANDO novo produto");
         const { error } = await supabase
           .from("produtos")
           .insert(dataToSave);
 
-        if (error) throw error;
+        if (error) {
+          console.error("❌ Erro ao criar:", error);
+          throw error;
+        }
 
+        console.log("✅ Produto criado com sucesso!");
         toast({
           title: "Sucesso",
           description: "Produto cadastrado com sucesso",
