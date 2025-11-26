@@ -29,6 +29,7 @@ import ProductImport from "./pages/ProductImport";
 import ComprasCeasa from "./pages/ComprasCeasa";
 import Fornecedores from "./pages/Fornecedores";
 import CompraRapida from "./pages/CompraRapida";
+import CompraDetalhes from "./pages/CompraDetalhes";
 import Produtos from "./pages/Produtos";
 import ImportarProdutos from "./pages/ImportarProdutos";
 import ListaCompras from "./pages/ListaCompras";
@@ -117,6 +118,7 @@ const App = () => {
                 <Route path="lista-compras/:listaId" element={<ListaComprasDetalhes />} />
                 <Route path="compras-ceasa" element={<ComprasCeasa />} />
                 <Route path="compra-rapida" element={<CompraRapida />} />
+                <Route path="compra-rapida/:compraId" element={<CompraDetalhes />} />
                 <Route path="commercial" element={<Commercial />} />
                 <Route path="pricing" element={<Pricing />} />
                 <Route path="automation-rules" element={<AutomationRules />} />
