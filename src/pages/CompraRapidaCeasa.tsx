@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BuscaProdutoInteligente } from "@/components/compras-ceasa/BuscaProdutoInteligente";
 import { InputNumericoMobile } from "@/components/compras-ceasa/InputNumericoMobile";
 import { NovoFornecedorModal } from "@/components/compra-rapida/NovoFornecedorModal";
+import { SwipeableHistoricoItem } from "@/components/compras-ceasa/SwipeableHistoricoItem";
 import { ShoppingCart, Truck, List, Plus, Trash2, Save, History } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -327,27 +328,12 @@ export default function CompraRapidaCeasa() {
           </CardHeader>
           <CardContent className="space-y-1 px-3 pb-3">
             {produtosHistorico.slice(0, 5).map((produto: any) => (
-              <button
+              <SwipeableHistoricoItem
                 key={produto.id}
-                onClick={() => adicionarProdutoHistorico(produto)}
-                className="w-full p-2 border rounded-lg hover:bg-muted/50 transition-colors text-left"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-sm truncate">
-                      {produto.codigo} - {produto.descricao}
-                    </div>
-                    <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
-                      <span>{produto.vezes_comprado}x</span>
-                      <span>•</span>
-                      <span className="text-green-600 font-bold text-base">
-                        R$ {Number(produto.ultimo_valor).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                  <Plus className="h-4 w-4 text-primary flex-shrink-0 ml-2" />
-                </div>
-              </button>
+                produto={produto}
+                fornecedorId={fornecedorSelecionado}
+                onSelect={adicionarProdutoHistorico}
+              />
             ))}
           </CardContent>
         </Card>
