@@ -246,18 +246,13 @@ export default function CompraRapidaCeasa() {
       return;
     }
 
-    if (!valorTotal || parseFloat(valorTotal) <= 0) {
-      toast.error("Digite o valor total");
-      return;
-    }
-
     const novoItem: ItemCarrinho = {
       produto_id: produtoSelecionado.id,
       codigo: produtoSelecionado.codigo,
       descricao: produtoSelecionado.descricao,
       unidade: produtoSelecionado.unidade_venda,
       quantidade: quantidade,
-      valor_total: valorTotal,
+      valor_total: valorTotal || "0",
     };
 
     setCarrinho([...carrinho, novoItem]);
@@ -395,7 +390,7 @@ export default function CompraRapidaCeasa() {
               size="lg"
               className="w-full h-12 text-base font-bold"
               onClick={adicionarAoCarrinho}
-              disabled={!produtoSelecionado || !quantidade || !valorTotal}
+              disabled={!produtoSelecionado || !quantidade}
             >
               <Plus className="h-5 w-5 mr-2" />
               Adicionar

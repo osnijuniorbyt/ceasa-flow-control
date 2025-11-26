@@ -48,19 +48,9 @@ const menuItems = [
     icon: ClipboardList,
   },
   {
-    title: "⚡ Compra Rápida",
-    url: "/compra-rapida",
-    icon: Bolt,
-  },
-  {
-    title: "Compras CEASA",
-    url: "/compras-ceasa",
-    icon: ShoppingBag,
-  },
-  {
-    title: "📱 CEASA Mobile",
+    title: "⚡ Compra Rápida CEASA",
     url: "/compras-ceasa-mobile",
-    icon: ShoppingBag,
+    icon: Bolt,
   },
   {
     title: "Pedidos (Antigo)",
