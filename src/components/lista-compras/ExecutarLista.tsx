@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle, Package } from "lucide-react";
+import { CheckCircle, Package, ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -170,7 +170,112 @@ export function ExecutarLista({ listaId }: ExecutarListaProps) {
     }
   };
 
-  const finalizarLista = async () => {
+  const gerarCompras = async () => {
+    setLoading(true);
+    try {
+      // Buscar vasilhame padrão
+      const { data: vasilhames } = await supabase
+        .from("vasilhames")
+        .select("id")
+        .eq("ativo", true)
+        .limit(1);
+
+      const vasilhameId = vasilhames?.[0]?.id;
+
+      if (!vasilhameId) {
+        toast({
+          title: "Erro",
+          description: "Nenhum vasilhame cadastrado no sistema",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      let comprasCriadas = 0;
+
+      // Criar uma compra para cada fornecedor
+      for (const grupo of grupos) {
+        const itensComprados = grupo.itens.filter(item => item.comprado);
+        
+        if (itensComprados.length === 0 || grupo.fornecedorId === "sem-fornecedor") {
+          continue;
+        }
+
+        // Calcular total do fornecedor
+        const totalFornecedor = itensComprados.reduce((sum, item) => {
+          const qtd = item.quantidade_real || item.quantidade;
+          const valor = item.valor_pago || 0;
+          return sum + (qtd * valor);
+        }, 0);
+
+        // Criar compra
+        const { data: compra, error: compraError } = await supabase
+          .from("compras")
+          .insert({
+            fornecedor_id: grupo.fornecedorId,
+            status: "confirmado",
+            valor_produtos: totalFornecedor,
+            valor_total: totalFornecedor,
+            numero_compra: 0,
+          })
+          .select()
+          .single();
+
+        if (compraError) throw compraError;
+
+        // Criar itens da compra
+        const itensParaInserir = itensComprados.map(item => {
+          const qtd = item.quantidade_real || item.quantidade;
+          const valorUnitario = item.valor_pago || 0;
+          
+          return {
+            compra_id: compra.id,
+            produto_id: item.produto_id,
+            vasilhame_id: vasilhameId,
+            quantidade_vasilhames: qtd,
+            peso_total_kg: qtd,
+            preco_por_vasilhame: valorUnitario,
+            preco_por_kg: valorUnitario,
+            subtotal: qtd * valorUnitario,
+          };
+        });
+
+        const { error: itensError } = await supabase
+          .from("itens_compra")
+          .insert(itensParaInserir);
+
+        if (itensError) throw itensError;
+
+        comprasCriadas++;
+      }
+
+      // Atualizar status da lista
+      const { error: updateError } = await supabase
+        .from("listas_compras")
+        .update({ status: "finalizada" })
+        .eq("id", listaId);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Sucesso!",
+        description: `${comprasCriadas} compra${comprasCriadas !== 1 ? 's' : ''} gerada${comprasCriadas !== 1 ? 's' : ''} automaticamente`,
+      });
+
+      navigate("/lista-compras");
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const finalizarSemGerar = async () => {
     try {
       const { error } = await supabase
         .from("listas_compras")
@@ -181,7 +286,7 @@ export function ExecutarLista({ listaId }: ExecutarListaProps) {
 
       toast({
         title: "Lista finalizada!",
-        description: "Todos os itens foram registrados",
+        description: "Lista marcada como finalizada",
       });
 
       navigate("/lista-compras");
@@ -206,6 +311,10 @@ export function ExecutarLista({ listaId }: ExecutarListaProps) {
 
   const todosComprados = grupos.every((grupo) =>
     grupo.itens.every((item) => item.comprado)
+  );
+
+  const temItensComprados = grupos.some((grupo) =>
+    grupo.itens.some((item) => item.comprado)
   );
 
   return (
@@ -278,21 +387,45 @@ export function ExecutarLista({ listaId }: ExecutarListaProps) {
       ))}
 
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="p-6 space-y-3">
           <Button
-            onClick={finalizarLista}
-            disabled={!todosComprados}
+            onClick={gerarCompras}
+            disabled={!todosComprados || loading}
+            className="w-full"
+            size="lg"
+          >
+            <ShoppingCart className="h-5 w-5 mr-2" />
+            {loading ? "Gerando Compras..." : "Gerar Compras Automáticas"}
+          </Button>
+          
+          <Button
+            onClick={finalizarSemGerar}
+            disabled={!temItensComprados || loading}
+            variant="outline"
             className="w-full"
             size="lg"
           >
             <CheckCircle className="h-5 w-5 mr-2" />
-            Finalizar Lista
+            Finalizar Sem Gerar Compras
           </Button>
-          {!todosComprados && (
-            <p className="text-sm text-muted-foreground text-center mt-2">
-              Marque todos os itens como comprados para finalizar
+
+          {!todosComprados && temItensComprados && (
+            <p className="text-sm text-muted-foreground text-center">
+              ⚠️ Alguns itens ainda não foram marcados como comprados
             </p>
           )}
+          
+          {!temItensComprados && (
+            <p className="text-sm text-muted-foreground text-center">
+              Marque os itens como comprados para finalizar
+            </p>
+          )}
+
+          <div className="pt-3 border-t">
+            <p className="text-sm text-muted-foreground text-center">
+              <strong>Dica:</strong> "Gerar Compras" cria automaticamente os pedidos por fornecedor usando os valores reais
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
