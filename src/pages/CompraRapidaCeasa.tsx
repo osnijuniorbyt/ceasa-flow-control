@@ -822,7 +822,6 @@ export default function CompraRapidaCeasa() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      </div>
-    </MobileLayout>
+    </div>
   );
 }
