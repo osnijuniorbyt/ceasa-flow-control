@@ -115,33 +115,42 @@ export type Database = {
       fornecedores: {
         Row: {
           ativo: boolean
+          box: string | null
           cnpj: string | null
           contato: string | null
           created_at: string
+          endereco: string | null
           id: string
           nome_fantasia: string | null
           razao_social: string
           telefone: string | null
+          tipo: string | null
         }
         Insert: {
           ativo?: boolean
+          box?: string | null
           cnpj?: string | null
           contato?: string | null
           created_at?: string
+          endereco?: string | null
           id?: string
           nome_fantasia?: string | null
           razao_social: string
           telefone?: string | null
+          tipo?: string | null
         }
         Update: {
           ativo?: boolean
+          box?: string | null
           cnpj?: string | null
           contato?: string | null
           created_at?: string
+          endereco?: string | null
           id?: string
           nome_fantasia?: string | null
           razao_social?: string
           telefone?: string | null
+          tipo?: string | null
         }
         Relationships: []
       }

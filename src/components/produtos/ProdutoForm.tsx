@@ -31,6 +31,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
   const [subgrupos, setSubgrupos] = useState<Array<{ id: string; nome: string }>>([]);
   const [fornecedores, setFornecedores] = useState<Array<{ id: string; razao_social: string; contato: string | null }>>([]);
   const [vasilhames, setVasilhames] = useState<Array<{ id: string; nome: string; peso_kg: number; unidade_base: string }>>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
   
   const [formData, setFormData] = useState({
     codigo: "",
@@ -49,12 +50,21 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
   const { toast } = useToast();
 
   useEffect(() => {
-    loadGrupos();
-    loadFornecedores();
-    loadVasilhames();
-    if (produtoId) {
-      loadProduto();
-    }
+    const initialize = async () => {
+      await Promise.all([
+        loadGrupos(),
+        loadFornecedores(),
+        loadVasilhames(),
+      ]);
+      
+      if (produtoId) {
+        await loadProduto();
+      }
+      
+      setIsInitialized(true);
+    };
+    
+    initialize();
   }, [produtoId]);
 
   useEffect(() => {
@@ -236,6 +246,13 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {!isInitialized ? (
+        <div className="flex items-center justify-center p-8">
+          <Loader2 className="h-8 w-8 animate-spin" />
+          <span className="ml-2">Carregando dados...</span>
+        </div>
+      ) : (
+        <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="codigo">Código *</Label>
@@ -456,10 +473,12 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
               Salvando...
             </>
           ) : (
-            "Salvar Produto"
-          )}
-        </Button>
-      </div>
-    </form>
+          "Salvar Produto"
+        )}
+      </Button>
+    </div>
+    </>
+      )}
+  </form>
   );
 }
