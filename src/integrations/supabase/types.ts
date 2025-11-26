@@ -142,7 +142,7 @@ export type Database = {
           razao_social: string
           telefone?: string | null
           tipo?: string | null
-          user_id: string
+          user_id?: string
         }
         Update: {
           ativo?: boolean

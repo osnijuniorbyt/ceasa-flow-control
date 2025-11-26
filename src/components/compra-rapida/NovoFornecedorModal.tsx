@@ -43,15 +43,22 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
 
     setLoading(true);
     try {
-      if (!user?.id) {
+      // Debug: Verificar sessão ativa
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('🔐 Debug - Sessão ativa:', !!session?.access_token);
+      console.log('🔐 Debug - User ID:', session?.user?.id);
+      console.log('🔐 Debug - User from context:', user?.id);
+      
+      if (!session?.access_token) {
         toast({
-          title: "Erro",
-          description: "Você precisa estar logado para cadastrar fornecedor",
+          title: "Erro de Autenticação",
+          description: "Sessão expirada. Faça login novamente.",
           variant: "destructive",
         });
         return;
       }
       
+      // Não enviar user_id manualmente - deixar o banco usar DEFAULT auth.uid()
       const { data, error } = await supabase
         .from("fornecedores")
         .insert({
@@ -61,13 +68,17 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
           contato: box || null,
           tipo: tipo,
           ativo: true,
-          user_id: user.id
+          // user_id será preenchido automaticamente pelo DEFAULT auth.uid()
         })
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Erro Supabase:', error);
+        throw error;
+      }
 
+      console.log('✅ Fornecedor cadastrado:', data);
       toast({
         title: "Sucesso",
         description: "Fornecedor cadastrado com sucesso",
@@ -78,11 +89,11 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
       setTipo("");
       onOpenChange(false);
       onSuccess(data.id);
-    } catch (error) {
-      console.error("Erro ao cadastrar fornecedor:", error);
+    } catch (error: any) {
+      console.error("❌ Erro ao cadastrar fornecedor:", error);
       toast({
         title: "Erro",
-        description: "Erro ao cadastrar fornecedor",
+        description: error.message || "Erro ao cadastrar fornecedor",
         variant: "destructive",
       });
     } finally {
