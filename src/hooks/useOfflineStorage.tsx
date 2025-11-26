@@ -10,7 +10,14 @@ export function useOfflineStorage<T>(key: string, initialValue: T) {
   const [value, setValue] = useState<T>(() => {
     try {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      if (!item) return initialValue;
+      
+      const parsed = JSON.parse(item);
+      // Check if it's wrapped in OfflineData structure
+      if (parsed && typeof parsed === 'object' && 'data' in parsed) {
+        return parsed.data ?? initialValue;
+      }
+      return parsed ?? initialValue;
     } catch (error) {
       console.error('Error loading from localStorage:', error);
       return initialValue;

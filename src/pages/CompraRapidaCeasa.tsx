@@ -66,6 +66,9 @@ export default function CompraRapidaCeasa() {
     isOnline 
   } = useOfflineStorage<ItemCarrinho[]>('carrinho_compra_ceasa', []);
   
+  // Garantir que carrinho seja sempre um array
+  const carrinhoArray = Array.isArray(carrinho) ? carrinho : [];
+  
   // Sincronização offline
   useOfflineSync();
   
@@ -100,13 +103,13 @@ export default function CompraRapidaCeasa() {
 
   // Salvar cache sempre que mudar
   useEffect(() => {
-    if (fornecedorSelecionado || carrinho.length > 0) {
+    if (fornecedorSelecionado || carrinhoArray.length > 0) {
       localStorage.setItem(CACHE_KEY, JSON.stringify({
         fornecedor: fornecedorSelecionado,
-        carrinho: carrinho
+        carrinho: carrinhoArray
       }));
     }
-  }, [fornecedorSelecionado, carrinho]);
+  }, [fornecedorSelecionado, carrinhoArray]);
 
   // Buscar todos os vasilhames disponíveis
   const { data: todosVasilhames = [] } = useQuery({
@@ -220,7 +223,7 @@ export default function CompraRapidaCeasa() {
         toast.warning('Sem conexão - compra será enviada quando voltar online');
         localStorage.setItem('compra_pendente', JSON.stringify({
           fornecedor: fornecedorSelecionado,
-          carrinho: carrinho,
+          carrinho: carrinhoArray,
           timestamp: Date.now()
         }));
         return { numero_compra: 'PENDENTE', pendente: true };
@@ -230,12 +233,12 @@ export default function CompraRapidaCeasa() {
         throw new Error("Selecione um fornecedor");
       }
 
-      if (carrinho.length === 0) {
+      if (carrinhoArray.length === 0) {
         throw new Error("Adicione produtos ao carrinho");
       }
 
       // Calcular total
-      const valorTotalCompra = carrinho.reduce((sum, item) => 
+      const valorTotalCompra = carrinhoArray.reduce((sum, item) => 
         sum + parseFloat(item.valor_total || "0"), 0
       );
 
@@ -263,7 +266,7 @@ export default function CompraRapidaCeasa() {
 
       // Pegar vasilhame de cada item do carrinho
       // Criar itens da compra
-      const itens = carrinho.map((item) => {
+      const itens = carrinhoArray.map((item) => {
         const qtd = parseFloat(item.quantidade || "1");
         const valor = parseFloat(item.valor_total || "0");
 
@@ -369,7 +372,7 @@ export default function CompraRapidaCeasa() {
       peso_total_kg: pesoTotal,
     };
 
-    setCarrinho([...carrinho, novoItem]);
+    setCarrinho([...carrinhoArray, novoItem]);
     setProdutoSelecionado(null);
     setQuantidade("");
     setValorTotal("");
@@ -378,12 +381,12 @@ export default function CompraRapidaCeasa() {
   };
 
   const removerDoCarrinho = (index: number) => {
-    setCarrinho(carrinho.filter((_, i) => i !== index));
+    setCarrinho(carrinhoArray.filter((_, i) => i !== index));
     toast.success("Item removido");
   };
 
   const cancelarCompra = () => {
-    if (carrinho.length > 0) {
+    if (carrinhoArray.length > 0) {
       setCancelarDialogOpen(true);
     } else {
       limparCampos();
@@ -407,7 +410,7 @@ export default function CompraRapidaCeasa() {
     navigate("/");
   };
 
-  const totalCarrinho = carrinho.reduce((sum, item) => 
+  const totalCarrinho = carrinhoArray.reduce((sum, item) => 
     sum + parseFloat(item.valor_total || "0"), 0
   );
 
@@ -726,24 +729,24 @@ export default function CompraRapidaCeasa() {
       )}
 
       {/* Carrinho - COMPACTO */}
-      {carrinho.length > 0 && (
+      {carrinhoArray.length > 0 && (
         <Card className="border border-green-500/30">
           <CardHeader className="pb-2 pt-3 px-3">
             <CardTitle className="flex items-center justify-between text-base">
               <span className="flex items-center gap-2">
                 <List className="h-4 w-4" />
-                Carrinho ({carrinho.length})
+                Carrinho ({carrinhoArray.length})
               </span>
               <span className="text-xl font-bold text-green-600">
                 R$ {totalCarrinho.toFixed(2)}
               </span>
               <span className="text-sm text-muted-foreground ml-2">
-                ({carrinho.reduce((sum, item) => sum + item.peso_total_kg, 0).toFixed(1)} kg)
+                ({carrinhoArray.reduce((sum, item) => sum + item.peso_total_kg, 0).toFixed(1)} kg)
               </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-1 px-3 pb-3">
-            {carrinho.map((item, index) => (
+            {carrinhoArray.map((item, index) => (
               <SwipeableCarrinhoItem
                 key={index}
                 item={item}
@@ -810,7 +813,7 @@ export default function CompraRapidaCeasa() {
           <AlertDialogHeader>
             <AlertDialogTitle>Limpar Lançamento?</AlertDialogTitle>
             <AlertDialogDescription>
-              Você tem {carrinho.length} {carrinho.length === 1 ? "item" : "itens"} no carrinho.
+              Você tem {carrinhoArray.length} {carrinhoArray.length === 1 ? "item" : "itens"} no carrinho.
               Deseja limpar o carrinho atual? O fornecedor permanecerá selecionado.
             </AlertDialogDescription>
           </AlertDialogHeader>
