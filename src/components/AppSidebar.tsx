@@ -43,6 +43,11 @@ const menuItems = [
     icon: ClipboardList,
   },
   {
+    title: "✅ Executar Lista CEASA",
+    url: "/executar-lista-ceasa",
+    icon: ClipboardList,
+  },
+  {
     title: "⚡ Compra Rápida",
     url: "/compra-rapida",
     icon: Bolt,
