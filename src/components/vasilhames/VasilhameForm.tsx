@@ -150,52 +150,24 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="nome">Nome *</Label>
+        <Label htmlFor="nome">Nome da Embalagem *</Label>
         <Input
           id="nome"
           {...register("nome")}
-          placeholder="Ex: KG, CX, SC, DZ"
+          placeholder="Ex: Caixa, Saco, Dúzia, Unidade"
+          autoFocus
         />
+        <p className="text-xs text-muted-foreground">
+          Nome que identifica a embalagem
+        </p>
         {errors.nome && (
           <p className="text-sm text-destructive">{errors.nome.message}</p>
         )}
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="unidade_base">Unidade *</Label>
-        <Input
-          id="unidade_base"
-          {...register("unidade_base")}
-          placeholder="kg, un, dz, cx, sc"
-        />
-        <p className="text-xs text-muted-foreground">
-          Ex: kg (quilos), un (unidades), dz (dúzias), cx (caixas), sc (sacos)
-        </p>
-        {errors.unidade_base && (
-          <p className="text-sm text-destructive">{errors.unidade_base.message}</p>
-        )}
-      </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="peso_embalagem_kg">Peso Embalagem (kg)</Label>
-          <Input
-            id="peso_embalagem_kg"
-            type="number"
-            step="0.01"
-            {...register("peso_embalagem_kg", { valueAsNumber: true })}
-            placeholder="Ex: 2"
-          />
-          <p className="text-xs text-muted-foreground">
-            Peso da embalagem vazia
-          </p>
-          {errors.peso_embalagem_kg && (
-            <p className="text-sm text-destructive">{errors.peso_embalagem_kg.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="peso_kg">Peso/Qtd Líquido *</Label>
+          <Label htmlFor="peso_kg">Peso/Quantidade *</Label>
           <Input
             id="peso_kg"
             type="number"
@@ -204,26 +176,63 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
             placeholder="Ex: 18"
           />
           <p className="text-xs text-muted-foreground">
-            Peso/quantidade do produto
+            Quantidade líquida do produto
           </p>
           {errors.peso_kg && (
             <p className="text-sm text-destructive">{errors.peso_kg.message}</p>
           )}
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="unidade_base">Unidade *</Label>
+          <Input
+            id="unidade_base"
+            {...register("unidade_base")}
+            placeholder="kg, un, dz"
+          />
+          <p className="text-xs text-muted-foreground">
+            kg, un, dz, cx, sc
+          </p>
+          {errors.unidade_base && (
+            <p className="text-sm text-destructive">{errors.unidade_base.message}</p>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="descricao">Descrição</Label>
+        <Label htmlFor="peso_embalagem_kg">Peso da Embalagem Vazia</Label>
+        <Input
+          id="peso_embalagem_kg"
+          type="number"
+          step="0.01"
+          {...register("peso_embalagem_kg", { valueAsNumber: true })}
+          placeholder="Ex: 2 (opcional)"
+        />
+        <p className="text-xs text-muted-foreground">
+          Peso só da embalagem em kg (opcional)
+        </p>
+        {errors.peso_embalagem_kg && (
+          <p className="text-sm text-destructive">{errors.peso_embalagem_kg.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="descricao">Observações</Label>
         <Textarea
           id="descricao"
           {...register("descricao")}
-          placeholder="Detalhes adicionais (opcional)"
+          placeholder="Informações adicionais (opcional)"
           rows={2}
         />
       </div>
 
-      <div className="flex items-center justify-between">
-        <Label htmlFor="ativo">Ativo</Label>
+      <div className="flex items-center justify-between py-2 border-t">
+        <div className="space-y-0.5">
+          <Label htmlFor="ativo">Status Ativo</Label>
+          <p className="text-xs text-muted-foreground">
+            Desative se não usar mais esta embalagem
+          </p>
+        </div>
         <Switch
           id="ativo"
           checked={ativo}
