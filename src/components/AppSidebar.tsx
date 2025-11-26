@@ -26,6 +26,7 @@ import {
   Zap,
   FolderTree,
   FileSpreadsheet,
+  Building2,
 } from "lucide-react";
 
 const menuItems = [
@@ -68,6 +69,11 @@ const menuItems = [
     title: "Árvore Mercadológica",
     url: "/categories",
     icon: FolderTree,
+  },
+  {
+    title: "Fornecedores",
+    url: "/fornecedores",
+    icon: Building2,
   },
   {
     title: "Importar Produtos",
