@@ -59,6 +59,11 @@ const menuItems = [
     icon: Package,
   },
   {
+    title: "Preços",
+    url: "/pricing",
+    icon: DollarSign,
+  },
+  {
     title: "Relatórios",
     url: "/desenvolvimento-relatorios",
     icon: BarChart3,
@@ -112,16 +117,6 @@ const menuItems = [
     title: "Central Comercial IA",
     url: "/commercial",
     icon: Brain,
-  },
-  {
-    title: "Gestão de Preços",
-    url: "/pricing",
-    icon: DollarSign,
-  },
-  {
-    title: "Entregas",
-    url: "/deliveries",
-    icon: Truck,
   },
   {
     title: "Configurações",
