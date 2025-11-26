@@ -77,7 +77,7 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
       // Agrupar por produto
       const produtosMap = new Map();
       itens?.forEach((item: any) => {
-        if (item.produtos) {
+        if (item.produtos && item.preco_por_kg) {
           const pid = item.produtos.id;
           if (!produtosMap.has(pid)) {
             produtosMap.set(pid, {
@@ -85,11 +85,11 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
               codigo: item.produtos.codigo,
               descricao: item.produtos.descricao,
               unidade_venda: item.produtos.unidade_venda,
-              precoCustoAtual: item.preco_por_kg,
-              precoVendaAtual: item.preco_venda_sugerido,
+              precoCustoAtual: item.preco_por_kg || 0,
+              precoVendaAtual: item.preco_venda_sugerido || 0,
               margem: item.produtos.margem_padrao || 30,
-              precoCustoAnterior: item.produtos.preco_ultima_compra,
-              dataUltimaCompra: item.produtos.data_ultima_compra,
+              precoCustoAnterior: item.produtos.preco_ultima_compra || null,
+              dataUltimaCompra: item.produtos.data_ultima_compra || null,
             });
           }
         }
@@ -141,6 +141,8 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
   // Calcular estatísticas baseadas no lucro total
   const estatisticasLote = produtosLote.reduce(
     (acc, produto: any) => {
+      if (!produto?.precoCustoAtual) return acc;
+      
       const margem = editando[produto.id] ? parseFloat(editando[produto.id]) : produto.margem;
       const precoVenda = editandoPrecoVenda[produto.id]
         ? parseFloat(editandoPrecoVenda[produto.id])
@@ -287,16 +289,16 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
       {/* Lista de Produtos */}
       <div className="space-y-2">
         {produtosLote && produtosLote.length > 0 ? (
-          produtosLote.map((produto: any) => {
+          produtosLote.filter((p: any) => p?.precoCustoAtual).map((produto: any) => {
             const margemAtual = editando[produto.id]
               ? parseFloat(editando[produto.id])
               : produto.margem;
             
             const precoVenda = editandoPrecoVenda[produto.id]
               ? parseFloat(editandoPrecoVenda[produto.id])
-              : calcularPrecoVenda(produto.precoCustoAtual, margemAtual);
+              : calcularPrecoVenda(produto.precoCustoAtual || 0, margemAtual);
 
-            const variacao = produto.precoCustoAnterior
+            const variacao = produto.precoCustoAnterior && produto.precoCustoAtual
               ? ((produto.precoCustoAtual - produto.precoCustoAnterior) / produto.precoCustoAnterior) * 100
               : null;
 
