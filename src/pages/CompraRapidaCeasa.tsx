@@ -13,7 +13,7 @@ import { SwipeableCarrinhoItem } from "@/components/compras-ceasa/SwipeableCarri
 import { ConferenciaMobile } from "@/components/compras-ceasa/ConferenciaMobile";
 import { PrecificacaoMobile } from "@/components/compras-ceasa/PrecificacaoMobile";
 import { HistoricoLote } from "@/components/compras-ceasa/HistoricoLote";
-import { Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign } from "lucide-react";
+import { Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign, Package } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import {
@@ -432,7 +432,18 @@ export default function CompraRapidaCeasa() {
       {fornecedorSelecionado && (
         <Card className="border border-primary/30">
           <CardHeader className="pb-2 pt-3 px-3">
-            <CardTitle className="text-base">Buscar Produto</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Buscar Produto</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/produtos-gestao")}
+                className="h-7 text-xs gap-1"
+              >
+                <Package className="h-3 w-3" />
+                Cadastrar
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-2 px-3 pb-3">
             <BuscaProdutoInteligente
