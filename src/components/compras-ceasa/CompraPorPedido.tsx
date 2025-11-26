@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
-export function CompraPorPedido() {
+export default function CompraPorPedido() {
   return (
     <Card>
       <CardHeader>

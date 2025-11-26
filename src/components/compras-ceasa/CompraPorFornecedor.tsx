@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2 } from "lucide-react";
 
-export function CompraPorFornecedor() {
+export default function CompraPorFornecedor() {
   return (
     <Card>
       <CardHeader>
