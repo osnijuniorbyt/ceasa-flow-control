@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Search, Save, Calendar, TrendingUp, TrendingDown } from "lucide-react";
+import { DollarSign, Search, Save, Calendar } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -322,28 +322,31 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                         R$ {produto.precoCustoAtual.toFixed(2)}
                       </div>
                     </div>
-                    <div>
-                      <div className="text-muted-foreground">Anterior</div>
-                      {produto.precoCustoAnterior ? (
-                        <div className="space-y-0.5">
-                          <div className="font-semibold text-sm">
-                            R$ {produto.precoCustoAnterior.toFixed(2)}
-                          </div>
-                          {variacao !== null && (
-                            <div
-                              className={`flex items-center gap-0.5 text-[10px] ${
-                                variacao > 0 ? "text-red-500" : "text-green-500"
-                              }`}
-                            >
-                              {variacao > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                              {Math.abs(variacao).toFixed(1)}%
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="text-muted-foreground text-sm">-</div>
-                      )}
-                    </div>
+                     <div>
+                       <div className="text-muted-foreground">Anterior</div>
+                       {produto.precoCustoAnterior ? (
+                         <div className="space-y-0.5">
+                           <Input
+                             type="number"
+                             step="0.01"
+                             value={produto.precoCustoAnterior.toFixed(2)}
+                             readOnly
+                             className="h-7 text-xs font-semibold text-center"
+                           />
+                           {variacao !== null && (
+                             <div
+                               className={`text-center text-[10px] font-medium ${
+                                 variacao > 0 ? "text-red-500" : "text-green-500"
+                               }`}
+                             >
+                               {variacao > 0 ? "+" : ""}{variacao.toFixed(1)}%
+                             </div>
+                           )}
+                         </div>
+                       ) : (
+                         <div className="text-muted-foreground text-sm text-center">-</div>
+                       )}
+                     </div>
                     <div>
                       <div className="text-muted-foreground">Venda</div>
                       <div className="font-bold text-sm text-green-600">
