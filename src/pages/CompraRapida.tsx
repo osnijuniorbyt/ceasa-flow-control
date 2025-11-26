@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingCart, DollarSign } from "lucide-react";
+import { ShoppingCart, DollarSign, Clock } from "lucide-react";
 import { RegistroCompra } from "@/components/compra-rapida/RegistroCompra";
 import { TabelaPrecos } from "@/components/compra-rapida/TabelaPrecos";
+import { ComprasRecentes } from "@/components/compra-rapida/ComprasRecentes";
 
 export default function CompraRapida() {
-  const [activeTab, setActiveTab] = useState("registro");
+  const [activeTab, setActiveTab] = useState("recentes");
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
@@ -15,16 +16,24 @@ export default function CompraRapida() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-14 mb-6">
+        <TabsList className="grid w-full grid-cols-3 h-14 mb-6">
+          <TabsTrigger value="recentes" className="text-lg">
+            <Clock className="h-5 w-5 mr-2" />
+            Recentes
+          </TabsTrigger>
           <TabsTrigger value="registro" className="text-lg">
             <ShoppingCart className="h-5 w-5 mr-2" />
-            Registro de Compra
+            Nova Compra
           </TabsTrigger>
           <TabsTrigger value="precos" className="text-lg">
             <DollarSign className="h-5 w-5 mr-2" />
-            Tabela de Preços
+            Preços
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="recentes">
+          <ComprasRecentes />
+        </TabsContent>
 
         <TabsContent value="registro">
           <RegistroCompra />
