@@ -39,6 +39,7 @@ const CACHE_KEY = "compra_ceasa_em_andamento";
 
 export default function CompraRapidaCeasa() {
   const [activeTab, setActiveTab] = useState("lancamento");
+  const [loteData, setLoteData] = useState<string>(new Date().toISOString().split('T')[0]);
   const [fornecedorSelecionado, setFornecedorSelecionado] = useState<string>("");
   const [produtoSelecionado, setProdutoSelecionado] = useState<any>(null);
   const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
@@ -511,11 +512,11 @@ export default function CompraRapidaCeasa() {
         </TabsContent>
 
         <TabsContent value="conferencia" className="mt-0">
-          <ConferenciaMobile />
+          <ConferenciaMobile loteData={loteData} onLoteDataChange={setLoteData} />
         </TabsContent>
 
         <TabsContent value="precificacao" className="mt-0">
-          <PrecificacaoMobile />
+          <PrecificacaoMobile loteData={loteData} onLoteDataChange={setLoteData} />
         </TabsContent>
       </Tabs>
 
