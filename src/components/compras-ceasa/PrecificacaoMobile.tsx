@@ -25,6 +25,7 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
   const [editando, setEditando] = useState<Record<string, string>>({});
   const [editandoPrecoVenda, setEditandoPrecoVenda] = useState<Record<string, string>>({});
   const [margemLote, setMargemLote] = useState("30");
+  const [produtoFocado, setProdutoFocado] = useState<number>(0);
   const queryClient = useQueryClient();
 
   const handleDateSelect = (newDate: Date | undefined) => {
@@ -166,6 +167,48 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
       ? (estatisticasLote.lucroTotal / estatisticasLote.custoTotal) * 100
       : 0;
 
+  // Atalhos de teclado
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const produtosFiltrados = produtosLote.filter((p: any) => p?.precoCustoAtual);
+      
+      // Alt + Seta Baixo: próximo produto
+      if (e.altKey && e.key === "ArrowDown") {
+        e.preventDefault();
+        setProdutoFocado(prev => Math.min(prev + 1, produtosFiltrados.length - 1));
+        const nextProduto = produtosFiltrados[Math.min(produtoFocado + 1, produtosFiltrados.length - 1)];
+        document.getElementById(`card-${nextProduto?.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      
+      // Alt + Seta Cima: produto anterior
+      if (e.altKey && e.key === "ArrowUp") {
+        e.preventDefault();
+        setProdutoFocado(prev => Math.max(prev - 1, 0));
+        const prevProduto = produtosFiltrados[Math.max(produtoFocado - 1, 0)];
+        document.getElementById(`card-${prevProduto?.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      // Alt + M: focar campo margem do produto atual
+      if (e.altKey && e.key === "m") {
+        e.preventDefault();
+        const inputMargem = document.getElementById(`margem-${produtosFiltrados[produtoFocado]?.id}`) as HTMLInputElement;
+        inputMargem?.focus();
+        inputMargem?.select();
+      }
+
+      // Alt + P: focar campo preço do produto atual
+      if (e.altKey && e.key === "p") {
+        e.preventDefault();
+        const inputPreco = document.getElementById(`preco-${produtosFiltrados[produtoFocado]?.id}`) as HTMLInputElement;
+        inputPreco?.focus();
+        inputPreco?.select();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [produtosLote, produtoFocado]);
+
   const handleMargemChange = (produtoId: string, value: string) => {
     setEditando({ ...editando, [produtoId]: value });
   };
@@ -268,7 +311,7 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
       {/* Lista de Produtos */}
       <div className="space-y-2">
         {produtosLote && produtosLote.length > 0 ? (
-          produtosLote.filter((p: any) => p?.precoCustoAtual).map((produto: any) => {
+          produtosLote.filter((p: any) => p?.precoCustoAtual).map((produto: any, index: number) => {
             const margemAtual = editando[produto.id]
               ? parseFloat(editando[produto.id])
               : produto.margem;
@@ -281,8 +324,14 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
               ? ((produto.precoCustoAtual - produto.precoCustoAnterior) / produto.precoCustoAnterior) * 100
               : null;
 
+            const isFocado = index === produtoFocado;
+
             return (
-              <Card key={produto.id} className="border">
+              <Card 
+                key={produto.id} 
+                id={`card-${produto.id}`}
+                className={`border transition-all ${isFocado ? "ring-2 ring-primary shadow-lg" : ""}`}
+              >
                 <CardContent className="p-3 space-y-2">
                   <div>
                     <div className="font-semibold text-sm">
@@ -340,10 +389,16 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                       <Label className="text-xs text-muted-foreground">Margem %</Label>
                       <div className="flex gap-1">
                         <Input
+                          id={`margem-${produto.id}`}
                           type="number"
                           step="0.1"
                           value={editando[produto.id] ?? produto.margem}
                           onChange={(e) => handleMargemChange(produto.id, e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleSalvarMargem(produto.id);
+                            }
+                          }}
                           className="h-9 text-sm"
                         />
                         {editando[produto.id] && (
@@ -363,12 +418,18 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                       <Label className="text-xs text-muted-foreground">Preço R$</Label>
                       <div className="flex gap-1">
                         <Input
+                          id={`preco-${produto.id}`}
                           type="number"
                           step="0.01"
                           value={editandoPrecoVenda[produto.id] ?? precoVenda.toFixed(2)}
                           onChange={(e) =>
                             setEditandoPrecoVenda({ ...editandoPrecoVenda, [produto.id]: e.target.value })
                           }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleSalvarPrecoVenda(produto.id);
+                            }
+                          }}
                           className="h-9 text-sm"
                         />
                         {editandoPrecoVenda[produto.id] && (
@@ -396,6 +457,19 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
           </Card>
         )}
       </div>
+
+      {/* Ajuda de Atalhos */}
+      <Card className="border-dashed bg-muted/30">
+        <CardContent className="p-2 text-[10px] text-muted-foreground">
+          <div className="font-semibold mb-1">Atalhos:</div>
+          <div className="grid grid-cols-2 gap-1">
+            <div>Alt + ↑/↓: Navegar produtos</div>
+            <div>Alt + M: Editar margem</div>
+            <div>Alt + P: Editar preço</div>
+            <div>Enter: Salvar</div>
+          </div>
+        </CardContent>
+      </Card>
 
       <ValidarLoteMobile
         loteData={loteData}
