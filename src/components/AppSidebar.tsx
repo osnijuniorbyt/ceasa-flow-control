@@ -28,6 +28,7 @@ import {
   FileSpreadsheet,
   Building2,
   Bolt,
+  ClipboardList,
 } from "lucide-react";
 
 const menuItems = [
@@ -35,6 +36,11 @@ const menuItems = [
     title: "Dashboard",
     url: "/",
     icon: LayoutDashboard,
+  },
+  {
+    title: "📋 Lista de Compras",
+    url: "/lista-compras",
+    icon: ClipboardList,
   },
   {
     title: "⚡ Compra Rápida",
