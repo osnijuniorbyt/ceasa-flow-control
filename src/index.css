@@ -94,6 +94,45 @@
     overscroll-behavior-y: contain;
   }
 
+  /* iPad Mini and tablet optimizations */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    body {
+      font-size: 18px;
+    }
+    
+    /* Larger touch targets for tablets */
+    button, a, input, select, textarea {
+      min-height: 48px;
+    }
+  }
+
+  /* Specific iPad mini optimizations */
+  body.is-tablet {
+    font-size: 17px;
+  }
+
+  /* iPad mini landscape mode */
+  @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    .mobile-container {
+      @apply px-8 py-4;
+      max-width: 95%;
+      margin: 0 auto;
+    }
+
+    /* Two-column layout for forms on iPad landscape */
+    .tablet-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    /* Wider cards on tablet */
+    .tablet-card-wide {
+      max-width: 95%;
+      margin: 0 auto;
+    }
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
@@ -123,6 +162,14 @@
     /* Prevent auto-zoom on iOS - force 16px font size */
     font-size: 16px !important;
     -webkit-appearance: none;
+  }
+
+  /* Tablet input sizes */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    input, textarea, select {
+      min-height: 52px;
+      font-size: 18px !important;
+    }
   }
 
   /* Mobile-specific input handling to prevent zoom */
@@ -178,6 +225,13 @@
     @apply scale-[0.98];
   }
 
+  /* Tablet card design - larger padding */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .mobile-card {
+      @apply p-6;
+    }
+  }
+
   /* Responsive layouts */
   .mobile-grid {
     display: grid;
@@ -191,6 +245,14 @@
     }
   }
 
+  /* Tablet grid optimizations */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .mobile-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
   /* Mobile-specific spacing */
   .mobile-container {
     @apply px-4 py-2;
@@ -199,6 +261,15 @@
   @media (min-width: 640px) {
     .mobile-container {
       @apply px-6 py-4;
+    }
+  }
+
+  /* iPad mini container spacing */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .mobile-container {
+      @apply px-8 py-6;
+      max-width: 90%;
+      margin: 0 auto;
     }
   }
 }
@@ -212,6 +283,14 @@
     align-items: center;
     justify-content: center;
     touch-action: manipulation;
+  }
+
+  /* Tablet touch targets */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .touch-target {
+      min-height: 52px;
+      min-width: 52px;
+    }
   }
 
   /* Smooth mobile transitions */
@@ -246,20 +325,27 @@
   .text-mobile-base { font-size: 16px; line-height: 24px; }
   .text-mobile-lg { font-size: 18px; line-height: 28px; }
   .text-mobile-xl { font-size: 20px; line-height: 30px; }
+
+  /* Tablet typography sizes */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .text-mobile-xs { font-size: 14px; line-height: 18px; }
+    .text-mobile-sm { font-size: 16px; line-height: 22px; }
+    .text-mobile-base { font-size: 18px; line-height: 26px; }
+    .text-mobile-lg { font-size: 20px; line-height: 30px; }
+    .text-mobile-xl { font-size: 24px; line-height: 34px; }
+  }
 }
 
 /* Prevent iOS bounce effect */
 @supports (-webkit-overflow-scrolling: touch) {
   body {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+    overscroll-behavior-y: none;
   }
-  
-  #root {
-    overflow: auto;
-    height: 100vh;
-    -webkit-overflow-scrolling: touch;
+}
+
+/* PWA display modes */
+@media all and (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
   }
 }

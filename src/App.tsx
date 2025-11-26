@@ -9,6 +9,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useEffect } from "react";
+import { useIsTablet } from "@/hooks/use-tablet";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Compras from "./pages/Compras";
@@ -68,7 +69,7 @@ const App = () => {
       });
     }
 
-    // Add mobile viewport meta tag if not present
+    // Add mobile viewport meta tag optimized for iPad mini
     if (!document.querySelector('meta[name="viewport"]')) {
       const meta = document.createElement('meta');
       meta.name = 'viewport';
@@ -86,6 +87,12 @@ const App = () => {
     appleStatusBar.name = 'apple-mobile-web-app-status-bar-style';
     appleStatusBar.content = 'black-translucent';
     document.getElementsByTagName('head')[0].appendChild(appleStatusBar);
+
+    // Detect iPad
+    const isIpad = /iPad|Macintosh/.test(navigator.userAgent) && 'ontouchend' in document;
+    if (isIpad) {
+      document.body.classList.add('is-tablet');
+    }
 
     // Prevent zoom on double tap
     let lastTouchEnd = 0;

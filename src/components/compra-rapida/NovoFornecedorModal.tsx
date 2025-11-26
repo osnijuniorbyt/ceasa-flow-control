@@ -30,6 +30,15 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
       return;
     }
 
+    if (!tipo) {
+      toast({
+        title: "Erro",
+        description: "Tipo/Local do fornecedor é obrigatório",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -40,8 +49,9 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
         .insert({
           razao_social: nome,
           nome_fantasia: nome,
-          contato: box,
-          tipo: tipo || null,
+          box: box || null,
+          contato: box || null,
+          tipo: tipo,
           ativo: true,
           user_id: user.id
         })
@@ -74,25 +84,25 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] max-w-md">
+      <DialogContent className="w-[90vw] md:w-[85vw] max-w-md md:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl">Novo Fornecedor</DialogTitle>
+          <DialogTitle className="text-xl md:text-2xl">Novo Fornecedor</DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="space-y-2">
-            <Label htmlFor="nome" className="text-base">Nome *</Label>
+            <Label htmlFor="nome" className="text-base md:text-lg">Nome *</Label>
             <Input
               id="nome"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome do fornecedor"
-              className="h-14 text-lg"
+              className="h-14 md:h-16 text-lg md:text-xl"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="tipo" className="text-base">Local / Tipo *</Label>
+            <Label htmlFor="tipo" className="text-base md:text-lg">Local / Tipo *</Label>
             <Select value={tipo} onValueChange={setTipo}>
-              <SelectTrigger className="h-14 text-lg">
+              <SelectTrigger className="h-14 md:h-16 text-lg md:text-xl">
                 <SelectValue placeholder="Selecione o local" />
               </SelectTrigger>
               <SelectContent>
@@ -103,27 +113,27 @@ export function NovoFornecedorModal({ open, onOpenChange, onSuccess }: NovoForne
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="box" className="text-base">Box / Contato</Label>
+            <Label htmlFor="box" className="text-base md:text-lg">Box / Contato</Label>
             <Input
               id="box"
               value={box}
               onChange={(e) => setBox(e.target.value)}
               placeholder="Box 123 ou telefone"
-              className="h-14 text-lg"
+              className="h-14 md:h-16 text-lg md:text-xl"
             />
           </div>
           <div className="flex gap-3 pt-2">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="flex-1 h-14 text-lg"
+              className="flex-1 h-14 md:h-16 text-lg md:text-xl"
               disabled={loading}
             >
               Cancelar
             </Button>
             <Button
               onClick={handleSave}
-              className="flex-1 h-14 text-lg"
+              className="flex-1 h-14 md:h-16 text-lg md:text-xl"
               disabled={loading}
             >
               {loading ? "Salvando..." : "Salvar"}
