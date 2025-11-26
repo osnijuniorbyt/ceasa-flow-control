@@ -43,7 +43,7 @@ export function MobileNavigation() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div className="flex items-center justify-around h-16 md:h-20 px-1 md:px-4">
+      <div className="flex items-center justify-around h-20 md:h-24 px-2 md:px-4">
         {quickNavItems.map((item) => {
           const isActive = location.pathname === item.url;
           return (
@@ -51,16 +51,16 @@ export function MobileNavigation() {
               key={item.title}
               to={item.url}
               className={cn(
-                "flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 touch-manipulation transition-colors relative",
+                "flex flex-col items-center justify-center min-w-0 flex-1 py-3 px-2 touch-manipulation transition-colors relative",
                 isActive 
                   ? "text-primary" 
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <item.icon className={cn("h-5 w-5 md:h-6 md:w-6 mb-0.5", isActive && "scale-110")} />
-              <span className="text-[10px] md:text-xs font-medium truncate max-w-full">{item.title}</span>
+              <item.icon className={cn("h-7 w-7 md:h-8 md:w-8 mb-1", isActive && "scale-110")} />
+              <span className="text-xs md:text-sm font-medium truncate max-w-full">{item.title}</span>
               {isActive && (
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 md:w-10 h-0.5 md:h-1 bg-primary rounded-full" />
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-10 md:w-12 h-1 bg-primary rounded-full" />
               )}
             </Link>
           );

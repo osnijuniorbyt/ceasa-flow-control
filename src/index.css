@@ -85,30 +85,28 @@
 
   body {
     @apply bg-background text-foreground;
-    font-size: 16px;
+    font-size: 18px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
-    /* Prevent pull-to-refresh on mobile */
     overscroll-behavior-y: contain;
   }
 
-  /* iPad Mini and tablet optimizations */
+  /* Tablet optimizations - elementos ainda maiores */
   @media (min-width: 768px) and (max-width: 1024px) {
     body {
-      font-size: 18px;
+      font-size: 20px;
     }
     
-    /* Larger touch targets for tablets */
+    /* Touch targets maiores para tablets */
     button, a, input, select, textarea {
-      min-height: 48px;
+      min-height: 56px;
     }
   }
 
-  /* Specific iPad mini optimizations */
   body.is-tablet {
-    font-size: 17px;
+    font-size: 20px;
   }
 
   /* iPad mini landscape mode */
@@ -140,35 +138,39 @@
     -webkit-text-size-adjust: none;
   }
 
-  /* Mobile-optimized typography */
-  h1 { @apply text-xl sm:text-2xl md:text-3xl font-bold; }
-  h2 { @apply text-lg sm:text-xl md:text-2xl font-semibold; }
-  h3 { @apply text-base sm:text-lg md:text-xl font-medium; }
-  h4 { @apply text-sm sm:text-base md:text-lg font-medium; }
+  /* Typography - tamanhos maiores e consistentes */
+  h1 { @apply text-2xl md:text-3xl lg:text-4xl font-bold; }
+  h2 { @apply text-xl md:text-2xl lg:text-3xl font-semibold; }
+  h3 { @apply text-lg md:text-xl lg:text-2xl font-medium; }
+  h4 { @apply text-base md:text-lg lg:text-xl font-medium; }
 
-  /* Enhanced touch targets */
+  /* Touch targets maiores */
   button, [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
-    /* Prevent text selection on buttons */
+    min-height: 52px;
+    min-width: 52px;
     -webkit-user-select: none;
     user-select: none;
-    /* Prevent zoom on double tap */
     touch-action: manipulation;
+    font-size: 18px;
   }
 
   input, textarea, select {
-    min-height: 44px;
-    /* Prevent auto-zoom on iOS - force 16px font size */
-    font-size: 16px !important;
+    min-height: 52px;
+    font-size: 18px !important;
     -webkit-appearance: none;
   }
 
-  /* Tablet input sizes */
+  /* Tablet - elementos ainda maiores */
   @media (min-width: 768px) and (max-width: 1024px) {
+    button, [role="button"] {
+      min-height: 60px;
+      min-width: 60px;
+      font-size: 20px;
+    }
+    
     input, textarea, select {
-      min-height: 52px;
-      font-size: 18px !important;
+      min-height: 60px;
+      font-size: 20px !important;
     }
   }
 
