@@ -14,7 +14,203 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      compras: {
+        Row: {
+          created_at: string
+          data_compra: string
+          forma_pagamento: string | null
+          fornecedor_id: string
+          hora_compra: string
+          id: string
+          numero_compra: number
+          observacoes: string | null
+          status: string
+          valor_produtos: number
+          valor_total: number
+          xml_gerado: boolean
+        }
+        Insert: {
+          created_at?: string
+          data_compra?: string
+          forma_pagamento?: string | null
+          fornecedor_id: string
+          hora_compra?: string
+          id?: string
+          numero_compra: number
+          observacoes?: string | null
+          status?: string
+          valor_produtos?: number
+          valor_total?: number
+          xml_gerado?: boolean
+        }
+        Update: {
+          created_at?: string
+          data_compra?: string
+          forma_pagamento?: string | null
+          fornecedor_id?: string
+          hora_compra?: string
+          id?: string
+          numero_compra?: number
+          observacoes?: string | null
+          status?: string
+          valor_produtos?: number
+          valor_total?: number
+          xml_gerado?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compras_fornecedor_id_fkey"
+            columns: ["fornecedor_id"]
+            isOneToOne: false
+            referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fornecedores: {
+        Row: {
+          ativo: boolean
+          cnpj: string | null
+          contato: string | null
+          created_at: string
+          id: string
+          nome_fantasia: string | null
+          razao_social: string
+          telefone: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          cnpj?: string | null
+          contato?: string | null
+          created_at?: string
+          id?: string
+          nome_fantasia?: string | null
+          razao_social: string
+          telefone?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          cnpj?: string | null
+          contato?: string | null
+          created_at?: string
+          id?: string
+          nome_fantasia?: string | null
+          razao_social?: string
+          telefone?: string | null
+        }
+        Relationships: []
+      }
+      itens_compra: {
+        Row: {
+          compra_id: string
+          created_at: string
+          desconto: number
+          id: string
+          margem_aplicada: number | null
+          preco_unitario: number
+          preco_venda_sugerido: number | null
+          produto_id: string
+          quantidade: number
+          subtotal: number
+          unidade: string
+        }
+        Insert: {
+          compra_id: string
+          created_at?: string
+          desconto?: number
+          id?: string
+          margem_aplicada?: number | null
+          preco_unitario: number
+          preco_venda_sugerido?: number | null
+          produto_id: string
+          quantidade: number
+          subtotal: number
+          unidade: string
+        }
+        Update: {
+          compra_id?: string
+          created_at?: string
+          desconto?: number
+          id?: string
+          margem_aplicada?: number | null
+          preco_unitario?: number
+          preco_venda_sugerido?: number | null
+          produto_id?: string
+          quantidade?: number
+          subtotal?: number
+          unidade?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_compra_compra_id_fkey"
+            columns: ["compra_id"]
+            isOneToOne: false
+            referencedRelation: "compras"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itens_compra_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      produtos: {
+        Row: {
+          ativo: boolean
+          categoria: string | null
+          codigo_barras: string | null
+          codigo_interno: string
+          created_at: string
+          data_ultima_compra: string | null
+          id: string
+          margem_sugerida: number | null
+          ncm: string | null
+          nome: string
+          preco_ultima_compra: number | null
+          subcategoria: string | null
+          unidade_compra: string
+          unidade_venda: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria?: string | null
+          codigo_barras?: string | null
+          codigo_interno: string
+          created_at?: string
+          data_ultima_compra?: string | null
+          id?: string
+          margem_sugerida?: number | null
+          ncm?: string | null
+          nome: string
+          preco_ultima_compra?: number | null
+          subcategoria?: string | null
+          unidade_compra: string
+          unidade_venda?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string | null
+          codigo_barras?: string | null
+          codigo_interno?: string
+          created_at?: string
+          data_ultima_compra?: string | null
+          id?: string
+          margem_sugerida?: number | null
+          ncm?: string | null
+          nome?: string
+          preco_ultima_compra?: number | null
+          subcategoria?: string | null
+          unidade_compra?: string
+          unidade_venda?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
