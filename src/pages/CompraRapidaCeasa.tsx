@@ -352,7 +352,7 @@ export default function CompraRapidaCeasa() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-12 sticky top-[60px] z-10 rounded-none border-b bg-background">
+        <TabsList className="grid w-full grid-cols-3 h-12 sticky top-[60px] z-20 rounded-none border-b bg-background shadow-sm">
           <TabsTrigger value="lancamento" className="text-xs gap-1">
             <List className="h-4 w-4" />
             Lançar
@@ -369,9 +369,6 @@ export default function CompraRapidaCeasa() {
 
         <TabsContent value="lancamento" className="mt-0">
           <div className="space-y-2 p-2">
-      
-      {/* Histórico de Compras do Lote */}
-      <HistoricoLote loteData={loteData} />
 
       {/* Seleção de Fornecedor */}
       <Card className="border">
@@ -405,6 +402,9 @@ export default function CompraRapidaCeasa() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Histórico de Compras do Lote */}
+      {fornecedorSelecionado && <HistoricoLote loteData={loteData} />}
 
       {/* Histórico de Produtos do Fornecedor - COMPACTO COM SCROLL */}
       {fornecedorSelecionado && produtosHistorico && produtosHistorico.length > 0 && (
