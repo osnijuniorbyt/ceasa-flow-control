@@ -342,58 +342,52 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="flex items-center justify-between text-xs">
                     <div>
-                      <div className="text-muted-foreground">Custo Atual</div>
-                      <div className="font-bold text-sm">
+                      <div className="text-muted-foreground text-[10px]">Custo Atual</div>
+                      <div className="font-bold text-base">
                         R$ {produto.precoCustoAtual.toFixed(2)}
                       </div>
                     </div>
-                     <div>
-                       <div className="text-muted-foreground">Anterior</div>
-                       {produto.precoCustoAnterior ? (
-                         <div className="space-y-0.5">
-                           <Input
-                             type="number"
-                             step="0.01"
-                             value={produto.precoCustoAnterior.toFixed(2)}
-                             onChange={(e) => {
-                               // Permite edição do preço anterior se necessário
-                             }}
-                             className="h-7 text-xs font-semibold text-center"
-                           />
-                           {variacao !== null && (
-                             <div
-                               className={`text-center text-[10px] font-medium ${
-                                 variacao > 0 ? "text-red-500" : "text-green-500"
-                               }`}
-                             >
-                               {variacao > 0 ? "+" : ""}{variacao.toFixed(1)}%
-                             </div>
-                           )}
-                         </div>
-                       ) : (
-                         <div className="text-muted-foreground text-sm text-center">-</div>
-                       )}
-                     </div>
-                    <div>
-                      <div className="text-muted-foreground">Venda</div>
-                      <div className="font-bold text-sm text-green-600">
+                    <div className="text-right opacity-50">
+                      <div className="text-muted-foreground text-[9px]">Ant</div>
+                      {produto.precoCustoAnterior ? (
+                        <div className="text-[10px] font-medium">
+                          R$ {produto.precoCustoAnterior.toFixed(2)}
+                          {variacao !== null && (
+                            <span className={`ml-1 ${variacao > 0 ? "text-red-500" : "text-green-500"}`}>
+                              {variacao > 0 ? "+" : ""}{variacao.toFixed(0)}%
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-[10px]">-</div>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <div className="text-muted-foreground text-[10px]">Venda</div>
+                      <div className="font-bold text-base text-green-600">
                         R$ {precoVenda.toFixed(2)}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <Label className="text-xs text-muted-foreground">Margem %</Label>
+                  <div className="grid grid-cols-[80px_1fr] gap-2">
+                    <div>
+                      <Label className="text-[10px] text-muted-foreground">Margem %</Label>
                       <div className="flex gap-1">
                         <Input
                           id={`margem-${produto.id}`}
                           type="number"
                           step="0.1"
+                          maxLength={3}
                           value={editando[produto.id] ?? produto.margem}
-                          onChange={(e) => handleMargemChange(produto.id, e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value.length <= 3 || value.includes('.')) {
+                              handleMargemChange(produto.id, value);
+                            }
+                          }}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
                               handleSalvarMargem(produto.id);
@@ -414,8 +408,8 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                       </div>
                     </div>
 
-                    <div className="flex-1">
-                      <Label className="text-xs text-muted-foreground">Preço R$</Label>
+                    <div>
+                      <Label className="text-xs text-muted-foreground font-medium">Preço Venda R$</Label>
                       <div className="flex gap-1">
                         <Input
                           id={`preco-${produto.id}`}
@@ -430,16 +424,16 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                               handleSalvarPrecoVenda(produto.id);
                             }
                           }}
-                          className="h-9 text-sm"
+                          className="h-10 text-base font-semibold"
                         />
                         {editandoPrecoVenda[produto.id] && (
                           <Button
                             size="sm"
                             onClick={() => handleSalvarPrecoVenda(produto.id)}
                             disabled={salvarMargemMutation.isPending}
-                            className="h-9 px-2"
+                            className="h-10 px-2"
                           >
-                            <Save className="h-3 w-3" />
+                            <Save className="h-4 w-4" />
                           </Button>
                         )}
                       </div>

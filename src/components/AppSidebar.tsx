@@ -49,9 +49,19 @@ const menuItems = [
     icon: ClipboardList,
   },
   {
-    title: "⚡ Compra Rápida CEASA",
+    title: "Compra",
     url: "/compras-ceasa-mobile",
-    icon: Bolt,
+    icon: ShoppingCart,
+  },
+  {
+    title: "Produtos",
+    url: "/produtos-gestao",
+    icon: Package,
+  },
+  {
+    title: "Relatórios",
+    url: "/desenvolvimento-relatorios",
+    icon: BarChart3,
   },
   {
     title: "Pedidos (Antigo)",
@@ -94,11 +104,6 @@ const menuItems = [
     icon: Package,
   },
   {
-    title: "🔧 Gestão de Produtos",
-    url: "/produtos-gestao",
-    icon: Package,
-  },
-  {
     title: "Importar Produtos",
     url: "/product-import",
     icon: FileSpreadsheet,
@@ -119,19 +124,9 @@ const menuItems = [
     icon: Truck,
   },
   {
-    title: "Relatórios",
-    url: "/reports",
-    icon: BarChart3,
-  },
-  {
     title: "Configurações",
     url: "/settings",
     icon: Settings,
-  },
-  {
-    title: "🚧 Desenvolvimento",
-    url: "/desenvolvimento",
-    icon: Construction,
   },
 ];
 
