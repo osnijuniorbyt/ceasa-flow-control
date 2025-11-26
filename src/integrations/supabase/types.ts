@@ -64,6 +64,54 @@ export type Database = {
           },
         ]
       }
+      fornecedor_produtos: {
+        Row: {
+          created_at: string
+          fornecedor_id: string
+          id: string
+          is_principal: boolean
+          preco_habitual: number | null
+          produto_id: string
+          ultima_compra: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fornecedor_id: string
+          id?: string
+          is_principal?: boolean
+          preco_habitual?: number | null
+          produto_id: string
+          ultima_compra?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fornecedor_id?: string
+          id?: string
+          is_principal?: boolean
+          preco_habitual?: number | null
+          produto_id?: string
+          ultima_compra?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fornecedor_produtos_fornecedor_id_fkey"
+            columns: ["fornecedor_id"]
+            isOneToOne: false
+            referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fornecedor_produtos_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fornecedores: {
         Row: {
           ativo: boolean
@@ -191,6 +239,107 @@ export type Database = {
           },
         ]
       }
+      itens_lista_compras: {
+        Row: {
+          comprado: boolean
+          created_at: string
+          fornecedor_id: string | null
+          fornecedor_sugerido_id: string | null
+          id: string
+          lista_id: string
+          produto_id: string
+          quantidade: number
+          quantidade_real: number | null
+          updated_at: string
+          valor_pago: number | null
+        }
+        Insert: {
+          comprado?: boolean
+          created_at?: string
+          fornecedor_id?: string | null
+          fornecedor_sugerido_id?: string | null
+          id?: string
+          lista_id: string
+          produto_id: string
+          quantidade: number
+          quantidade_real?: number | null
+          updated_at?: string
+          valor_pago?: number | null
+        }
+        Update: {
+          comprado?: boolean
+          created_at?: string
+          fornecedor_id?: string | null
+          fornecedor_sugerido_id?: string | null
+          id?: string
+          lista_id?: string
+          produto_id?: string
+          quantidade?: number
+          quantidade_real?: number | null
+          updated_at?: string
+          valor_pago?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_lista_compras_fornecedor_id_fkey"
+            columns: ["fornecedor_id"]
+            isOneToOne: false
+            referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itens_lista_compras_fornecedor_sugerido_id_fkey"
+            columns: ["fornecedor_sugerido_id"]
+            isOneToOne: false
+            referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itens_lista_compras_lista_id_fkey"
+            columns: ["lista_id"]
+            isOneToOne: false
+            referencedRelation: "listas_compras"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itens_lista_compras_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listas_compras: {
+        Row: {
+          created_at: string
+          data_compra: string
+          id: string
+          nome: string
+          observacoes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_compra: string
+          id?: string
+          nome: string
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_compra?: string
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       produtos: {
         Row: {
           ativo: boolean
@@ -198,6 +347,7 @@ export type Database = {
           created_at: string
           data_ultima_compra: string | null
           descricao: string
+          fornecedor_padrao_id: string | null
           grupo_id: string
           id: string
           margem_padrao: number | null
@@ -214,6 +364,7 @@ export type Database = {
           created_at?: string
           data_ultima_compra?: string | null
           descricao: string
+          fornecedor_padrao_id?: string | null
           grupo_id: string
           id?: string
           margem_padrao?: number | null
@@ -230,6 +381,7 @@ export type Database = {
           created_at?: string
           data_ultima_compra?: string | null
           descricao?: string
+          fornecedor_padrao_id?: string | null
           grupo_id?: string
           id?: string
           margem_padrao?: number | null
@@ -241,6 +393,13 @@ export type Database = {
           vasilhame_ultima_compra_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "produtos_fornecedor_padrao_id_fkey"
+            columns: ["fornecedor_padrao_id"]
+            isOneToOne: false
+            referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "produtos_grupo_id_fkey"
             columns: ["grupo_id"]

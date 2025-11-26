@@ -82,6 +82,11 @@ const menuItems = [
     icon: Building2,
   },
   {
+    title: "Produtos",
+    url: "/produtos",
+    icon: Package,
+  },
+  {
     title: "Importar Produtos",
     url: "/product-import",
     icon: FileSpreadsheet,
