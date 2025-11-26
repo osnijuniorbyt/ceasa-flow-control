@@ -9,9 +9,19 @@ import { InputNumericoMobile } from "@/components/compras-ceasa/InputNumericoMob
 import { NovoFornecedorModal } from "@/components/compra-rapida/NovoFornecedorModal";
 import { SwipeableHistoricoItem } from "@/components/compras-ceasa/SwipeableHistoricoItem";
 import { SwipeableCarrinhoItem } from "@/components/compras-ceasa/SwipeableCarrinhoItem";
-import { ShoppingCart, Truck, List, Plus, Trash2, Save, History } from "lucide-react";
+import { ShoppingCart, Truck, List, Plus, Trash2, Save, History, X } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ItemCarrinho {
   produto_id: string;
@@ -31,6 +41,7 @@ export default function CompraRapidaCeasa() {
   const [quantidade, setQuantidade] = useState("");
   const [valorTotal, setValorTotal] = useState("");
   const [novoFornecedorModalOpen, setNovoFornecedorModalOpen] = useState(false);
+  const [cancelarDialogOpen, setCancelarDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -271,6 +282,26 @@ export default function CompraRapidaCeasa() {
     toast.success("Item removido");
   };
 
+  const cancelarCompra = () => {
+    if (carrinho.length > 0) {
+      setCancelarDialogOpen(true);
+    } else {
+      limparTudo();
+    }
+  };
+
+  const limparTudo = () => {
+    localStorage.removeItem(CACHE_KEY);
+    setCarrinho([]);
+    setQuantidade("");
+    setValorTotal("");
+    setFornecedorSelecionado("");
+    setProdutoSelecionado(null);
+    setCancelarDialogOpen(false);
+    toast.success("Compra cancelada");
+    navigate("/");
+  };
+
   const totalCarrinho = carrinho.reduce((sum, item) => 
     sum + parseFloat(item.valor_total || "0"), 0
   );
@@ -279,10 +310,23 @@ export default function CompraRapidaCeasa() {
     <div className="min-h-screen pb-20 p-2 space-y-2">
       {/* Header Compacto */}
       <div className="bg-primary text-primary-foreground p-3 rounded-lg shadow-lg">
-        <h1 className="text-xl font-bold flex items-center gap-2">
-          <ShoppingCart className="h-5 w-5" />
-          Compra CEASA
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold flex items-center gap-2">
+            <ShoppingCart className="h-5 w-5" />
+            Compra CEASA
+          </h1>
+          {fornecedorSelecionado && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={cancelarCompra}
+              className="text-primary-foreground hover:bg-primary-foreground/20 h-8"
+            >
+              <X className="h-4 w-4 mr-1" />
+              Cancelar
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Seleção de Fornecedor */}
@@ -443,6 +487,25 @@ export default function CompraRapidaCeasa() {
           queryClient.invalidateQueries({ queryKey: ["fornecedores"] });
         }}
       />
+
+      {/* Dialog de Confirmação de Cancelamento */}
+      <AlertDialog open={cancelarDialogOpen} onOpenChange={setCancelarDialogOpen}>
+        <AlertDialogContent className="w-[90vw] max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancelar Compra?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você tem {carrinho.length} {carrinho.length === 1 ? "item" : "itens"} no carrinho.
+              Tem certeza que deseja cancelar esta compra? Todos os dados serão perdidos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="h-12 text-base">Não</AlertDialogCancel>
+            <AlertDialogAction onClick={limparTudo} className="h-12 text-base bg-destructive hover:bg-destructive/90">
+              Sim, Cancelar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
