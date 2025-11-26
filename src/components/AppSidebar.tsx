@@ -23,6 +23,7 @@ import {
   DollarSign,
   CreditCard,
   Zap,
+  FolderTree,
 } from "lucide-react";
 
 const menuItems = [
@@ -55,6 +56,11 @@ const menuItems = [
     title: "Inventário",
     url: "/inventory",
     icon: Package,
+  },
+  {
+    title: "Árvore Mercadológica",
+    url: "/categories",
+    icon: FolderTree,
   },
   {
     title: "Central Comercial IA",
