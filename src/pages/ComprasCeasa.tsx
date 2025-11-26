@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShoppingCart, FileText, Building2 } from "lucide-react";
-import { CompraRapida } from "@/components/compras-ceasa/CompraRapida";
-import { CompraPorPedido } from "@/components/compras-ceasa/CompraPorPedido";
-import { CompraPorFornecedor } from "@/components/compras-ceasa/CompraPorFornecedor";
+import CompraRapida from "@/components/compras-ceasa/CompraRapida";
+import CompraPorPedido from "@/components/compras-ceasa/CompraPorPedido";
+import CompraPorFornecedor from "@/components/compras-ceasa/CompraPorFornecedor";
 
 export default function ComprasCeasa() {
   const [activeTab, setActiveTab] = useState("rapida");
