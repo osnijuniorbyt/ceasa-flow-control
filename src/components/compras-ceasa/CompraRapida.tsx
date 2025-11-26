@@ -61,7 +61,7 @@ export default function CompraRapida() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("vasilhames")
-        .select("*")
+        .select("id, nome, peso_kg, unidade_base, tipo_calculo, ativo")
         .eq("ativo", true);
       if (error) throw error;
       return data;
@@ -392,11 +392,12 @@ export default function CompraRapida() {
                 const totalQuantidade = quantidade * vasilhame.peso_kg;
                 const precoUnitario = precoVasilhame / vasilhame.peso_kg;
                 const precoVenda = precoUnitario * (1 + (selectedProduct.margem_padrao || 0) / 100);
+                const labelTotal = isPorPeso ? 'Peso Total' : 'Quantidade Total';
                 
                 return (
                   <div className="bg-muted p-3 rounded-lg space-y-1 text-sm">
                     <div className="flex justify-between">
-                      <span>Total {isPorPeso ? 'Peso' : 'Quantidade'}:</span>
+                      <span>{labelTotal}:</span>
                       <span className="font-medium">
                         {totalQuantidade.toFixed(2)} {vasilhame.unidade_base}
                       </span>

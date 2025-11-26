@@ -27,8 +27,8 @@ export default function ProdutosGestao() {
           *,
           grupos (nome),
           subgrupos (nome),
-          vasilhames!produtos_vasilhame_padrao_id_fkey (nome, peso_kg, unidade_base),
-          vasilhame_secundario:vasilhames!produtos_vasilhame_secundario_id_fkey (nome, peso_kg, unidade_base),
+          vasilhames!produtos_vasilhame_padrao_id_fkey (nome, peso_kg, unidade_base, tipo_calculo),
+          vasilhame_secundario:vasilhames!produtos_vasilhame_secundario_id_fkey (nome, peso_kg, unidade_base, tipo_calculo),
           fornecedores (razao_social, nome_fantasia)
         `)
         .order("descricao");
@@ -120,12 +120,12 @@ export default function ProdutosGestao() {
                           </div>
                           {produto.vasilhames && (
                             <div>
-                              <span className="font-medium">Embalagem Padrão:</span> {produto.vasilhames.nome} ({produto.vasilhames.peso_kg} {produto.vasilhames.unidade_base})
+                              <span className="font-medium">Embalagem Padrão:</span> {produto.vasilhames.nome} ({produto.vasilhames.peso_kg} {produto.vasilhames.unidade_base}) • {produto.vasilhames.tipo_calculo === 'peso' ? 'Por Peso' : 'Por Unidade'}
                             </div>
                           )}
                           {produto.vasilhame_secundario && (
                             <div>
-                              <span className="font-medium">Embalagem Alt:</span> {produto.vasilhame_secundario.nome} ({produto.vasilhame_secundario.peso_kg} {produto.vasilhame_secundario.unidade_base})
+                              <span className="font-medium">Embalagem Alt:</span> {produto.vasilhame_secundario.nome} ({produto.vasilhame_secundario.peso_kg} {produto.vasilhame_secundario.unidade_base}) • {produto.vasilhame_secundario.tipo_calculo === 'peso' ? 'Por Peso' : 'Por Unidade'}
                             </div>
                           )}
                           {produto.fornecedores && (

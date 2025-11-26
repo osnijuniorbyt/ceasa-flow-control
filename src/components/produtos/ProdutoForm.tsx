@@ -30,7 +30,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
   const [grupos, setGrupos] = useState<Array<{ id: string; nome: string }>>([]);
   const [subgrupos, setSubgrupos] = useState<Array<{ id: string; nome: string }>>([]);
   const [fornecedores, setFornecedores] = useState<Array<{ id: string; razao_social: string; contato: string | null }>>([]);
-  const [vasilhames, setVasilhames] = useState<Array<{ id: string; nome: string; peso_kg: number; unidade_base: string }>>([]);
+  const [vasilhames, setVasilhames] = useState<Array<{ id: string; nome: string; peso_kg: number; unidade_base: string; tipo_calculo: string }>>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -107,7 +107,7 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
   const loadVasilhames = async () => {
     const { data } = await supabase
       .from("vasilhames")
-      .select("id, nome, peso_kg, unidade_base")
+      .select("id, nome, peso_kg, unidade_base, tipo_calculo")
       .eq("ativo", true)
       .order("nome");
 
@@ -366,14 +366,14 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
             <SelectContent>
               {vasilhames.map((vasilhame) => (
                 <SelectItem key={vasilhame.id} value={vasilhame.id}>
-                  {vasilhame.nome}
+                  {vasilhame.nome} ({vasilhame.peso_kg} {vasilhame.unidade_base})
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           {vasilhamePadraoSelecionado && (
             <p className="text-xs text-muted-foreground">
-              Peso: {vasilhamePadraoSelecionado.peso_kg} kg ({vasilhamePadraoSelecionado.unidade_base})
+              {vasilhamePadraoSelecionado.peso_kg} {vasilhamePadraoSelecionado.unidade_base} • Tipo: {vasilhamePadraoSelecionado.tipo_calculo === 'peso' ? 'Por Peso' : 'Por Unidade'}
             </p>
           )}
         </div>
@@ -391,14 +391,14 @@ export function ProdutoForm({ produtoId, onSuccess, onCancel }: ProdutoFormProps
             <SelectContent>
               {vasilhames.map((vasilhame) => (
                 <SelectItem key={vasilhame.id} value={vasilhame.id}>
-                  {vasilhame.nome}
+                  {vasilhame.nome} ({vasilhame.peso_kg} {vasilhame.unidade_base})
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           {vasilhameSecundarioSelecionado && (
             <p className="text-xs text-muted-foreground">
-              Peso: {vasilhameSecundarioSelecionado.peso_kg} kg ({vasilhameSecundarioSelecionado.unidade_base})
+              {vasilhameSecundarioSelecionado.peso_kg} {vasilhameSecundarioSelecionado.unidade_base} • Tipo: {vasilhameSecundarioSelecionado.tipo_calculo === 'peso' ? 'Por Peso' : 'Por Unidade'}
             </p>
           )}
         </div>
