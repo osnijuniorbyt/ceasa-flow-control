@@ -8,6 +8,10 @@ interface ItemCarrinho {
   unidade: string;
   quantidade: string;
   valor_total: string;
+  vasilhame_id: string;
+  vasilhame_nome: string;
+  peso_unitario_kg: number;
+  peso_total_kg: number;
 }
 
 interface SwipeableCarrinhoItemProps {
@@ -83,7 +87,13 @@ export function SwipeableCarrinhoItem({ item, index, onRemove }: SwipeableCarrin
             {item.codigo} - {item.descricao}
           </div>
           <div className="text-xs text-muted-foreground mt-0.5">
-            {item.quantidade} {item.unidade} • <span className="text-green-600 font-bold text-base">R$ {parseFloat(item.valor_total).toFixed(2)}</span>
+            <span className="font-medium">{item.quantidade} cx</span> × {item.vasilhame_nome} 
+            <span className="mx-1">•</span>
+            <span className="text-blue-600 font-bold">{item.peso_total_kg.toFixed(1)} kg</span>
+          </div>
+          <div className="text-xs mt-0.5">
+            <span className="text-green-600 font-bold text-base">R$ {parseFloat(item.valor_total).toFixed(2)}</span>
+            <span className="text-muted-foreground ml-2">(R$ {(parseFloat(item.valor_total) / item.peso_total_kg).toFixed(2)}/kg)</span>
           </div>
         </div>
       </div>
