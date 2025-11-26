@@ -361,7 +361,7 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[10px] text-muted-foreground">{produto.unidade_venda}</span>
                         <span className="text-[10px] text-blue-600 font-medium">
-                          {produto.quantidadeTotal?.toFixed(1)} kg ({produto.quantidadeVasilhames || 0} cx)
+                          Total: R$ {(produto.quantidadeTotal * produto.precoCustoAtual).toFixed(2)}
                         </span>
                         <span className="text-[10px] text-blue-600/70">
                           {produto.porcentagemLote?.toFixed(1)}% lote
@@ -370,7 +370,7 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-between text-xs mb-2">
                     <div>
                       <div className="text-muted-foreground text-[9px]">Custo</div>
                       <div className="font-bold text-sm">
@@ -391,6 +391,12 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                       ) : (
                         <div className="text-[9px]">-</div>
                       )}
+                    </div>
+                    <div className="text-right">
+                      <div className="text-muted-foreground text-[9px]">Venda</div>
+                      <div className="font-bold text-base text-green-600">
+                        R$ {precoVenda.toFixed(2)}
+                      </div>
                     </div>
                   </div>
 
@@ -420,7 +426,7 @@ export function PrecificacaoMobile({ loteData, onLoteDataChange }: PrecificacaoM
                     </div>
 
                     <div>
-                      <Label className="text-[9px] text-muted-foreground font-medium">Preço R$</Label>
+                      <Label className="text-[9px] text-muted-foreground font-medium">Digitar Preço R$</Label>
                       <Input
                         id={`preco-${produto.id}`}
                         type="tel"
