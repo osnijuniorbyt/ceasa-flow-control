@@ -153,12 +153,14 @@ export default function ProdutosGestao() {
         </div>
       </div>
 
-      {/* Dialog de Edição */}
       <Dialog open={!!produtoEditando} onOpenChange={(open) => !open && setProdutoEditando(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Produto</DialogTitle>
           </DialogHeader>
+          <div className="text-sm text-muted-foreground mb-4">
+            Edite as informações do produto abaixo. Campos com * são obrigatórios.
+          </div>
           <ProdutoForm
             produtoId={produtoEditando}
             onSuccess={() => {
