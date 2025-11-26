@@ -465,84 +465,85 @@ export default function CompraRapidaCeasa() {
   );
 
   return (
-    <div className="min-h-screen pb-20 bg-background">
-      {/* Header Compacto - Full Width */}
-      <div className="bg-black text-white py-3 sticky top-0 z-10 shadow-lg -mx-[100vw] ml-[calc(-50vw+50%)] w-screen">
-        <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-2">
-              <svg 
-                width="32" 
-                height="32" 
-                viewBox="0 0 40 40" 
-                fill="none" 
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="20" cy="22" r="12" stroke="white" strokeWidth="2" fill="none" />
-                <path d="M20 10 Q23 7 26 10 L25 12 Q22 10 20 12 Z" stroke="white" strokeWidth="2" fill="none" strokeLinejoin="round" />
-              </svg>
-              <h1 className="text-2xl md:text-3xl font-light tracking-[0.3em]">
-                HORTII
-              </h1>
-            </div>
+    <div className="min-h-screen pb-4 md:pb-6 bg-background">
+      {/* Header - Full Width */}
+      <div className="bg-black text-white py-4 md:py-5 sticky top-0 z-10 shadow-lg">
+        <div className="container mx-auto px-3 md:px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <svg 
+              width="40" 
+              height="40" 
+              viewBox="0 0 40 40" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-8 h-8 md:w-10 md:h-10"
+            >
+              <circle cx="20" cy="22" r="12" stroke="white" strokeWidth="2" fill="none" />
+              <path d="M20 10 Q23 7 26 10 L25 12 Q22 10 20 12 Z" stroke="white" strokeWidth="2" fill="none" strokeLinejoin="round" />
+            </svg>
+            <h1 className="text-3xl md:text-4xl font-light tracking-[0.3em]">
+              HORTII
+            </h1>
+          </div>
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate("/produtos-gestao")}
-              className="text-white hover:bg-white/20 h-9"
+              className="text-white hover:bg-white/20 h-10 md:h-12 px-3 md:px-4"
             >
-              <Settings className="h-4 w-4 mr-1" />
-              Gestão
+              <Settings className="h-5 w-5 md:mr-2" />
+              <span className="hidden md:inline">Gestão</span>
             </Button>
+            {activeTab === "lancamento" && fornecedorSelecionado && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={cancelarCompra}
+                className="text-white hover:bg-white/20 h-10 md:h-12"
+              >
+                <X className="h-5 w-5 md:mr-2" />
+                <span className="hidden md:inline">Cancelar</span>
+              </Button>
+            )}
           </div>
-          {activeTab === "lancamento" && fornecedorSelecionado && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={cancelarCompra}
-              className="text-white hover:bg-white/20 h-8 absolute right-7"
-            >
-              <X className="h-4 w-4 mr-1" />
-              Cancelar
-            </Button>
-          )}
         </div>
       </div>
 
-      {/* Container Centralizado */}
-      <div className="max-w-6xl mx-auto">
+      {/* Container */}
+      <div className="container mx-auto px-2 md:px-4">
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 sticky top-[52px] z-20 rounded-none border-b bg-background shadow-sm">
-          <TabsTrigger value="lancamento" className="gap-1">
-            <List className="h-5 w-5" />
+        <TabsList className="grid w-full grid-cols-3 sticky top-[60px] md:top-[68px] z-20 rounded-none border-b-2 bg-background shadow-sm h-14 md:h-16">
+          <TabsTrigger value="lancamento" className="gap-2 text-base md:text-lg">
+            <List className="h-6 w-6" />
             Lançar
           </TabsTrigger>
-          <TabsTrigger value="conferencia" className="gap-1">
-            <ClipboardCheck className="h-5 w-5" />
+          <TabsTrigger value="conferencia" className="gap-2 text-base md:text-lg">
+            <ClipboardCheck className="h-6 w-6" />
             Conferir
           </TabsTrigger>
-          <TabsTrigger value="precificacao" className="gap-1">
-            <DollarSign className="h-5 w-5" />
+          <TabsTrigger value="precificacao" className="gap-2 text-base md:text-lg">
+            <DollarSign className="h-6 w-6" />
             Preços
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="lancamento" className="mt-0">
-          <div className="space-y-2 p-1">
+        <TabsContent value="lancamento" className="mt-0 py-3 md:py-4">
+          <div className="space-y-3 md:space-y-4">
 
       {/* Seleção de Fornecedor */}
-      <Card className="border rounded-none border-x-0">
-        <CardHeader className="pb-2 pt-2 px-2">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Truck className="h-5 w-5" />
+      <Card className="border-2">
+        <CardHeader className="pb-3 pt-3 px-3 md:px-6">
+          <CardTitle className="flex items-center gap-3 text-xl md:text-2xl">
+            <Truck className="h-6 w-6 md:h-7 md:w-7" />
             Fornecedor
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-2 pb-2 space-y-2">
-          <div className="space-y-1">
-            <Label className="text-sm">Filtrar por tipo:</Label>
-            <div className="grid grid-cols-4 gap-1">
+        <CardContent className="px-3 md:px-6 pb-4 space-y-3">
+          <div className="space-y-2">
+            <Label className="text-base md:text-lg">Filtrar por tipo:</Label>
+            <div className="grid grid-cols-4 gap-2 md:gap-3">
               {["TODOS", "PEDRA", "LOJAS", "OUTROS"].map((tipo) => (
                 <button
                   key={tipo}
@@ -551,25 +552,25 @@ export default function CompraRapidaCeasa() {
                     setTipoFornecedorFiltro(tipo);
                     localStorage.setItem("tipo_fornecedor_filtro", tipo);
                   }}
-                  className={`p-3 text-sm font-medium rounded-lg border-2 transition-all min-h-[60px] ${
+                  className={`p-4 md:p-5 font-medium rounded-xl border-2 transition-all min-h-[70px] md:min-h-[90px] ${
                     tipoFornecedorFiltro === tipo
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background border-border hover:border-primary/50"
+                      ? "bg-primary text-primary-foreground border-primary shadow-lg"
+                      : "bg-card border-border hover:border-primary/50 hover:shadow-md"
                   }`}
                 >
-                  <div className="text-2xl">
+                  <div className="text-3xl md:text-4xl">
                     {tipo === "PEDRA" && "🪨"}
                     {tipo === "LOJAS" && "🏪"}
                     {tipo === "OUTROS" && "📦"}
                     {tipo === "TODOS" && "🔍"}
                   </div>
-                  <div className="text-xs mt-1">{tipo}</div>
+                  <div className="text-sm md:text-base mt-1 font-semibold">{tipo}</div>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-3 items-center">
             <Select 
               value={fornecedorSelecionado} 
               onValueChange={(value) => {
@@ -577,18 +578,20 @@ export default function CompraRapidaCeasa() {
                 localStorage.setItem("ultimo_fornecedor", value);
               }}
             >
-              <SelectTrigger className="h-16 text-lg border-2">
+              <SelectTrigger className="h-16 md:h-20 text-lg md:text-xl border-2">
                 <SelectValue placeholder="Selecione o fornecedor" />
               </SelectTrigger>
               <SelectContent>
                 {fornecedores?.map((f: any) => (
-                  <SelectItem key={f.id} value={f.id} className="text-lg py-4">
-                    <div className="flex items-center gap-2">
-                      {f.tipo === "PEDRA" && "🪨"}
-                      {f.tipo === "LOJAS" && "🏪"}
-                      {f.tipo === "OUTROS" && "📦"}
-                      <span className="font-medium">{f.nome_fantasia || f.razao_social}</span>
-                      {f.box && <span className="text-sm text-muted-foreground">({f.box})</span>}
+                  <SelectItem key={f.id} value={f.id} className="text-lg md:text-xl py-4 md:py-5">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">
+                        {f.tipo === "PEDRA" && "🪨"}
+                        {f.tipo === "LOJAS" && "🏪"}
+                        {f.tipo === "OUTROS" && "📦"}
+                      </span>
+                      <span className="font-semibold">{f.nome_fantasia || f.razao_social}</span>
+                      {f.box && <span className="text-base text-muted-foreground">({f.box})</span>}
                     </div>
                   </SelectItem>
                 ))}
@@ -596,7 +599,7 @@ export default function CompraRapidaCeasa() {
             </Select>
             <Button
               size="icon"
-              className="h-16 w-16 flex-shrink-0"
+              className="h-16 md:h-20 w-16 md:w-20 flex-shrink-0"
               onClick={() => setNovoFornecedorModalOpen(true)}
             >
               <Plus className="h-6 w-6" />
@@ -605,17 +608,17 @@ export default function CompraRapidaCeasa() {
         </CardContent>
       </Card>
 
-      {/* Histórico de Produtos do Fornecedor - FULL WIDTH */}
+      {/* Histórico de Produtos do Fornecedor */}
       {fornecedorSelecionado && produtosHistorico && produtosHistorico.length > 0 && (
-        <Card className="border rounded-none border-x-0 border-blue-500/30">
-          <CardHeader className="pb-1 pt-2 px-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <History className="h-5 w-5" />
+        <Card className="border-2">
+          <CardHeader className="pb-2 pt-3 px-3 md:px-6">
+            <CardTitle className="flex items-center gap-3 text-lg md:text-xl">
+              <History className="h-6 w-6" />
               Histórico ({produtosHistorico.length})
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-1 pb-2">
-            <div className="space-y-1 max-h-[350px] overflow-y-auto">
+          <CardContent className="px-2 md:px-4 pb-3">
+            <div className="space-y-2 max-h-[400px] md:max-h-[500px] overflow-y-auto">
               {produtosHistorico.map((produto: any) => (
                 <SwipeableHistoricoItem
                   key={produto.id}
@@ -629,24 +632,24 @@ export default function CompraRapidaCeasa() {
         </Card>
       )}
 
-      {/* Busca de Produto - FULL WIDTH */}
+      {/* Busca de Produto */}
       {fornecedorSelecionado && (
-        <Card className="border rounded-none border-x-0 border-primary/30">
-          <CardHeader className="pb-1 pt-2 px-2">
+        <Card className="border-2">
+          <CardHeader className="pb-2 pt-3 px-3 md:px-6">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Buscar Produto</CardTitle>
+              <CardTitle className="text-xl md:text-2xl">Buscar Produto</CardTitle>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setNovoProdutoModalOpen(true)}
-                className="h-10 text-sm gap-1"
+                className="h-12 md:h-14 text-base md:text-lg gap-2 px-4"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-5 w-5" />
                 Novo
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="space-y-2 px-2 pb-2">
+          <CardContent className="space-y-3 px-3 md:px-6 pb-3">
             <BuscaProdutoInteligente
               onSelectProduto={(produto) => {
                 setProdutoSelecionado(produto);
@@ -673,17 +676,17 @@ export default function CompraRapidaCeasa() {
             />
 
             {produtoSelecionado && (
-              <div className="space-y-2">
-                <div className="bg-primary/10 border border-primary/30 p-2 rounded-lg">
-                  <div className="font-semibold text-lg mb-1">
+              <div className="space-y-3">
+                <div className="bg-primary/10 border-2 border-primary/30 p-3 md:p-4 rounded-xl">
+                  <div className="font-bold text-xl md:text-2xl mb-2">
                     {produtoSelecionado.codigo} - {produtoSelecionado.descricao}
                   </div>
                   
-                  <div className="border-t pt-1">
-                    <label className="text-xs text-muted-foreground font-medium block mb-1">📦 Embalagem:</label>
+                  <div className="border-t-2 pt-2">
+                    <label className="text-sm md:text-base text-muted-foreground font-semibold block mb-2">📦 Embalagem:</label>
                     
                     {(produtoSelecionado.vasilhame_padrao || produtoSelecionado.vasilhame_secundario || produtoSelecionado.vasilhame_ultima_compra) ? (
-                      <div className="flex gap-2 flex-wrap">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                         {produtoSelecionado.vasilhame_padrao && (
                           <button
                             type="button"
@@ -691,16 +694,16 @@ export default function CompraRapidaCeasa() {
                               setVasilhameSelecionado("padrao");
                               setVasilhameManualId("");
                             }}
-                            className={`flex-1 p-3 rounded border-2 transition-all min-h-[60px] ${
+                            className={`p-4 md:p-5 rounded-xl border-2 transition-all min-h-[80px] md:min-h-[100px] ${
                               vasilhameSelecionado === "padrao"
-                                ? "bg-blue-500 text-white border-blue-600"
-                                : "bg-background border-border hover:border-blue-400"
+                                ? "bg-blue-500 text-white border-blue-600 shadow-lg"
+                                : "bg-card border-border hover:border-blue-400"
                             }`}
                           >
-                            <div className="text-sm font-medium">
+                            <div className="text-base md:text-lg font-semibold">
                               {produtoSelecionado.vasilhame_padrao.nome}
                             </div>
-                            <div className="text-lg font-bold">
+                            <div className="text-xl md:text-2xl font-bold mt-1">
                               {produtoSelecionado.vasilhame_padrao.peso_kg} kg/cx
                             </div>
                           </button>
@@ -712,9 +715,9 @@ export default function CompraRapidaCeasa() {
                               setVasilhameSelecionado("secundario");
                               setVasilhameManualId("");
                             }}
-                            className={`flex-1 p-3 rounded border-2 transition-all min-h-[60px] ${
+                            className={`p-4 md:p-5 rounded-xl border-2 transition-all min-h-[80px] md:min-h-[100px] ${
                               vasilhameSelecionado === "secundario"
-                                ? "bg-blue-500 text-white border-blue-600"
+                                ? "bg-blue-500 text-white border-blue-600 shadow-lg"
                                 : "bg-background border-border hover:border-blue-400"
                             }`}
                           >
@@ -784,7 +787,7 @@ export default function CompraRapidaCeasa() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <div id="quantidade-input">
                     <InputNumericoMobile
                       label="Qtd Caixas"
@@ -805,12 +808,12 @@ export default function CompraRapidaCeasa() {
 
                 <Button
                   size="lg"
-                  className="w-full h-16 text-lg font-bold"
+                  className="w-full h-20 md:h-24 text-xl md:text-2xl font-bold shadow-lg"
                   onClick={adicionarAoCarrinho}
                   disabled={!produtoSelecionado || !quantidade || 
                     (!produtoSelecionado.vasilhame_padrao && !produtoSelecionado.vasilhame_secundario && !produtoSelecionado.vasilhame_ultima_compra && !vasilhameManualId)}
                 >
-                  <Plus className="h-6 w-6 mr-2" />
+                  <Plus className="h-7 w-7 mr-2" />
                   Adicionar ao Carrinho
                 </Button>
               </div>
@@ -819,26 +822,26 @@ export default function CompraRapidaCeasa() {
         </Card>
       )}
 
-      {/* Carrinho - FULL WIDTH */}
+      {/* Carrinho */}
       {carrinhoArray.length > 0 && (
-        <Card className="border rounded-none border-x-0 border-green-500/30">
-          <CardHeader className="pb-2 pt-2 px-2">
-            <CardTitle className="flex items-center justify-between text-lg">
-              <span className="flex items-center gap-2">
-                <List className="h-5 w-5" />
+        <Card className="border-2 border-green-500/50 shadow-lg">
+          <CardHeader className="pb-3 pt-3 px-3 md:px-6">
+            <CardTitle className="flex items-center justify-between text-xl md:text-2xl">
+              <span className="flex items-center gap-3">
+                <List className="h-6 w-6 md:h-7 md:w-7" />
                 Carrinho ({carrinhoArray.length})
               </span>
               <div className="flex flex-col items-end">
-                <span className="text-2xl font-bold text-green-600">
+                <span className="text-2xl md:text-3xl font-bold text-green-600">
                   R$ {totalCarrinho.toFixed(2)}
                 </span>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-base md:text-lg text-muted-foreground font-semibold">
                   {carrinhoArray.reduce((sum, item) => sum + item.peso_total_kg, 0).toFixed(1)} kg total
                 </span>
               </div>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-1 px-1 pb-2">
+          <CardContent className="space-y-2 px-2 md:px-4 pb-3">
             {carrinhoArray.map((item, index) => (
               <SwipeableCarrinhoItem
                 key={index}
@@ -850,11 +853,11 @@ export default function CompraRapidaCeasa() {
 
             <Button
               size="lg"
-              className="w-full h-16 text-xl font-bold bg-green-600 hover:bg-green-700 mt-3"
+              className="w-full h-20 md:h-24 text-xl md:text-2xl font-bold bg-green-600 hover:bg-green-700 mt-4 shadow-lg"
               onClick={() => salvarCompraMutation.mutate()}
               disabled={salvarCompraMutation.isPending}
             >
-              <Save className="h-6 w-6 mr-2" />
+              <Save className="h-7 w-7 mr-2" />
               {salvarCompraMutation.isPending ? "Salvando..." : "💾 Finalizar Compra"}
             </Button>
           </CardContent>
@@ -863,14 +866,15 @@ export default function CompraRapidaCeasa() {
           </div>
         </TabsContent>
 
-        <TabsContent value="conferencia" className="mt-0">
+        <TabsContent value="conferencia" className="mt-0 py-3 md:py-4">
           <ConferenciaMobile loteData={loteData} onLoteDataChange={setLoteData} />
         </TabsContent>
 
-        <TabsContent value="precificacao" className="mt-0">
+        <TabsContent value="precificacao" className="mt-0 py-3 md:py-4">
           <PrecificacaoMobile loteData={loteData} onLoteDataChange={setLoteData} />
         </TabsContent>
       </Tabs>
+      </div>
 
       {/* Modal Novo Fornecedor */}
       <NovoFornecedorModal
@@ -918,7 +922,6 @@ export default function CompraRapidaCeasa() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      </div>
     </div>
   );
 }
