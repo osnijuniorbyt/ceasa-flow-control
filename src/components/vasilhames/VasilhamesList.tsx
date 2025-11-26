@@ -114,7 +114,12 @@ export function VasilhamesList() {
                       )}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {vasilhame.peso_kg} {vasilhame.unidade_base}
+                      <span className="font-medium">Líquido:</span> {vasilhame.peso_kg} {vasilhame.unidade_base}
+                      {vasilhame.peso_embalagem_kg > 0 && (
+                        <span className="ml-2">
+                          <span className="font-medium">• Embalagem:</span> {vasilhame.peso_embalagem_kg} kg
+                        </span>
+                      )}
                       {vasilhame.descricao && ` • ${vasilhame.descricao}`}
                     </div>
                   </div>
