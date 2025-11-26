@@ -8,11 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
 const vasilhameSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
+  tipo_calculo: z.enum(["peso", "unidade"]),
   peso_embalagem_kg: z.number().min(0, "Peso da embalagem não pode ser negativo"),
   peso_kg: z.number().positive("Peso líquido deve ser maior que zero"),
   unidade_base: z.string().min(1, "Unidade é obrigatória"),
@@ -42,6 +44,7 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
     resolver: zodResolver(vasilhameSchema),
     defaultValues: {
       nome: "",
+      tipo_calculo: "peso",
       peso_embalagem_kg: 0,
       peso_kg: 1,
       unidade_base: "kg",
@@ -51,6 +54,7 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
   });
 
   const ativo = watch("ativo");
+  const tipoCalculo = watch("tipo_calculo");
 
   useEffect(() => {
     if (vasilhameId) {
@@ -78,6 +82,7 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
 
     if (data) {
       setValue("nome", data.nome);
+      setValue("tipo_calculo", (data.tipo_calculo || "peso") as "peso" | "unidade");
       setValue("peso_embalagem_kg", data.peso_embalagem_kg || 0);
       setValue("peso_kg", data.peso_kg);
       setValue("unidade_base", data.unidade_base);
@@ -98,6 +103,7 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
           .from("vasilhames")
           .update({
             nome: data.nome,
+            tipo_calculo: data.tipo_calculo,
             peso_embalagem_kg: data.peso_embalagem_kg,
             peso_kg: data.peso_kg,
             unidade_base: data.unidade_base,
@@ -118,6 +124,7 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
           .from("vasilhames")
           .insert({
             nome: data.nome,
+            tipo_calculo: data.tipo_calculo,
             peso_embalagem_kg: data.peso_embalagem_kg,
             peso_kg: data.peso_kg,
             unidade_base: data.unidade_base,
@@ -162,6 +169,28 @@ export function VasilhameForm({ vasilhameId, onSuccess, onCancel }: VasilhameFor
         </p>
         {errors.nome && (
           <p className="text-sm text-destructive">{errors.nome.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="tipo_calculo">Tipo de Cálculo *</Label>
+        <Select 
+          value={tipoCalculo} 
+          onValueChange={(value) => setValue("tipo_calculo", value as "peso" | "unidade")}
+        >
+          <SelectTrigger id="tipo_calculo">
+            <SelectValue placeholder="Selecione o tipo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="peso">Por Peso (kg)</SelectItem>
+            <SelectItem value="unidade">Por Unidade</SelectItem>
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          Define se compra/vende por peso ou unidade
+        </p>
+        {errors.tipo_calculo && (
+          <p className="text-sm text-destructive">{errors.tipo_calculo.message}</p>
         )}
       </div>
 
