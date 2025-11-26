@@ -6,12 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Building2, Plus, Pencil, Trash2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Building2, Plus, Pencil, Trash2, Package } from "lucide-react";
 import { toast } from "sonner";
+import { FornecedorProdutos } from "@/components/fornecedores/FornecedorProdutos";
 
 export default function Fornecedores() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingFornecedor, setEditingFornecedor] = useState<any>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [selectedFornecedor, setSelectedFornecedor] = useState<any>(null);
   const [formData, setFormData] = useState({
     razao_social: "",
     nome_fantasia: "",
@@ -122,6 +126,11 @@ export default function Fornecedores() {
     setIsDialogOpen(true);
   };
 
+  const handleViewDetails = (fornecedor: any) => {
+    setSelectedFornecedor(fornecedor);
+    setDetailsOpen(true);
+  };
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
@@ -223,7 +232,7 @@ export default function Fornecedores() {
       ) : fornecedores && fornecedores.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {fornecedores.map((fornecedor) => (
-            <Card key={fornecedor.id}>
+            <Card key={fornecedor.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleViewDetails(fornecedor)}>
               <CardHeader>
                 <CardTitle className="text-lg">
                   {fornecedor.nome_fantasia || fornecedor.razao_social}
@@ -240,19 +249,13 @@ export default function Fornecedores() {
                     <div className="font-mono">{fornecedor.cnpj}</div>
                   </div>
                 )}
-                {fornecedor.telefone && (
-                  <div className="text-sm">
-                    <div className="text-muted-foreground">Telefone:</div>
-                    <div>{fornecedor.telefone}</div>
-                  </div>
-                )}
                 {fornecedor.contato && (
                   <div className="text-sm">
                     <div className="text-muted-foreground">Contato:</div>
                     <div>{fornecedor.contato}</div>
                   </div>
                 )}
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
                   <Button
                     variant="outline"
                     size="sm"
@@ -289,6 +292,69 @@ export default function Fornecedores() {
           </CardContent>
         </Card>
       )}
+
+      {/* Modal de detalhes com abas */}
+      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5" />
+              {selectedFornecedor?.nome_fantasia || selectedFornecedor?.razao_social}
+            </DialogTitle>
+          </DialogHeader>
+
+          <Tabs defaultValue="info" className="flex-1 overflow-hidden flex flex-col">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="info">Informações</TabsTrigger>
+              <TabsTrigger value="produtos">
+                <Package className="h-4 w-4 mr-2" />
+                Produtos
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="info" className="space-y-4 overflow-y-auto">
+              <Card>
+                <CardContent className="pt-6 space-y-3">
+                  <div>
+                    <div className="text-sm text-muted-foreground">Razão Social</div>
+                    <div className="font-medium">{selectedFornecedor?.razao_social}</div>
+                  </div>
+                  {selectedFornecedor?.nome_fantasia && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">Nome Fantasia</div>
+                      <div className="font-medium">{selectedFornecedor.nome_fantasia}</div>
+                    </div>
+                  )}
+                  {selectedFornecedor?.cnpj && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">CNPJ</div>
+                      <div className="font-mono">{selectedFornecedor.cnpj}</div>
+                    </div>
+                  )}
+                  {selectedFornecedor?.telefone && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">Telefone</div>
+                      <div>{selectedFornecedor.telefone}</div>
+                    </div>
+                  )}
+                  {selectedFornecedor?.contato && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">Contato</div>
+                      <div>{selectedFornecedor.contato}</div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="produtos" className="flex-1 overflow-y-auto">
+              {selectedFornecedor && (
+                <FornecedorProdutos fornecedorId={selectedFornecedor.id} />
+              )}
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
