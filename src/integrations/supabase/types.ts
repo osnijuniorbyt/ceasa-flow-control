@@ -550,6 +550,7 @@ export type Database = {
           nome: string
           peso_embalagem_kg: number
           peso_kg: number
+          tipo_calculo: string
           unidade_base: string
           updated_at: string
           user_id: string
@@ -562,6 +563,7 @@ export type Database = {
           nome: string
           peso_embalagem_kg?: number
           peso_kg: number
+          tipo_calculo?: string
           unidade_base: string
           updated_at?: string
           user_id: string
@@ -574,6 +576,7 @@ export type Database = {
           nome?: string
           peso_embalagem_kg?: number
           peso_kg?: number
+          tipo_calculo?: string
           unidade_base?: string
           updated_at?: string
           user_id?: string

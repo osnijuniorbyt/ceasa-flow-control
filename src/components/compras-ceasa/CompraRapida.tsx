@@ -89,8 +89,8 @@ export default function CompraRapida() {
     const vasilhame = vasilhames?.find(v => v.id === selectedVasilhame);
     if (!vasilhame) return;
 
-    // Detecta se é produto por peso (kg) ou por unidade
-    const isPorPeso = vasilhame.unidade_base.toLowerCase() === 'kg';
+    // Usa o tipo_calculo do vasilhame para determinar se calcula por peso ou unidade
+    const isPorPeso = vasilhame.tipo_calculo === 'peso';
     
     let peso_total_kg: number;
     let preco_por_kg: number;
@@ -103,8 +103,8 @@ export default function CompraRapida() {
       preco_por_kg = precoVasilhame / vasilhame.peso_kg;
       preco_venda_sugerido = preco_por_kg * (1 + margem / 100);
     } else {
-      // Produto por unidade: usar quantidade direta
-      peso_total_kg = quantidade * vasilhame.peso_kg; // quantidade de unidades
+      // Produto por unidade: quantidade é o total de unidades
+      peso_total_kg = quantidade * vasilhame.peso_kg; // quantidade total de unidades
       preco_por_kg = precoVasilhame / vasilhame.peso_kg; // preço por unidade
       preco_venda_sugerido = preco_por_kg * (1 + margem / 100);
     }
@@ -388,7 +388,7 @@ export default function CompraRapida() {
                 const vasilhame = vasilhames?.find(v => v.id === selectedVasilhame);
                 if (!vasilhame) return null;
                 
-                const isPorPeso = vasilhame.unidade_base.toLowerCase() === 'kg';
+                const isPorPeso = vasilhame.tipo_calculo === 'peso';
                 const totalQuantidade = quantidade * vasilhame.peso_kg;
                 const precoUnitario = precoVasilhame / vasilhame.peso_kg;
                 const precoVenda = precoUnitario * (1 + (selectedProduct.margem_padrao || 0) / 100);
