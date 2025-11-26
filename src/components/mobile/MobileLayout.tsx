@@ -36,7 +36,6 @@ export function MobileLayout() {
       <div className="min-h-screen flex flex-col bg-background">
         <MobileHeader 
           onMenuClick={() => setSidebarOpen(true)}
-          isOnline={isOnline}
         />
         
         <OfflineIndicator isVisible={!isOnline} />
