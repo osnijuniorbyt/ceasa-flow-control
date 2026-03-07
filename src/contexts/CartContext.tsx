@@ -1,8 +1,9 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { toast } from 'sonner';
+import { FastCheckoutProduct } from '@/types/fastCheckout';
 
-interface CartItem {
+export interface CartItem {
   id: string;
   name: string;
   unit: string;
@@ -14,7 +15,7 @@ interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: any, quantity: number) => void;
+  addItem: (product: FastCheckoutProduct, quantity: number) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
   clearCart: () => void;
@@ -27,7 +28,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  const addItem = (product: any, quantity: number) => {
+  const addItem = (product: FastCheckoutProduct, quantity: number) => {
     if (quantity <= 0) {
       toast.error("Quantidade deve ser maior que zero");
       return;
