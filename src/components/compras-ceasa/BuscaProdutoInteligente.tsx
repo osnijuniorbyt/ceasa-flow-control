@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Search, Package } from "lucide-react";
+import { DbProduct } from "@/types/product";
 
 interface BuscaProdutoInteligenteProps {
-  onSelectProduto: (produto: any) => void;
+  onSelectProduto: (produto: DbProduct) => void;
   placeholder?: string;
 }
 
@@ -77,7 +78,7 @@ export function BuscaProdutoInteligente({ onSelectProduto, placeholder = "Digite
     }
   };
 
-  const handleSelectProduto = (produto: any) => {
+  const handleSelectProduto = (produto: DbProduct) => {
     onSelectProduto(produto);
     setSearchTerm("");
     setShowSuggestions(false);

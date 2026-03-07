@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,9 +62,9 @@ export default function CompraDetalhes() {
   useEffect(() => {
     loadCompra();
     loadItens();
-  }, [compraId]);
+  }, [loadCompra, loadItens]);
 
-  const loadCompra = async () => {
+  const loadCompra = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("compras")
@@ -87,9 +87,9 @@ export default function CompraDetalhes() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [compraId, toast]);
 
-  const loadItens = async () => {
+  const loadItens = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("itens_compra")
@@ -109,7 +109,7 @@ export default function CompraDetalhes() {
         variant: "destructive",
       });
     }
-  };
+  }, [compraId, toast]);
 
   const atualizarStatus = async () => {
     try {

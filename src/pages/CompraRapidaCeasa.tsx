@@ -19,6 +19,7 @@ import { HistoricoLote } from "@/components/compras-ceasa/HistoricoLote";
 import { Truck, List, Plus, Trash2, Save, History, X, ClipboardCheck, DollarSign, Package, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { DbProduct } from "@/types/product";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,7 +57,7 @@ export default function CompraRapidaCeasa() {
   const [tipoFornecedorFiltro, setTipoFornecedorFiltro] = useState<string>(() => {
     return localStorage.getItem("tipo_fornecedor_filtro") || "TODOS";
   });
-  const [produtoSelecionado, setProdutoSelecionado] = useState<any>(null);
+  const [produtoSelecionado, setProdutoSelecionado] = useState<DbProduct | null>(null);
   const [vasilhameSelecionado, setVasilhameSelecionado] = useState<string>("padrao");
   
   // Carrinho com persistência offline
@@ -95,17 +96,18 @@ export default function CompraRapidaCeasa() {
     if (cached) {
       try {
         const data = JSON.parse(cached);
-        setFornecedorSelecionado(data.fornecedor || "");
-        setCarrinho(data.carrinho || []);
+        if (data.fornecedor) setFornecedorSelecionado(data.fornecedor);
+        if (data.carrinho) setCarrinho(data.carrinho);
         toast.info("Compra em andamento restaurada");
       } catch (e) {
         console.error("Erro ao carregar cache:", e);
       }
-    } else if (ultimoFornecedor && !fornecedorSelecionado) {
+    } else if (ultimoFornecedor) {
       // Se não tem compra em andamento, usa o último fornecedor
       setFornecedorSelecionado(ultimoFornecedor);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Só executa na montagem
 
   // Salvar cache sempre que mudar
   useEffect(() => {
@@ -339,7 +341,7 @@ export default function CompraRapidaCeasa() {
     },
   });
 
-  const adicionarProdutoHistorico = (produto: any) => {
+  const adicionarProdutoHistorico = (produto: DbProduct & { ultima_quantidade?: number, ultimo_valor?: number }) => {
     setProdutoSelecionado(produto);
     setQuantidade(produto.ultima_quantidade?.toString() || "");
     
