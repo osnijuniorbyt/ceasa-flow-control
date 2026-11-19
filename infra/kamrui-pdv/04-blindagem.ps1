@@ -10,9 +10,17 @@ $usbSub = '2a737441-1930-4402-8d77-b2bebba308a3'
 $usbSel = '48e6b7a6-50f5-4782-a5d4-53bb8f07e226'
 powercfg /setacvalueindex SCHEME_CURRENT $usbSub $usbSel 0
 powercfg /setdcvalueindex SCHEME_CURRENT $usbSub $usbSel 0
+# Causas comuns de tela touch apagando alem do timeout: escurecimento, tela de bloqueio,
+# brilho adaptativo e economia de energia do link PCIe (derruba controladora USB do touch).
+foreach ($v in 'VIDEODIM', 'VIDEOCONLOCK', 'ADAPTBRIGHT') {
+    powercfg /setacvalueindex SCHEME_CURRENT SUB_VIDEO $v 0
+    powercfg /setdcvalueindex SCHEME_CURRENT SUB_VIDEO $v 0
+}
+powercfg /setacvalueindex SCHEME_CURRENT SUB_PCIEXPRESS ASPM 0
 powercfg /setactive SCHEME_CURRENT
 powercfg /h off
-Write-Log 'Energia: tela/disco/suspensao/hibernacao = nunca; suspensao seletiva USB off; hibernacao e inicializacao rapida off.'
+Set-RegValue -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'InactivityTimeoutSecs' -Value 0
+Write-Log 'Energia: tela/disco/suspensao/hibernacao = nunca; sem escurecer, sem apagar no bloqueio, brilho adaptativo off; USB seletivo e ASPM off; bloqueio por inatividade off.'
 
 # Equivale a desmarcar "O computador pode desligar este dispositivo" (touch, balanca, leitor, rede).
 $n = 0
