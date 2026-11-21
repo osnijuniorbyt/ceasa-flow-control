@@ -30,9 +30,19 @@ A direção está certa (gravar tela e câmera como prova). Correções obrigat�
 5. **LGPD e trabalhista:** termo assinado pelo funcionário, placa para clientes, sem áudio, câmera só na área do caixa.
 - Preferir a câmera do DVR da loja (se existir), com relógio sincronizado por NTP entre Titan, Kamrui e DVR.
 
+## Sentinela v2: decisões posteriores (21/11)
+O plano completo, em formato de mapa axial OPE, está em **`PLANO-MESTRE.md`**. O roteiro para os fornecedores está em `fornecedores-antifraude.md`.
+- A pesagem é sempre no caixa (balança de checkout embutida). A loja **não tem câmeras**.
+- **Câmera da balança:** Raspberry Pi AI Camera (Sony IMX500) + Raspberry Pi 5, ligada ao Kamrui por rede. No piloto ela manda fotos para a IA da nuvem. Depois, roda o modelo treinado dentro da câmera.
+- **Gatilho:** o teclado em tempo real (tecla Smart, PLU+Enter, nome, leitor, cancelar), com memória de 5 s. Ignora campos de senha e não guarda a digitação.
+- **Regras:** certeza mínima e prejuízo (item cobrado mais barato que o visto). Aviso na tela para erro honesto. Alerta silencioso ao gerente para fraude.
+- **CFTV:** Hikvision profissional com PoE (dome AcuSense no teto do caixa + gravador série I com POS). Mapa de calor, contagem e depósito na fase de escala.
+- **Áudio desligado em todas as câmeras.** Reconhecimento facial desligado.
+
 ## Pendências e perguntas em aberto
-- A loja tem câmeras com DVR, ou a webcam do caixa é a única câmera?
 - Qual banco de dados o Titan PDV usa localmente? (descobrir no Kamrui ou com o suporte Titan)
+- Remote Control liberado na conta escolhida para ser o TI.
+- Modelo da gaveta Elgin (de tampa para cima) e se ela tem sensor.
 - Modelo e software do fabricante do teclado Smart 44 teclas.
 - Lista de acesso do AnyDesk (só o ID do Osni) e 2FA.
 - A senha do TI_Admin aparece em texto no documento V2 do Drive: usar uma senha **nova** e apagar a antiga do documento.
